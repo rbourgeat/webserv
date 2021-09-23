@@ -6,19 +6,11 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/23 16:12:47 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/23 17:22:24 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <sys/socket.h>
-// DOC: https://pubs.opengroup.org/onlinepubs/007908775/xns/syssocket.h.html
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <netinet/in.h>
-#include <cstring>
-
-#define PORT 8081
+# include "classWebserv.hpp"
 
 int main(int argc, char const *argv[])
 {
@@ -54,7 +46,7 @@ int main(int argc, char const *argv[])
 		perror("In listen");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	while(1)
 	{
 		printf("\n+++++++ Waiting for new connection ++++++++\n\n");
@@ -67,8 +59,9 @@ int main(int argc, char const *argv[])
 		char buffer[30000] = {0};
 		valread = read( new_socket , buffer, 30000);
 		printf("%s\n",buffer );
-		write(new_socket , hello , strlen(hello));
-		printf("------------------Hello message sent-------------------\n");
+		const char* message = parsing(buffer);
+		write(new_socket , message , strlen(message));
+		printf("\n------------------Hello message sent-------------------\n");
 		close(new_socket);
 	}
 	return 0;
