@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/23 18:44:03 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/23 19:39:39 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ const char* parsing(char *buffer)
 		j++;
 	}
 	
-	std::cout << "location: " << location << std::endl;
+	// std::cout << "location: " << location << std::endl;
 
 	if (!IsPathExist(location))
 	{
@@ -78,7 +78,8 @@ const char* parsing(char *buffer)
 	}
 	else
 	{
-		message += "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ";
+		message += "HTTP/1.1 200 OK\nContent-Type: text/html";
+		message += "\nContent-Length: ";
 		message += countFileChar(location);
 		message += "\n\n" + getFileContent(location);
 	}
