@@ -8,4 +8,4 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP)
 
 **HTTP documentation**
-- [HTTP 1.1 protocol](https://datatracker.ietf.org/doc/html/rfc2616)
+- [RFC 2616: HTTP 1.1 protocol](https://datatracker.ietf.org/doc/html/rfc2616)
