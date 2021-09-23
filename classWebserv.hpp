@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/23 17:24:29 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/23 18:41:08 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,9 @@
 # include <cstring>
 # include <iostream>
 # include <sys/stat.h>
+# include <fstream>
 
-# define PORT 8082
+# define PORT 8081
 
 class Webserv
 {

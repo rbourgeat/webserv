@@ -6,16 +6,44 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/23 17:24:21 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/23 18:44:03 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "classWebserv.hpp"
 
-char* get_file()
+std::string getFileContent(const std::string& path)
 {
+  std::ifstream file(path);
+  std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
+  return content;
 }
+
+unsigned long int countFileChar(std::string string)
+{
+    char c;
+    unsigned long int cc = 0;
+
+    std::ifstream FILE;
+    FILE.open(string);
+    if (!FILE.fail())
+    {
+        while (1)
+        {
+            FILE.get(c);
+            if (FILE.eof()) break;
+            cc++;
+        }
+        FILE.close();
+    }
+    else
+    {
+        std::cout << "Counter: Failed to open file: " << string << std::endl;
+    }
+
+    return cc;
+};
 
 bool IsPathExist(const std::string &s)
 {
@@ -26,7 +54,7 @@ bool IsPathExist(const std::string &s)
 const char* parsing(char *buffer)
 {
 	int i = 0, j = 0;
-	std::string location = "/directory";
+	std::string location = "directory";
 	std::string s(buffer);
 	std::string delimiter = " ";
 	std::string message;
@@ -36,22 +64,25 @@ const char* parsing(char *buffer)
 	while ((pos = s.find(delimiter)) != std::string::npos)
 	{
 		token = s.substr(0, pos);
-		
 		if (j == 1)
 			location += token;
-		
-		// std::cout << std::endl << token << std::endl << std::endl;
-		
 		s.erase(0, pos + delimiter.length());
 		j++;
 	}
+	
+	std::cout << "location: " << location << std::endl;
 
-	std::cout << std::endl << location << std::endl << std::endl;
-	
 	if (!IsPathExist(location))
-		message = "HTTP/1.1 404 OK\nContent-Type: text/plain\nContent-Length: 100\n\nError 404: File Not Found !";
-		
-	
+	{
+		message = "HTTP/1.1 404 Not Found\n";
+	}
+	else
+	{
+		message += "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: ";
+		message += countFileChar(location);
+		message += "\n\n" + getFileContent(location);
+	}
+
 	const char* c = message.c_str();
 	return (c);
 }
