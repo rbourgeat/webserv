@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/23 19:39:39 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/24 01:21:37 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,20 @@ bool IsPathExist(const std::string &s)
   return (stat (s.c_str(), &buffer) == 0);
 }
 
+std::string getContentType(std::string path)
+{
+	std::string extension = path.substr(path.find_last_of(".") + 1);
+	
+	if (extension == "html")
+		extension = "text/html";
+	else if (extension == "png")
+		extension = "image/png";
+	else
+		extension = "text/plain";
+	
+	return (extension);
+}
+
 const char* parsing(char *buffer)
 {
 	int i = 0, j = 0;
@@ -70,19 +84,21 @@ const char* parsing(char *buffer)
 		j++;
 	}
 	
-	// std::cout << "location: " << location << std::endl;
-
 	if (!IsPathExist(location))
 	{
-		message = "HTTP/1.1 404 Not Found\n";
+		message += "HTTP/1.1 404 Not Found\nContent-Type: text/html";
+		message += "\nContent-Length: ";
+		location = "directory/404.html";
 	}
 	else
 	{
-		message += "HTTP/1.1 200 OK\nContent-Type: text/html";
+		message += "HTTP/1.1 200 OK\nContent-Type: ";
+		message += getContentType(location);
 		message += "\nContent-Length: ";
-		message += countFileChar(location);
-		message += "\n\n" + getFileContent(location);
 	}
+
+	message += countFileChar(location);
+	message += "\n\n" + getFileContent(location);
 
 	const char* c = message.c_str();
 	return (c);

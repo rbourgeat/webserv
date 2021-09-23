@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/23 17:22:24 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/24 00:39:08 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int main(int argc, char const *argv[])
 	struct sockaddr_in address;
 	int addrlen = sizeof(address);
 	
-	char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
+	// char *hello = "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!";
 	
 	// Creating socket file descriptor
 	if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
@@ -33,8 +33,7 @@ int main(int argc, char const *argv[])
 	address.sin_port = htons( PORT );
 	
 	memset(address.sin_zero, '\0', sizeof address.sin_zero);
-	
-	
+
 	if (bind(server_fd, (struct sockaddr *)&address, sizeof(address))<0)
 	{
 		perror("In bind");
@@ -61,7 +60,7 @@ int main(int argc, char const *argv[])
 		printf("%s\n",buffer );
 		const char* message = parsing(buffer);
 		write(new_socket , message , strlen(message));
-		printf("\n------------------Hello message sent-------------------\n");
+		printf("\n-------------------------------------\n");
 		close(new_socket);
 	}
 	return 0;
