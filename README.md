@@ -21,3 +21,6 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [listen](https://man7.org/linux/man-pages/man2/listen.2.html): listens for connections on a socket.
 - [poll](https://man7.org/linux/man-pages/man2/poll.2.html): waits for one of a set of file descriptors to become ready to perform I/O.
 - [accept](https://man7.org/linux/man-pages/man2/accept.2.html): accepts a connection on a socket.
+
+**Tools**
+- [Super Mega Site pour tester les Headers !](https://reqbin.com/)

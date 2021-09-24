@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/24 01:21:37 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/24 15:38:59 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,31 +19,6 @@ std::string getFileContent(const std::string& path)
 
   return content;
 }
-
-unsigned long int countFileChar(std::string string)
-{
-    char c;
-    unsigned long int cc = 0;
-
-    std::ifstream FILE;
-    FILE.open(string);
-    if (!FILE.fail())
-    {
-        while (1)
-        {
-            FILE.get(c);
-            if (FILE.eof()) break;
-            cc++;
-        }
-        FILE.close();
-    }
-    else
-    {
-        std::cout << "Counter: Failed to open file: " << string << std::endl;
-    }
-
-    return cc;
-};
 
 bool IsPathExist(const std::string &s)
 {
@@ -72,23 +47,43 @@ const char* parsing(char *buffer)
 	std::string s(buffer);
 	std::string delimiter = " ";
 	std::string message;
+	std::string error;
 
 	size_t pos = 0;
 	std::string token;
 	while ((pos = s.find(delimiter)) != std::string::npos)
 	{
 		token = s.substr(0, pos);
+		if (j == 0 && (token != "GET" && token != "POST" && token != "DELETE"))
+		{
+			error = "405";
+			break;
+		}
+
+
 		if (j == 1)
 			location += token;
 		s.erase(0, pos + delimiter.length());
 		j++;
 	}
 	
-	if (!IsPathExist(location))
+	if (error == "405")
+	{
+		message += "HTTP/1.1 405 Method Not Allowed\nContent-Type: text/html";
+		message += "\nContent-Length: ";
+		location = "directory/405.html";
+	}
+	else if (!IsPathExist(location))
 	{
 		message += "HTTP/1.1 404 Not Found\nContent-Type: text/html";
 		message += "\nContent-Length: ";
 		location = "directory/404.html";
+	}
+	else if (location == "directory/")
+	{
+		message += "HTTP/1.1 200 OK\nContent-Type: text/html";
+		message += "\nContent-Length: ";
+		location = "directory/index.html";
 	}
 	else
 	{
@@ -97,7 +92,7 @@ const char* parsing(char *buffer)
 		message += "\nContent-Length: ";
 	}
 
-	message += countFileChar(location);
+	message += location.length();
 	message += "\n\n" + getFileContent(location);
 
 	const char* c = message.c_str();
