@@ -9,7 +9,7 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [Manage a socket flow of events using poll()](https://www.ibm.com/docs/en/i/7.2?topic=designs-using-poll-instead-select)
 
 **HTTP documentation**
-- [RFC editor](https://www.rfc-editor.org/retrieve/)
+- [RFC editor](https://www.rfc-editor.org/retrieve/): official source for RFCs on the World Wide Web.
 - [RFC 2616: HTTP 1.1 protocol](https://datatracker.ietf.org/doc/html/rfc2616)
 - [List of HTTP status codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 - [Content-Type](https://docs.microsoft.com/en-us/previous-versions/exchange-server/exchange-10/ms526508(v=exchg.10)?redirectedfrom=MSDN)
