@@ -15,6 +15,7 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [Content-Type](https://docs.microsoft.com/en-us/previous-versions/exchange-server/exchange-10/ms526508(v=exchg.10)?redirectedfrom=MSDN)
 - [Content-Type Stack List](https://stackoverflow.com/questions/23714383/what-are-all-the-possible-values-for-http-content-type-header)
 - [Content-Type Full List](https://www.iana.org/assignments/media-types/media-types.xhtml)
+- [Tres bon site aussi !](https://developer.mozilla.org/fr/docs/Web/HTTP/Status/)
 
 **Useful C functions**
 - [socket](https://man7.org/linux/man-pages/man2/socket.2.html): creates an endpoint for communication and returns a file descriptor that refers to that endpoint.

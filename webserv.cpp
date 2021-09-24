@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/24 00:39:08 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/24 16:50:07 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,10 @@ int main(int argc, char const *argv[])
 		
 		char buffer[30000] = {0};
 		valread = read( new_socket , buffer, 30000);
-		printf("%s\n",buffer );
+		printf("[%s]\n",buffer );
 		const char* message = parsing(buffer);
-		write(new_socket , message , strlen(message));
+		if (buffer[0] != '\r')
+			write(new_socket , message , strlen(message));
 		printf("\n-------------------------------------\n");
 		close(new_socket);
 	}
