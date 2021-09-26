@@ -9,13 +9,16 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [Manage a socket flow of events using poll()](https://www.ibm.com/docs/en/i/7.2?topic=designs-using-poll-instead-select)
 
 **HTTP documentation**
-- [RFC editor](https://www.rfc-editor.org/retrieve/): official source for RFCs on the World Wide Web.
 - [RFC 2616: HTTP 1.1 protocol](https://datatracker.ietf.org/doc/html/rfc2616)
 - [List of HTTP status codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 - [Content-Type](https://docs.microsoft.com/en-us/previous-versions/exchange-server/exchange-10/ms526508(v=exchg.10)?redirectedfrom=MSDN)
 - [Content-Type Stack List](https://stackoverflow.com/questions/23714383/what-are-all-the-possible-values-for-http-content-type-header)
 - [Content-Type Full List](https://www.iana.org/assignments/media-types/media-types.xhtml)
 - [Tres bon site aussi !](https://developer.mozilla.org/fr/docs/Web/HTTP/Status/)
+
+**Useful RFCs**
+- [RFC editor](https://www.rfc-editor.org/retrieve/): official source for RFCs on the World Wide Web.
+- [RFC 2396: Uniform Resource Identifiers (URI): Generic Syntax](https://datatracker.ietf.org/doc/html/rfc2396): useful definitions of URI, port and host
 
 **Useful C functions**
 - [socket](https://man7.org/linux/man-pages/man2/socket.2.html): creates an endpoint for communication and returns a file descriptor that refers to that endpoint.
