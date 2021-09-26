@@ -6,15 +6,15 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/26 14:41:32 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/26 16:05:55 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "classWebserv.hpp"
 
-std::string findFileType(std::string str)
+std::string findTypeofFile(std::string path)
 {
-	str = str.substr(str.find_last_of(".") + 1);
+	std::string str = path.substr(path.find_last_of(".") + 1);
 
 	if (str == "html")
 		return ("text/html");
@@ -200,19 +200,16 @@ bool IsPathExist(const std::string &s)
   return (stat (s.c_str(), &buffer) == 0);
 }
 
-std::string getContentType(std::string path)
+std::string countFileChar(std::string string)
 {
-	std::string extension = path.substr(path.find_last_of(".") + 1);
-	
-	if (extension == "html")
-		extension = "text/html";
-	else if (extension == "png")
-		extension = "image/png";
-	else
-		extension = "text/plain";
-	
-	return (extension);
-}
+	std::ifstream in_file(string, std::ios::binary);
+	in_file.seekg(0, std::ios::end);
+	int file_size = in_file.tellg();
+	std::stringstream ss;
+	ss << file_size;
+	ss >> string;
+    return (string);
+};
 
 const char* parsing(char *buffer)
 {
@@ -250,46 +247,41 @@ const char* parsing(char *buffer)
 	
 	if (method != "GET" && method != "POST" && method != "DELETE")
 	{
-		message += "HTTP/1.1 405 Method Not Allowed\nContent-Type: text/html";
-		message += "\nContent-Length: ";
+		message += "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
 		location = "directory/405.html";
 	}
 	else if ((method == "GET" || method == "POST" || method == "DELETE")
 				&& location == "directory")
 	{
-		message += "HTTP/1.1 400 Method Not Allowed\nContent-Type: text/html";
-		message += "\nContent-Length: ";
+		message += "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
 		location = "directory/400.html";
 	}
 	else if (!IsPathExist(location))
 	{
-		message += "HTTP/1.1 404 Not Found\nContent-Type: text/html";
-		message += "\nContent-Length: ";
+		message += "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
 		location = "directory/404.html";
 	}
 	// else if (s.find("Content-Length") == std::string::npos)
 	// {
 	// 	message += "HTTP/1.1 411 Length Required";
-	// 	const char* c = message.c_str();
-	// 	return (c);
 	// }
 	else if (location == "directory/")
 	{
-		message += "HTTP/1.1 200 OK\nContent-Type: text/html";
-		message += "\nContent-Length: ";
+		message += "HTTP/1.1 200 OK\r\nContent-Type: text/html";
 		location = "directory/index.html";
 	}
 	else
 	{
-		message += "HTTP/1.1 200 OK\nContent-Type: ";
-		message += getContentType(location);
-		message += "\nContent-Length: ";
+		message += "HTTP/1.1 200 OK\r\nContent-Type: ";
+		message += findTypeofFile(location);
 	}
 
-	message += location.length();
-	message += "\r\n" + getFileContent(location);
+	message += "\r\nContent-Length: ";
+	message += countFileChar(location);
+	message += "\r\n\r\n" + getFileContent(location);
 
 	const char* c = message.c_str();
+	std::cout << "[c: " << c << "]" << std::endl;
 	return (c);
 }
 
