@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/26 17:00:38 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/26 17:33:57 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,9 +188,14 @@ std::string findTypeofFile(std::string path)
 
 std::string getFileContent(const std::string& path)
 {
-	std::ifstream file(path);
-	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-	return content;
+//   std::ifstream file(path);
+//   std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+//   return content;
+	std::ifstream fin(path, std::ios::binary);
+	std::ostringstream oss;
+	oss << fin.rdbuf();
+	std::string data(oss.str());
+	return (data);
 }
 
 bool IsPathExist(const std::string &s)
@@ -278,7 +283,7 @@ const char* parsing(char *buffer)
 	message += "\r\nContent-Length: ";
 	message += countFileChar(location);
 	message += "\r\n\r\n" + getFileContent(location);
-
+	
 	const char* c = message.c_str();
 	std::cout << "[c: " << c << "]" << std::endl;
 	return (c);

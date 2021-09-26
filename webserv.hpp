@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/26 16:57:49 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/26 17:34:16 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,6 @@
 # include <fstream>
 # include <sstream>
 
-# define PORT 8081
+# define PORT 8080
 
 const char* parsing(char* buffer);
