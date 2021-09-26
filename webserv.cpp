@@ -6,11 +6,11 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/26 14:35:21 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/26 14:55:54 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "classWebserv.hpp"
+# include "webserv.hpp"
 
 int main(int argc, char const *argv[])
 {
