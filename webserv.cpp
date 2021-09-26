@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/24 16:50:07 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/26 12:35:36 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 int main(int argc, char const *argv[])
 {
+	/*1. Make the web server program available from the internet and manage the flow of requests*/
 	int server_fd, new_socket; long valread;
 	struct sockaddr_in address;
 	int addrlen = sizeof(address);
@@ -54,11 +55,13 @@ int main(int argc, char const *argv[])
 			perror("In accept");
 			exit(EXIT_FAILURE);
 		}
-		
 		char buffer[30000] = {0};
+		/*2. Receive request message from client and parse it to analyze what is client expectation*/
 		valread = read( new_socket , buffer, 30000);
 		printf("[%s]\n",buffer );
 		const char* message = parsing(buffer);
+		/*3. Send response message to client: either succeed in fulfilling request, or return appropriate error statu
+s code*/
 		if (buffer[0] != '\r')
 			write(new_socket , message , strlen(message));
 		printf("\n-------------------------------------\n");
