@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/26 14:37:43 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/26 14:56:52 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,5 @@
 # include <fstream>
 
 # define PORT 8081
-
-class Webserv
-{
-    public:
-        
-};
 
 const char* parsing(char* buffer);
