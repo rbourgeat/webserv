@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/26 14:42:57 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/09/26 14:43:30 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 int main(int argc, char const *argv[])
 {
+	(void)argc;
+	(void)argv;
 	/*1. Make the HTTP web server program available from the internet and manage the flow of requests*/
 	int server_fd, new_socket; long valread;
 	struct sockaddr_in address;
