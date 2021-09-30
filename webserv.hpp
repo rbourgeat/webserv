@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   classWebserv.hpp                                   :+:      :+:    :+:   */
+/*   webserv.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/30 10:14:20 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/09/30 10:20:13 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@
 # include <iostream>
 # include <sys/stat.h>
 # include <fstream>
+# include <sstream>
 
-# define PORT 8081
+# define PORT 8080
 
 const char* parsing(char* buffer);
