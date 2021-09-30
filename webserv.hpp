@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/30 10:22:07 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/09/30 16:55:48 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,10 @@
 # include <sys/stat.h>
 # include <fstream>
 # include <sstream>
+# include <vector>
 
 # define PORT 8080
 
-const char* parsing(char* buffer);
+// const char* parsing(char* buffer);
+
+std::vector<unsigned char> parsing(std::vector<unsigned char> buffer);

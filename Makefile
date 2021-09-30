@@ -6,11 +6,11 @@
 #    By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/23 19:42:48 by rbourgea          #+#    #+#              #
-#    Updated: 2021/09/26 14:56:02 by dgoudet          ###   ########.fr        #
+#    Updated: 2021/09/30 16:09:01 by rbourgea         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME	=	webserv
+NAME	= 	webserv
 
 SRCS	=	parser.cpp \
 			webserv.cpp
@@ -19,7 +19,7 @@ OBJS	=	$(SRCS:.cpp=.o)
 
 CC		=	g++
 
-CFLAGS	=	-Wall -Werror -Wextra -std=c++98
+CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -fsanitize=address -g
 
 all:		$(NAME)
 
