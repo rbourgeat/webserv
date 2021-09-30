@@ -6,11 +6,11 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/26 14:41:32 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/09/30 09:44:55 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "classWebserv.hpp"
+# include "webserv.hpp"
 
 std::string findFileType(std::string str)
 {
