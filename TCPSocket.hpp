@@ -5,14 +5,23 @@ class TCPSocket
 	public:
 		TCPSocket()
 		{
-			_socketFd = socket(AF_INET, SOCK_STREAM, 0); //create a TCP socket
+			/*1. Creation of TCP socket*/
+			_socketFd = socket(AF_INET, SOCK_STREAM, 0);
 			if (_socketFd < 0)
-				throw TCPSocketException("Error during socket creation");
+				throw TCPSocketException("while creating");
+			/*2. Connect socket to a port*/
 			_address.sin_family = AF_INET;
 			_address.sin_addr.s_addr = INADDR_ANY;
 			_address.sin_port = htons(PORT);
 			memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
+			addrlen = sizeof(_address);
+			if (bind(_socketFd, (struct sockaddr *)&_address, sizeof(_address))<0)
+				throw TCPSocketException("while binding");
+			/*3. Make server listen to incoming connections with listen()*/
+			if (listen(_socketFd, 10) < 0)
+				throw TCPSocketException("while listening");
 		}
+		
 		~TCPSocket() {;}
 
 		struct sockaddr_in const&	getAddress() const
@@ -26,8 +35,9 @@ class TCPSocket
 		}
 
 	private:
-		int	_socketFd;
-		struct sockaddr_in _address;
+		int		_socketFd;
+		struct	sockaddr_in _address;
+		int		addrlen;
 
 	public:
 		class TCPSocketException: public std::exception
@@ -42,6 +52,14 @@ class TCPSocket
 			}
 
 		private:
-			std::string _errorM;
+			std::string	_errorM;
 	};
 };
+
+/*1. Creation of a TCP socket with the following arguments:
+ * - Socket family: AF_INET for a socket IPv4
+ * - Socket type: SOCK_STREAM for TCP
+ * - Socket protocal: associated with SOCK_STREAM, so set to 0.
+ */
+
+/*2. When a socket is created with socket(), it exists in a name space but has no address assigned to it. bind() assigns the address specified by the sockaddr_in structure to the socket. This results in assigning a transport address to the socket (using a port).*/
