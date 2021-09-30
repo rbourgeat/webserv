@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/30 12:05:31 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/09/30 13:41:52 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,13 @@ int main(int argc, char const *argv[])
 	try
 	{
 		/*1.1. Create a socket object that is bound to a port and listens to incoming connections on that port.*/
-		TCPSocket socket;
-		int server_fd = socket.getSocketFd();
-		struct sockaddr_in address = socket.getAddress();
+		TCPSocket server(PORT);
+		server.socketBind();
+		server.socketListen();
+		int server_fd = server.getSocketFd();
+		struct sockaddr_in address = server.getAddress();
 		addrlen = sizeof(address);
+
 		while(1)
 		{
 			printf("\n+++++++ Waiting for new connection ++++++++\n\n");
