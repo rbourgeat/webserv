@@ -7,6 +7,12 @@ int main()
 	{
 		TCPSocket client(PORT);
 		client.socketConnect();
+		std::cout << "-----------Client connected----------\n";
+		char str[12]("Hello there");
+		std::vector<unsigned char> buff;
+		client.socketSend(client.getSocketFd(), &str, sizeof(&str));
+		client.socketRecv(client.getSocketFd(), buff);
+		std::cout << buff[0] << std::endl;
 	}
     catch(TCPSocket::TCPSocketException const& e)
 	{
