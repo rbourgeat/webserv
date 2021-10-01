@@ -8,6 +8,7 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [Build a simple HTTP server from scratch](https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa)
 - [Manage a socket flow of events using poll()](https://www.ibm.com/docs/en/i/7.2?topic=designs-using-poll-instead-select)
 - [C++ programming applied to network](https://bousk.developpez.com/cours/reseau-c++/)(in French)
+- [Network programming](https://beej.us/guide/bgnet/)
 
 **HTTP documentation**
 - [RFC 2616: HTTP 1.1 protocol](https://datatracker.ietf.org/doc/html/rfc2616)
