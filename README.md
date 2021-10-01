@@ -28,5 +28,8 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [poll](https://man7.org/linux/man-pages/man2/poll.2.html): waits for one of a set of file descriptors to become ready to perform I/O.
 - [accept](https://man7.org/linux/man-pages/man2/accept.2.html): accepts a connection on a socket.
 
+**CGI Doc**
+- [Best CGI Exemple](https://www.fi.muni.cz/usr/jkucera/tic/tic0305.html): Programmation CGI in C++.
+
 **Tools**
 - [Super Mega Site pour tester les Headers !](https://reqbin.com/)
