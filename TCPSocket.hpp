@@ -38,7 +38,6 @@ class TCPSocket
 				throw TCPSocketException("while connecting");
 		}
 
-		/*versions with protocol for packet serialization
 		int		socketSend(int fd, void *message, unsigned short len)
 		{
 			int sent;
@@ -67,7 +66,7 @@ class TCPSocket
 				recved += ret;
 			}
 			return (recved);
-		}*/
+		}
 
 		/*GETTERS*/
 		struct sockaddr_in const&	getAddress() const
