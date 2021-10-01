@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/30 16:55:41 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/01 17:26:07 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,14 @@ int main(int argc, char const *argv[])
 		int server_fd = server.getSocketFd();
 		struct sockaddr_in address = server.getAddress();
 		addrlen = sizeof(address);
-
 		while(1)
 		{
 			printf("\n+++++++ Waiting for new connection ++++++++\n\n");
-			if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
-			{
-				perror("In accept");
-				exit(EXIT_FAILURE);
-			}
+            if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
+            {
+                perror("In accept");
+                exit(EXIT_FAILURE);
+            }
 			// char buffer[30000] = {0};
 			std::vector<unsigned char> buffer(30000);
 			/*2. Receive request message (i.e., request for accessing a file OR executing a file (CGI program) to get the output) from client and parse it to analyze what is client expectation*/
