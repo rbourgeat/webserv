@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/30 17:33:39 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/01 13:38:27 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,6 +276,11 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 	{
 		rep += "HTTP/1.1 200 OK\r\nContent-Type: text/html";
 		location = "directory/index.html";
+	}
+	else if (HTTP != "1.1")
+	{
+		rep += "HTTP/1.1 505 HTTP Version not supported\r\nContent-Type: text/html";
+		location = "directory/505.html";
 	}
 	else
 	{
