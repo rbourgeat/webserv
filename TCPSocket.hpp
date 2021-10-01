@@ -15,7 +15,7 @@ class TCPSocket
             _address.sin_addr.s_addr = INADDR_ANY;
             _address.sin_port = htons(_port);
             memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
-			fcntl(_socketFd, F_SETFL, O_NONBLOCK); //server socket must be set to non-blocking
+			//fcntl(_socketFd, F_SETFL, O_NONBLOCK); //server socket must be set to non-blocking
 		}
         ~TCPSocket() {;}
 

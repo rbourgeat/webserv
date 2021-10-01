@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/01 11:24:27 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/01 17:16:02 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 # include <fstream>
 # include <sstream>
 # include <fcntl.h>
-#include <vector>
+# include <vector>
 
 #define NC "\e[0m"
 #define GRN "\e[0;32m"
@@ -33,4 +33,6 @@
 
 # define PORT 8080
 
-const char* parsing(char* buffer);
+// const char* parsing(char* buffer);
+
+std::vector<unsigned char> parsing(std::vector<unsigned char> buffer);

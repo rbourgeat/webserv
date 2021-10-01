@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/09/30 10:20:59 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/09/30 17:33:39 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,54 +215,57 @@ std::string countFileChar(std::string string)
     return (string);
 };
 
-const char* parsing(char *buffer)
+std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 {
-	int j = 0;
-	std::string location = "directory";
-	std::string s(buffer);
-	std::string delimiter = " ";
-	std::string message;
-	std::string error;
-	std::string method = "";
-
-	size_t pos = 0;
-	std::string token;
-	// remove all newlines
-	while ( s.find ("\r\n") != std::string::npos )
-	{
-		s.erase ( s.find ("\r\n"), 2 );
-	}
-
-	while ((pos = s.find(delimiter)) != std::string::npos)
-	{
-		token = s.substr(0, pos);
-		if (j == 0)
-			method = token;
-
-		if (j == 1)
-			location += token;
-		s.erase(0, pos + delimiter.length());
-		j++;
-	}
-	if (method == "")
-		method = s;
-
-	std::cout << "[" << method << "]" << std::endl;
+	std::string location = "directory", METHOD, PATH, HTTP;
+	std::vector<char> tmp;
+	int i = 0;
 	
-	if (method != "GET" && method != "POST" && method != "DELETE")
+	while ((size_t)i < buffer.size())
 	{
-		message += "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
+		while ((size_t)i < buffer.size() && buffer[i] != ' ')
+		{
+			tmp.push_back(buffer[i]);
+			i++;
+		}
+		
+		std::string s_tmp(tmp.begin(), tmp.end());
+		std::cout << "[" << s_tmp << "] ";
+		// GET METHOD
+		if (s_tmp == "GET" || s_tmp == "POST" || s_tmp == "DELETE")
+			METHOD = s_tmp;
+		// GET PATH
+		if (tmp[0] == '/')
+			PATH = s_tmp;
+		// GET HTTP
+		if (s_tmp.find("HTTP/") != std::string::npos)
+			HTTP.assign(tmp.begin() + 5, tmp.begin() + 8);
+
+		tmp.clear();
+		i++;
+	}
+	
+	std::cout << std::endl << "METHOD = " << METHOD;
+	std::cout << std::endl << "PATH = " << PATH;
+	std::cout << std::endl << "HTTP = " << HTTP;
+	
+	std::string rep;
+	location += PATH;
+
+	if (METHOD != "GET" && METHOD != "POST" && METHOD != "DELETE")
+	{
+		rep += "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
 		location = "directory/405.html";
 	}
-	else if ((method == "GET" || method == "POST" || method == "DELETE")
+	else if ((METHOD == "GET" || METHOD == "POST" || METHOD == "DELETE")
 				&& location == "directory")
 	{
-		message += "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
+		rep += "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
 		location = "directory/400.html";
 	}
 	else if (!IsPathExist(location))
 	{
-		message += "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
+		rep += "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
 		location = "directory/404.html";
 	}
 	// else if (s.find("Content-Length") == std::string::npos)
@@ -271,21 +274,94 @@ const char* parsing(char *buffer)
 	// }
 	else if (location == "directory/")
 	{
-		message += "HTTP/1.1 200 OK\r\nContent-Type: text/html";
+		rep += "HTTP/1.1 200 OK\r\nContent-Type: text/html";
 		location = "directory/index.html";
 	}
 	else
 	{
-		message += "HTTP/1.1 200 OK\r\nContent-Type: ";
-		message += findTypeofFile(location);
+		rep += "HTTP/1.1 200 OK\r\nContent-Type: ";
+		rep += findTypeofFile(location);
 	}
-
-	message += "\r\nContent-Length: ";
-	message += countFileChar(location);
-	message += "\r\n\r\n" + getFileContent(location);
 	
-	const char* c = message.c_str();
-	std::cout << "[c: " << c << "]" << std::endl;
-	return (c);
+	rep += "\r\nContent-Length: ";
+	rep += countFileChar(location);
+	rep += "\r\n\r\n" + getFileContent(location);
+
+	std::vector<unsigned char> response(rep.begin(), rep.end());
+	return (response);
 }
+
+// const char* parsing(char *buffer)
+// {
+// 	int j = 0;
+// 	std::string location = "directory";
+// 	std::string s(buffer);
+// 	std::string delimiter = " ";
+// 	std::string message;
+// 	std::string error;
+// 	std::string method = "";
+
+// 	size_t pos = 0;
+// 	std::string token;
+// 	// remove all newlines
+// 	while ( s.find ("\r\n") != std::string::npos )
+// 	{
+// 		s.erase ( s.find ("\r\n"), 2 );
+// 	}
+
+// 	while ((pos = s.find(delimiter)) != std::string::npos)
+// 	{
+// 		token = s.substr(0, pos);
+// 		if (j == 0)
+// 			method = token;
+
+// 		if (j == 1)
+// 			location += token;
+// 		s.erase(0, pos + delimiter.length());
+// 		j++;
+// 	}
+// 	if (method == "")
+// 		method = s;
+
+// 	std::cout << "[" << method << "]" << std::endl;
+	
+// 	if (method != "GET" && method != "POST" && method != "DELETE")
+// 	{
+// 		message += "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
+// 		location = "directory/405.html";
+// 	}
+// 	else if ((method == "GET" || method == "POST" || method == "DELETE")
+// 				&& location == "directory")
+// 	{
+// 		message += "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
+// 		location = "directory/400.html";
+// 	}
+// 	else if (!IsPathExist(location))
+// 	{
+// 		message += "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
+// 		location = "directory/404.html";
+// 	}
+// 	// else if (s.find("Content-Length") == std::string::npos)
+// 	// {
+// 	// 	message += "HTTP/1.1 411 Length Required";
+// 	// }
+// 	else if (location == "directory/")
+// 	{
+// 		message += "HTTP/1.1 200 OK\r\nContent-Type: text/html";
+// 		location = "directory/index.html";
+// 	}
+// 	else
+// 	{
+// 		message += "HTTP/1.1 200 OK\r\nContent-Type: ";
+// 		message += findTypeofFile(location);
+// 	}
+
+// 	message += "\r\nContent-Length: ";
+// 	message += countFileChar(location);
+// 	message += "\r\n\r\n" + getFileContent(location);
+	
+// 	const char* c = message.c_str();
+// 	std::cout << "[c: " << c << "]" << std::endl;
+// 	return (c);
+// }
 
