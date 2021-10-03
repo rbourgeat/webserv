@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/01 13:38:27 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/01 20:11:09 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,7 +191,10 @@ std::string getFileContent(const std::string& path)
 //   std::ifstream file(path);
 //   std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 //   return content;
-	std::ifstream fin(path, std::ios::binary);
+	//If on MAC:
+	//std::ifstream fin(path, std::ios::binary);
+	//If on VM:
+	std::basic_ifstream<char> fin(path, std::ios::binary);
 	std::ostringstream oss;
 	oss << fin.rdbuf();
 	std::string data(oss.str());
