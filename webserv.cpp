@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/03 14:08:45 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/03 15:46:22 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int		main(int argc, char const *argv[])
 	int fd_count(1);
 	//char buf[1000];
 	int pfd_size(5); //arbitrary; will have to manage it more appropriately;
-  std::vector<unsigned char> request(30000);
+	std::vector<unsigned char> request(30000);
 	int totalBytes(0);
 	struct pollfd pfd[pfd_size]; //this structure array stores the socket fds to monitor
 	try
