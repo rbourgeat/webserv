@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/01 20:11:09 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/03 14:12:20 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,11 +218,48 @@ std::string countFileChar(std::string string)
     return (string);
 };
 
+void setQueryString(std::string PATH)
+{
+	size_t position = PATH.find("?");
+	std::string queryPATH = PATH.substr(position);
+	setenv("QUERY_STRING", queryPATH.c_str(), 0);
+}
+
+void print_CGIenv()
+{
+	std::cout << "\n---------------------------" << std::endl;
+	std::cout << "| CGI Environment Variables:" << std::endl;
+	std::cout << "---------------------------" << std::endl;
+	std::cout << "| SERVER_SOFTWARE = " << "???" << std::endl;
+	std::cout << "| SERVER_NAME = " << "???" << std::endl;
+	std::cout << "| GATEWAY_INTERFACE = " << "???" << std::endl << std::endl;
+	std::cout << "| SERVER_PROTOCOL = " << "???" << std::endl;
+	std::cout << "| SERVER_PORT = " << "???" << std::endl;
+	std::cout << "| REQUEST_METHOD = " << getenv("REQUEST_METHOD") << std::endl;
+	std::cout << "| PATH_INFO = " << getenv("PATH_INFO") << std::endl;
+	std::cout << "| PATH_TRANSLATED = " << "???" << std::endl;
+	std::cout << "| SCRIPT_NAME = " << "???" << std::endl;
+	// std::cout << "| QUERY_STRING = " << getenv("QUERY_STRING") << std::endl;
+	std::cout << "| REMOTE_HOST = " << "???" << std::endl;
+	std::cout << "| REMOTE_ADDR = " << "???" << std::endl;
+	std::cout << "| AUTH_TYPE = " << "???" << std::endl;
+	std::cout << "| REMOTE_USER = " << "???" << std::endl;
+	std::cout << "| REMOTE_IDENT = " << "???" << std::endl;
+	std::cout << "| CONTENT_TYPE = " << "???" << std::endl;
+	std::cout << "| CONTENT_LENGTH = " << getenv("CONTENT_LENGTH") << std::endl << std::endl;
+	// std::cout << "| HTTP_ACCEPT = " << getenv("HTTP_ACCEPT") << std::endl;
+	std::cout << "| HTTP_ACCEPT_LANGUAGE = " << "???" << std::endl;
+	std::cout << "| HTTP_USER_AGENT = " << "???" << std::endl;
+	std::cout << "| HTTP_COOKIE = " << "???" << std::endl;
+	std::cout << "| HTTP_REFERER = " << "???" << std::endl;
+	std::cout << "---------------------------" << std::endl;
+}
+
 std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 {
-	std::string location = "directory", METHOD, PATH, HTTP;
+	std::string location = "directory", METHOD, PATH, HTTP, s_tmp_previous;
 	std::vector<char> tmp;
-	int i = 0;
+	int i = 0, p = 0;
 	
 	while ((size_t)i < buffer.size())
 	{
@@ -234,26 +271,42 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 		
 		std::string s_tmp(tmp.begin(), tmp.end());
 		std::cout << "[" << s_tmp << "] ";
+		// GET PREVIOUS STRING
+		if (p == i - 2)
+		{
+			s_tmp_previous = s_tmp;
+			p = i;
+		}
 		// GET METHOD
 		if (s_tmp == "GET" || s_tmp == "POST" || s_tmp == "DELETE")
 			METHOD = s_tmp;
 		// GET PATH
-		if (tmp[0] == '/')
+		if (s_tmp.rfind("/", 0) == 0)
 			PATH = s_tmp;
 		// GET HTTP
 		if (s_tmp.find("HTTP/") != std::string::npos)
 			HTTP.assign(tmp.begin() + 5, tmp.begin() + 8);
-
+		// GET HTTP_ACCEPT
+		if (s_tmp_previous.find("Accept:") != std::string::npos)
+		{
+			std::string::size_type pos = s_tmp.find('\n');
+			if (pos != std::string::npos)
+				setenv("HTTP_ACCEPT", s_tmp.substr(0, pos).c_str() , 0);
+			else
+				setenv("HTTP_ACCEPT", s_tmp.c_str(), 0);
+			std::cout << s_tmp << std::endl;
+		}
+		
 		tmp.clear();
 		i++;
 	}
 	
-	std::cout << std::endl << "METHOD = " << METHOD;
-	std::cout << std::endl << "PATH = " << PATH;
-	std::cout << std::endl << "HTTP = " << HTTP;
+	setenv("PATH_INFO", PATH.c_str(), 0);
+	setenv("REQUEST_METHOD", METHOD.c_str(), 0);
 	
 	std::string rep;
 	location += PATH;
+	// setQueryString(PATH);
 
 	if (METHOD != "GET" && METHOD != "POST" && METHOD != "DELETE")
 	{
@@ -293,7 +346,12 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 	
 	rep += "\r\nContent-Length: ";
 	rep += countFileChar(location);
+	setenv("CONTENT_LENGTH", countFileChar(location).c_str(), 0);
 	rep += "\r\n\r\n" + getFileContent(location);
+
+	print_CGIenv();
+
+	// cgi_get();
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);

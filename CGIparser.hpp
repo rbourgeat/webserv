@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parser_cgi.hpp                                     :+:      :+:    :+:   */
+/*   CGIparser.hpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/01 13:51:49 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/01 18:14:25 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/02 16:27:23 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ class CGIpair : public std::pair<std::string, std::string>
 class CGImap : public std::vector<CGIpair>
 {
 	public:
-		CGImap(std::string query) : index(0), gq(query)
+		CGImap(std::string query) : gq(query), index(0)
 		{
 			CGIpair p;
 			while ((p = nextPair()) != 0)
@@ -101,7 +101,7 @@ class CGImap : public std::vector<CGIpair>
 		{
 			if (gq.length() == 0)
 				return CGIpair(); // Error, return empty
-			if (gq.find('=') == -1)
+			if (gq.find('=') == -1.0)
 				return CGIpair(); // Error, return empty
 			std::string name = gq.substr(0, gq.find('='));
 			gq = gq.substr(gq.find('=') + 1);

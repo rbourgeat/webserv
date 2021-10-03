@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/01 17:32:00 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/02 10:58:36 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,6 @@
 
 # define PORT 8080
 
-// const char* parsing(char* buffer);
 
 std::vector<unsigned char> parsing(std::vector<unsigned char> buffer);
+void cgi_get();
