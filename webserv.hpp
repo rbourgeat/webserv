@@ -6,9 +6,12 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/02 10:58:36 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/04 18:06:31 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#ifndef WEBSERV_HPP
+# define WEBSERV_HPP
 
 # include <sys/socket.h>
 # include <netinet/in.h>
@@ -26,6 +29,7 @@
 # include <fcntl.h>
 # include <vector>
 # include <poll.h>
+# include <memory>
 
 #define NC "\e[0m"
 #define GRN "\e[0;32m"
@@ -35,5 +39,7 @@
 # define PORT 8080
 
 
-std::vector<unsigned char> parsing(std::vector<unsigned char> buffer);
-void cgi_get();
+std::vector<unsigned char>	parsing(std::vector<unsigned char> buffer);
+void												cgi_get();
+
+#endif

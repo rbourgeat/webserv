@@ -2,6 +2,7 @@
 #define TCPSOCKET_HPP
 
 #include "webserv.hpp"
+#include "PollFd.hpp"
 
 class TCPSocket
 {
@@ -36,40 +37,65 @@ class TCPSocket
 			std::cout << "Server listening on port: " << _port << std::endl;
 		}
 
-		void	socketConnect()
+		int	socketAccept()
 		{
-			if (connect(_socketFd, (struct sockaddr *)&_address, sizeof(_address)) <0)
-				throw TCPSocketException("while connecting");
+						int addrlen = sizeof(_address);
+						int new_socket;
+
+						if ((new_socket = accept(_socketFd, (struct sockaddr *)&_address, (socklen_t *)&addrlen)) < 0)
+        			throw TCPSocketException("while accepting");
+						return (new_socket);
 		}
 
-		int		socketSend(int fd, void *message, unsigned short len)
+		int		socketSend(int fd, std::vector<unsigned char> answer)
 		{
-			int sent;
-			unsigned short networkLen = htons(len);
-			if (send(fd, reinterpret_cast<const char*>(& networkLen), sizeof(networkLen), 0) < 0)
-				throw TCPSocketException("while sending");
-			if ((sent = send(fd, reinterpret_cast<const char*>(message), len, 0)) < 0)
-				throw TCPSocketException("while sending");
-			return (sent);
-		}
+			int sentBytes(0);
 
-		int		socketRecv(int fd, std::vector<unsigned char>& buff)
-		{
-			int recved(0);
-			int ret;
-			unsigned short packetSize;
-			
-			if ((ret = recv(fd, reinterpret_cast<char*>(&packetSize), sizeof(packetSize), 0)) < 0 || ret != sizeof(unsigned short))
-				throw TCPSocketException("while receiving");
-			packetSize = ntohs(packetSize);
-			buff.resize(packetSize);
-			while (recved < packetSize)
+			if ((sentBytes = send(fd, &answer[0], answer.size(), 0)) < 0)
 			{
-				if ((ret = recv(fd, reinterpret_cast<char*>(&buff[recved]), (packetSize - recved) * sizeof(unsigned char), 0)) < 0)
-					throw TCPSocketException("while receiving");
-				recved += ret;
+				perror("sending");
+				throw TCPSocketException("while sending");
 			}
-			return (recved);
+			return (sentBytes);
+		}
+
+		std::vector<unsigned char>	socketRecv(int i, PollFd &objectPoll)
+		{
+      std::vector<unsigned char> request(30000);
+			std::vector<unsigned char> buffer(30000);
+			int totalBytes(0);
+
+			int nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), 0);
+      if (nbytes <= 0)
+      {
+      	if (nbytes == 0)
+        	std::cout << "Socket " << objectPoll.getPfd()[i].fd << " hung up.\n";
+        else
+          throw TCPSocketException("while receiving");
+        close(objectPoll.getPfd()[i].fd);
+				objectPoll.deleteFd(i);
+      }
+      else
+      {
+      	int j(0);
+        for (int k(0); k < nbytes; k++)
+        {
+					request[j] = buffer[k];
+          j++;
+         }
+         totalBytes+= nbytes;
+         while (nbytes > 0)
+         {
+         	nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), MSG_DONTWAIT);
+          for (int k(0); k < nbytes; k++)
+          {
+          	request[j] = buffer[k];
+            j++;
+          }
+          totalBytes+= nbytes;
+         }
+			}
+			return (request);
 		}
 
 		/*GETTERS*/
