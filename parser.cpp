@@ -6,9 +6,10 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/03 14:12:20 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/03 17:58:23 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 # include "webserv.hpp"
 
@@ -188,12 +189,6 @@ std::string findTypeofFile(std::string path)
 
 std::string getFileContent(const std::string& path)
 {
-//   std::ifstream file(path);
-//   std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-//   return content;
-	//If on MAC:
-	//std::ifstream fin(path, std::ios::binary);
-	//If on VM:
 	std::basic_ifstream<char> fin(path, std::ios::binary);
 	std::ostringstream oss;
 	oss << fin.rdbuf();
@@ -218,48 +213,123 @@ std::string countFileChar(std::string string)
     return (string);
 };
 
-void setQueryString(std::string PATH)
-{
-	size_t position = PATH.find("?");
-	std::string queryPATH = PATH.substr(position);
-	setenv("QUERY_STRING", queryPATH.c_str(), 0);
-}
-
 void print_CGIenv()
 {
 	std::cout << "\n---------------------------" << std::endl;
 	std::cout << "| CGI Environment Variables:" << std::endl;
 	std::cout << "---------------------------" << std::endl;
-	std::cout << "| SERVER_SOFTWARE = " << "???" << std::endl;
+	std::cout << "| SERVER_SOFTWARE = " << getenv("SERVER_SOFTWARE") << std::endl;
 	std::cout << "| SERVER_NAME = " << "???" << std::endl;
-	std::cout << "| GATEWAY_INTERFACE = " << "???" << std::endl << std::endl;
-	std::cout << "| SERVER_PROTOCOL = " << "???" << std::endl;
+	std::cout << "| GATEWAY_INTERFACE = " << getenv("GATEWAY_INTERFACE") << std::endl;
+	std::cout << "|" << std::endl;
+	std::cout << "| SERVER_PROTOCOL = " << getenv("SERVER_PROTOCOL") << std::endl;
 	std::cout << "| SERVER_PORT = " << "???" << std::endl;
 	std::cout << "| REQUEST_METHOD = " << getenv("REQUEST_METHOD") << std::endl;
 	std::cout << "| PATH_INFO = " << getenv("PATH_INFO") << std::endl;
 	std::cout << "| PATH_TRANSLATED = " << "???" << std::endl;
-	std::cout << "| SCRIPT_NAME = " << "???" << std::endl;
-	// std::cout << "| QUERY_STRING = " << getenv("QUERY_STRING") << std::endl;
+	std::cout << "| SCRIPT_NAME = " << getenv("SCRIPT_NAME") << std::endl;
+	std::cout << "| QUERY_STRING = " << getenv("QUERY_STRING") << std::endl;
 	std::cout << "| REMOTE_HOST = " << "???" << std::endl;
 	std::cout << "| REMOTE_ADDR = " << "???" << std::endl;
-	std::cout << "| AUTH_TYPE = " << "???" << std::endl;
+	std::cout << "| AUTH_TYPE = " << getenv("AUTH_TYPE") << std::endl;
 	std::cout << "| REMOTE_USER = " << "???" << std::endl;
 	std::cout << "| REMOTE_IDENT = " << "???" << std::endl;
 	std::cout << "| CONTENT_TYPE = " << "???" << std::endl;
-	std::cout << "| CONTENT_LENGTH = " << getenv("CONTENT_LENGTH") << std::endl << std::endl;
-	// std::cout << "| HTTP_ACCEPT = " << getenv("HTTP_ACCEPT") << std::endl;
-	std::cout << "| HTTP_ACCEPT_LANGUAGE = " << "???" << std::endl;
-	std::cout << "| HTTP_USER_AGENT = " << "???" << std::endl;
+	std::cout << "| CONTENT_LENGTH = " << getenv("CONTENT_LENGTH") << std::endl;
+	std::cout << "|" << std::endl;
+	std::cout << "| HTTP_ACCEPT = " << getenv("HTTP_ACCEPT") << std::endl;
+	std::cout << "| HTTP_ACCEPT_LANGUAGE = " << getenv("HTTP_ACCEPT_LANGUAGE") << std::endl;
+	std::cout << "| HTTP_USER_AGENT = " << getenv("HTTP_USER_AGENT") << std::endl;
 	std::cout << "| HTTP_COOKIE = " << "???" << std::endl;
-	std::cout << "| HTTP_REFERER = " << "???" << std::endl;
+	std::cout << "| HTTP_REFERER = " << getenv("HTTP_REFERER") << std::endl;
 	std::cout << "---------------------------" << std::endl;
+}
+
+void CGIparsing(std::vector<unsigned char> buffer)
+{
+	std::vector<char> tmp;
+	int i = 0;
+
+	while ((size_t)i < buffer.size())
+	{
+		tmp.push_back(buffer[i]);
+		i++;
+	}
+	std::string s_tmp(tmp.begin(), tmp.end());
+	// std::cout << "[" << s_tmp << "] ";
+
+	setenv("SERVER_SOFTWARE", "webserv/1.0", 0);
+	setenv("GATEWAY_INTERFACE", "CGI/1.1", 0);
+	setenv("SERVER_PROTOCOL", "HTTP/1.1", 0);
+	setenv("AUTH_TYPE", "Basic", 0);
+
+	std::istringstream buffer2(s_tmp);
+	std::string line;
+	size_t first;
+
+	while (getline(buffer2, line, '\n'))
+	{
+		if (line.empty() || line == "\r")
+			break;
+		if (line.back() == '\r')
+			line.resize(line.size() - 1);
+		std::cout << "> " << line << "\n";
+
+		first = line.find("GET /cgi-bin/");
+		if (first != std::string::npos)
+		{
+			line.erase(first, 13);
+			first = line.find(" HTTP/");
+			line.erase(first, 9);
+			first = line.find("/");
+			setenv("QUERY_STRING", line.substr(first + 2).c_str(), 0);
+			setenv("PATH_INFO", line.substr(first + 1).c_str(), 0);
+			first = line.find("/");
+			line.erase(first, line.length());
+			setenv("SCRIPT_NAME", line.c_str(), 0);
+		}
+
+		first = line.find("User-Agent: ");
+		if (first != std::string::npos)
+			setenv("HTTP_USER_AGENT", line.substr(first + 12).c_str(), 0);
+
+		first = line.find("Referer: ");
+		if (first != std::string::npos)
+			setenv("HTTP_REFERER", line.substr(first + 9).c_str(), 0);
+
+		first = line.find("Accept: ");
+		if (first != std::string::npos)
+			setenv("HTTP_ACCEPT", line.substr(first + 8).c_str(), 0);
+
+		first = line.find("Accept-Language: ");
+		if (first != std::string::npos)
+			setenv("HTTP_ACCEPT_LANGUAGE", line.substr(first + 17).c_str(), 0);
+
+	}
+
+	if (!getenv("REQUEST_METHOD"))
+		setenv("REQUEST_METHOD", "NAN", 0);
+	if (!getenv("PATH_INFO"))
+		setenv("PATH_INFO", "NAN", 0);
+	if (!getenv("SCRIPT_NAME"))
+		setenv("SCRIPT_NAME", "NAN", 0);
+	if (!getenv("QUERY_STRING"))
+		setenv("QUERY_STRING", "NAN", 0);
+	if (!getenv("HTTP_USER_AGENT"))
+		setenv("HTTP_USER_AGENT", "NAN", 0);
+	if (!getenv("HTTP_REFERER"))
+		setenv("HTTP_REFERER", "NAN", 0);
+	if (!getenv("HTTP_ACCEPT"))
+		setenv("HTTP_ACCEPT", "NAN", 0);
+	if (!getenv("HTTP_ACCEPT_LANGUAGE"))
+		setenv("HTTP_ACCEPT_LANGUAGE", "NAN", 0);
 }
 
 std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 {
-	std::string location = "directory", METHOD, PATH, HTTP, s_tmp_previous;
+	std::string location = "directory", METHOD = "NAN", PATH = "NAN", HTTP, s_tmp_previous;
 	std::vector<char> tmp;
-	int i = 0, p = 0;
+	int i = 0;
 	
 	while ((size_t)i < buffer.size())
 	{
@@ -270,13 +340,7 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 		}
 		
 		std::string s_tmp(tmp.begin(), tmp.end());
-		std::cout << "[" << s_tmp << "] ";
-		// GET PREVIOUS STRING
-		if (p == i - 2)
-		{
-			s_tmp_previous = s_tmp;
-			p = i;
-		}
+		// std::cout << "[" << s_tmp << "] ";
 		// GET METHOD
 		if (s_tmp == "GET" || s_tmp == "POST" || s_tmp == "DELETE")
 			METHOD = s_tmp;
@@ -286,27 +350,15 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 		// GET HTTP
 		if (s_tmp.find("HTTP/") != std::string::npos)
 			HTTP.assign(tmp.begin() + 5, tmp.begin() + 8);
-		// GET HTTP_ACCEPT
-		if (s_tmp_previous.find("Accept:") != std::string::npos)
-		{
-			std::string::size_type pos = s_tmp.find('\n');
-			if (pos != std::string::npos)
-				setenv("HTTP_ACCEPT", s_tmp.substr(0, pos).c_str() , 0);
-			else
-				setenv("HTTP_ACCEPT", s_tmp.c_str(), 0);
-			std::cout << s_tmp << std::endl;
-		}
 		
 		tmp.clear();
 		i++;
 	}
 	
-	setenv("PATH_INFO", PATH.c_str(), 0);
-	setenv("REQUEST_METHOD", METHOD.c_str(), 0);
-	
 	std::string rep;
 	location += PATH;
-	// setQueryString(PATH);
+
+	setenv("REQUEST_METHOD", METHOD.c_str(), 0);
 
 	if (METHOD != "GET" && METHOD != "POST" && METHOD != "DELETE")
 	{
@@ -349,9 +401,8 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 	setenv("CONTENT_LENGTH", countFileChar(location).c_str(), 0);
 	rep += "\r\n\r\n" + getFileContent(location);
 
+	CGIparsing(buffer);
 	print_CGIenv();
-
-	// cgi_get();
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);

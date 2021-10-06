@@ -6,17 +6,17 @@
 #    By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/23 19:42:48 by rbourgea          #+#    #+#              #
-#    Updated: 2021/10/03 16:29:24 by dgoudet          ###   ########.fr        #
+#    Updated: 2021/10/06 19:34:29 by dgoudet          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	= 	webserv
 
 SRCS	=	parser.cpp \
-			webserv.cpp \
-			CGIget.cpp
+			webserv.cpp
 
 OBJS	=	$(SRCS:.cpp=.o)
+
 
 CC		=	g++
 
