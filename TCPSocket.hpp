@@ -34,7 +34,7 @@ class TCPSocket
 		{	
 			if (listen(_socketFd, 10) < 0)
 				throw TCPSocketException("while listening");
-			std::cout << "Server listening on port: " << _port << std::endl;
+			std::cout << "Server listening on port: " << _port << std::endl << std::endl;
 		}
 
 		int	socketAccept()
@@ -69,7 +69,7 @@ class TCPSocket
       if (nbytes <= 0)
       {
       	if (nbytes == 0)
-        	std::cout << "Socket " << objectPoll.getPfd()[i].fd << " hung up.\n";
+        	std::cout << NC << "Socket " << objectPoll.getPfd()[i].fd << " hung up -------------------------------------------\n";
         else
           throw TCPSocketException("while receiving");
         close(objectPoll.getPfd()[i].fd);

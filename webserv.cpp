@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/06 19:35:48 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/06 19:49:40 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,31 +44,34 @@ int		main(int argc, char const *argv[])
 				{
 					if (socketPoll.getPfd()[i].fd == server_fd) //if there is some data to read on server
 					{
-						std::cout << GRN << "+++++++ Accepting new connection ++++++++\n\n";
+						std::cout << "+++++++ Accepting new connection ++++++++\n\n";
 						new_socket = server.socketAccept();
 						//add_to_pfd(pfd, new_socket, &fd_count, &pfd_size); //Add the socket fd to the poll of fds to monitor
 						socketPoll.addFd(new_socket);
-						std::cout << GRN << "+++New connection from : " << address.sin_port << " +++" << std::endl;
+						std::cout << "+++New connection from : " << address.sin_port << " accepted +++" << std::endl;
 						std::cout << std::endl;
 					}
 					else //else, there is some data to read elsewhere (meaning on client side)
 					{
 						/*2 Receive request message (i.e., request for accessing a file OR executing a file (CGI program) to get the output) from client and parse it to analyze what is client expectation*/
-			      request = server.socketRecv(i, socketPoll);
-						std::cout << GRN << "+++ Request received from fd : " << socketPoll.getPfd()[i].fd << "+++\n";
+            std::cout << GRN << "+++ Request received from fd " << socketPoll.getPfd()[i].fd << " +++\n";
+						request = server.socketRecv(i, socketPoll);
             for (size_t k(0); k < request.size(); k++)
-            	std::cout << NC << request[k];
+            	std::cout << GRN << request[k];
+						std::cout << NC << std::endl;
 						if (request[0] && socketPoll.getPfd()[i].fd & POLLOUT) //if client is ready to receive answer
 						{
 				 			/*3. Send response message to client: either succeed in fulfilling request (i.e., provide access to the file OR returns file execution output), or return appropriate error status code*/
 						  std::vector<unsigned char> answer = parsing(request);
-							std::cout << MAG << answer[0] << std::endl;
 							if (request[0] != '\r')
 								server.socketSend(socketPoll.getPfd()[i].fd, answer);
-        			std::cout << "+++ Answer sent +++" << std::endl;
-							std::cout << GRN << "\n-------------------------------------\n";
+        			std::cout << MAG << "+++ Answer sent +++" << std::endl;
+							for (size_t k(0); k < answer.size(); k++)
+              	std::cout << request[k];
+							std::cout << std::endl;
       				close(socketPoll.getPfd()[i].fd);
 			        socketPoll.deleteFd(i);
+							std::cout << NC << "End of exchange with fd " << socketPoll.getPfd()[i].fd <<" ----------------------------------------------" << std::endl << std::endl;
 						}
 					}
 				}
