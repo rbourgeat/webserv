@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/03 17:58:23 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/07 16:36:37 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,6 +202,18 @@ bool IsPathExist(const std::string &s)
   return (stat (s.c_str(), &buffer) == 0);
 }
 
+bool CheckFilePerm(std::string& path)
+{
+	if (access (path.c_str(), F_OK) != 0)
+	{
+		if (errno == ENOENT)
+			return (1);
+		else if (errno == EACCES)
+			return (0);
+	}
+	return (1);
+}
+
 std::string countFileChar(std::string string)
 {
 	std::ifstream in_file(string, std::ios::binary);
@@ -340,8 +352,7 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 		}
 		
 		std::string s_tmp(tmp.begin(), tmp.end());
-		// std::cout << "[" << s_tmp << "] ";
-		// GET METHOD
+		// GET METHODS
 		if (s_tmp == "GET" || s_tmp == "POST" || s_tmp == "DELETE")
 			METHOD = s_tmp;
 		// GET PATH
@@ -362,18 +373,18 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 
 	if (METHOD != "GET" && METHOD != "POST" && METHOD != "DELETE")
 	{
-		rep += "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
+		rep = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
 		location = "directory/405.html";
 	}
 	else if ((METHOD == "GET" || METHOD == "POST" || METHOD == "DELETE")
 				&& location == "directory")
 	{
-		rep += "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
+		rep = "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
 		location = "directory/400.html";
 	}
 	else if (!IsPathExist(location))
 	{
-		rep += "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
+		rep = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
 		location = "directory/404.html";
 	}
 	// else if (s.find("Content-Length") == std::string::npos)
@@ -382,17 +393,22 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 	// }
 	else if (location == "directory/")
 	{
-		rep += "HTTP/1.1 200 OK\r\nContent-Type: text/html";
+		rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html";
 		location = "directory/index.html";
 	}
 	else if (HTTP != "1.1")
 	{
-		rep += "HTTP/1.1 505 HTTP Version not supported\r\nContent-Type: text/html";
+		rep = "HTTP/1.1 505 HTTP Version not supported\r\nContent-Type: text/html";
+		location = "directory/505.html";
+	}
+	else if (!CheckFilePerm(location))
+	{
+		rep = "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html";
 		location = "directory/505.html";
 	}
 	else
 	{
-		rep += "HTTP/1.1 200 OK\r\nContent-Type: ";
+		rep = "HTTP/1.1 200 OK\r\nContent-Type: ";
 		rep += findTypeofFile(location);
 	}
 	
