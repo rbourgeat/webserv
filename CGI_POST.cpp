@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/03 18:29:55 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/03 18:30:44 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/04 09:56:02 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,7 @@
 
 int main()
 {
-    std::cout << "Content-type: text/plain\n"
-         << std::endl;
+    std::cout << "Content-type: text/plain\n\r\n\r";
     Post p; // Get the query string
     CGImap query(p);
     // Test: dump all names and values
