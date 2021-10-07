@@ -6,75 +6,41 @@
 class	PollFd
 {
 		public:
-				PollFd(void) : _fdCount(0), _pfdSize(0) {;}
-				PollFd(int pfdSize) : _fdCount(0), _pfdSize(pfdSize)
-				{
-						if (_pfdSize > 0)
-							_pfd = _myAllocator.allocate(_pfdSize);
-				}
+				PollFd(void) {}
 				//PollFd(PollFd const& src);
-				~PollFd(void)
-				{
-					_myAllocator.deallocate(_pfd, _pfdSize);
-				}
+				~PollFd(void) {}
 
 				//PollFd &operator=(PollFd const& src);
 
 				void	addFd(int fd)
 				{
-						int i(0);
-						struct pollfd *temp;
-						if (_pfdSize == 0)
-						{
-              _pfd = _myAllocator.allocate(_pfdSize + 1);
-							_pfdSize++;
-						}
-						if (_pfdSize > 0 && _pfdSize < (_fdCount + 1))
-						{
-							temp = _myAllocator.allocate(_pfdSize + 1);
-							while (i < _fdCount)
-							{
-									temp[i].fd = _pfd[i].fd;
-									temp[i].events = _pfd[i].events;
-									temp[i].revents = _pfd[i].revents;
-									i++;
-							}
-							temp[i].fd = fd;
-							temp[i].events = POLLIN | POLLOUT;
-							_myAllocator.deallocate(_pfd, _pfdSize);
-							_pfd = temp;
-							_pfdSize++;
-						}
-						else
-						{
-							_pfd[_fdCount].fd = fd;
-							_pfd[_fdCount].events = POLLIN | POLLOUT;
-						}
-						_fdCount++;
+					struct pollfd pfd;
+					pfd.fd = fd;
+					pfd.events = POLLIN | POLLOUT;
+					
+					_pfd.push_back(pfd);
 				}
 
 				void		deleteFd(int i)
 				{
-						_pfd[i] = _pfd[_fdCount - 1]; //replace this one by the one at the end
-						_fdCount--;
+					std::vector<struct pollfd>::iterator it(_pfd.begin());
+					for (int j(0); j < i; j++)
+						it++;
+					_pfd.erase(it);
 				}
 
-				struct	pollfd *getPfd() const
+				std::vector<struct pollfd>&	getPfd()
 				{
 						return (_pfd);
 				}
 
-				int							getFdCount() const
+				size_t							getFdCount() const
 				{
-						return (_fdCount);
+						return (_pfd.size());
 				}
 
 		private:
-				struct pollfd *_pfd;
-				int						_fdCount;
-				int						_pfdSize;
-				std::allocator<struct pollfd> _myAllocator;
+				std::vector<struct pollfd> _pfd;
 };
 
 #endif
-

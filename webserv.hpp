@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/06 19:34:04 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/07 16:01:36 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@
 #define MAG "\e[0;35m"
 #define CYN "\e[0;36m"
 
-# define PORT 8081
+# define PORT 8080
 
 
 std::vector<unsigned char>	parsing(std::vector<unsigned char> buffer);
