@@ -6,12 +6,12 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/07 16:54:39 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/08 12:21:02 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "TCPSocket.hpp"
-
+#include <unistd.h>
 int		main(int argc, char const *argv[])
 {
 	(void)argc;
@@ -20,6 +20,7 @@ int		main(int argc, char const *argv[])
 	int new_socket; //long valread;
 	//char buf[1000];
 	//std::vector<unsigned char> request(30000);
+	sethostname("hello", 6);
 
 	try
 	{
@@ -48,7 +49,6 @@ int		main(int argc, char const *argv[])
 					{
 						std::cout << "+++++++ Accepting new connection ++++++++\n\n";
 						new_socket = server.socketAccept();
-						//add_to_pfd(pfd, new_socket, &fd_count, &pfd_size); //Add the socket fd to the poll of fds to monitor
 						vPfd.addFd(new_socket);
 						std::cout << "+++New connection from fd " << new_socket << " accepted +++" << std::endl;
 						std::cout << std::endl;
@@ -75,9 +75,9 @@ int		main(int argc, char const *argv[])
 							for (size_t k(0); k < answer.size(); k++)
 								std::cout << request[k];
 							std::cout << std::endl;
-							std::cout << NC << "End of exchange with fd " << vPfd.getPfd()[i].fd <<" ----------------------------------------------" << std::endl << std::endl;
-							close(vPfd.getPfd()[i].fd);
-							vPfd.deleteFd(i);
+							//std::cout << NC << "End of exchange with fd " << vPfd.getPfd()[i].fd <<" ----------------------------------------------" << std::endl << std::endl;
+							//close(vPfd.getPfd()[i].fd);
+							//vPfd.deleteFd(i);
 						}
 					}
 				}
