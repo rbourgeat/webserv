@@ -31,6 +31,7 @@ This project is here to make you write your HTTP server. You will be able to tes
 **CGI Doc**
 - [Best CGI Exemple](https://www.fi.muni.cz/usr/jkucera/tic/tic0305.html): Programmation CGI in C++.
 - [CGI Environmnent Variables](https://fr.wikipedia.org/wiki/Variables_d%27environnement_CGI)
+- [Good CGI Howto (and cookies)](http://www.purplepixie.org/cgi/howto.php)
 
 **Tools**
 - [Super Mega Site pour tester les Headers !](https://reqbin.com/)
