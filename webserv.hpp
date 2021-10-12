@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/07 19:07:02 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/11 13:06:42 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,11 @@
 # include <vector>
 # include <poll.h>
 # include <memory>
+# include <map>
+# include <sys/stat.h>
+# include <sys/wait.h>
+# include <sys/types.h>
+# include <sys/ioctl.h>
 
 #define NC "\e[0m"
 #define GRN "\e[0;32m"

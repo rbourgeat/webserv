@@ -6,12 +6,13 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/10 14:20:45 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/11 12:37:14 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 # include "webserv.hpp"
+# include "CGI.hpp"
 
 std::string findTypeofFile(std::string path)
 {
@@ -417,8 +418,12 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 	setenv("CONTENT_LENGTH", countFileChar(location).c_str(), 0);
 	rep += "\r\n\r\n" + getFileContent(location);
 
-	CGIparsing(buffer);
-	print_CGIenv();
+	//  OLD CGI SYSTEM
+	// CGIparsing(buffer);
+	// print_CGIenv();
+	
+	// NEW CGI SYSTEM
+	CGI *cgi = new CGI();
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);
