@@ -38,4 +38,5 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [cURL "--resolve"; curl -H "Host: ..."](https://sodocumentation.net/curl/topic/10565/name-resolve-curl-tricks) (for testing different server names).
 
 **Server model: nginx documentation**
+- [Inside Nginx architecture](https://www.nginx.com/blog/inside-nginx-how-we-designed-for-performance-scale/)
 - [Understanding Nginx Server and Location Block Selection Algorithms](https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms)
