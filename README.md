@@ -7,7 +7,7 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [HTTP](https://developer.mozilla.org/en-US/docs/Web/HTTP)
 - [Build a simple HTTP server from scratch](https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa)
 - [Manage a socket flow of events using poll()](https://www.ibm.com/docs/en/i/7.2?topic=designs-using-poll-instead-select)
-- [C++ programming applied to network](https://bousk.developpez.com/cours/reseau-c++/)(in French)
+- [C++ programming applied to network](https://bousk.developpez.com/cours/reseau-c++/) (in French)
 - [Network programming](https://beej.us/guide/bgnet/)
 
 **HTTP documentation**
