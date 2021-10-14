@@ -35,3 +35,4 @@ This project is here to make you write your HTTP server. You will be able to tes
 
 **Tools**
 - [Super Mega Site pour tester les Headers !](https://reqbin.com/)
+- [cURL "--resolve"](https://support.acquia.com/hc/en-us/articles/360005257154-Use-cURL-s-resolve-option-to-pin-a-request-to-an-IP-address) (for testing different server names).
