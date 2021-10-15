@@ -6,12 +6,13 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/07 16:36:37 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/11 12:37:14 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 # include "webserv.hpp"
+# include "CGI.hpp"
 
 std::string findTypeofFile(std::string path)
 {
@@ -417,84 +418,13 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 	setenv("CONTENT_LENGTH", countFileChar(location).c_str(), 0);
 	rep += "\r\n\r\n" + getFileContent(location);
 
-	CGIparsing(buffer);
-	print_CGIenv();
+	//  OLD CGI SYSTEM
+	// CGIparsing(buffer);
+	// print_CGIenv();
+	
+	// NEW CGI SYSTEM
+	CGI *cgi = new CGI();
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);
 }
-
-// const char* parsing(char *buffer)
-// {
-// 	int j = 0;
-// 	std::string location = "directory";
-// 	std::string s(buffer);
-// 	std::string delimiter = " ";
-// 	std::string message;
-// 	std::string error;
-// 	std::string method = "";
-
-// 	size_t pos = 0;
-// 	std::string token;
-// 	// remove all newlines
-// 	while ( s.find ("\r\n") != std::string::npos )
-// 	{
-// 		s.erase ( s.find ("\r\n"), 2 );
-// 	}
-
-// 	while ((pos = s.find(delimiter)) != std::string::npos)
-// 	{
-// 		token = s.substr(0, pos);
-// 		if (j == 0)
-// 			method = token;
-
-// 		if (j == 1)
-// 			location += token;
-// 		s.erase(0, pos + delimiter.length());
-// 		j++;
-// 	}
-// 	if (method == "")
-// 		method = s;
-
-// 	std::cout << "[" << method << "]" << std::endl;
-	
-// 	if (method != "GET" && method != "POST" && method != "DELETE")
-// 	{
-// 		message += "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
-// 		location = "directory/405.html";
-// 	}
-// 	else if ((method == "GET" || method == "POST" || method == "DELETE")
-// 				&& location == "directory")
-// 	{
-// 		message += "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
-// 		location = "directory/400.html";
-// 	}
-// 	else if (!IsPathExist(location))
-// 	{
-// 		message += "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
-// 		location = "directory/404.html";
-// 	}
-// 	// else if (s.find("Content-Length") == std::string::npos)
-// 	// {
-// 	// 	message += "HTTP/1.1 411 Length Required";
-// 	// }
-// 	else if (location == "directory/")
-// 	{
-// 		message += "HTTP/1.1 200 OK\r\nContent-Type: text/html";
-// 		location = "directory/index.html";
-// 	}
-// 	else
-// 	{
-// 		message += "HTTP/1.1 200 OK\r\nContent-Type: ";
-// 		message += findTypeofFile(location);
-// 	}
-
-// 	message += "\r\nContent-Length: ";
-// 	message += countFileChar(location);
-// 	message += "\r\n\r\n" + getFileContent(location);
-	
-// 	const char* c = message.c_str();
-// 	std::cout << "[c: " << c << "]" << std::endl;
-// 	return (c);
-// }
-
