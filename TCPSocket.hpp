@@ -7,6 +7,9 @@
 class TCPSocket
 {
 	public:
+		
+		TCPSocket() {;}
+		
 		TCPSocket(uint16_t port) : _port(port)
 	{
 		_socketFd = socket(AF_INET, SOCK_STREAM, 0); /*1*/
@@ -18,6 +21,15 @@ class TCPSocket
 		memset(_address.sin_zero, '\0', sizeof _address.sin_zero);
 	}
 		~TCPSocket() {;}
+
+		TCPSocket	&operator=(TCPSocket const& src)
+		{
+			_socketFd = src._socketFd;
+    	_address = src._address;
+    	addrlen = src.addrlen;
+    	_port = src._port;
+			return (*this);
+		}
 
 		void	setToNonBlocking()
 		{
@@ -49,7 +61,7 @@ class TCPSocket
 
 		size_t		socketSend(int fd, std::vector<unsigned char> answer)
 		{
-			size_t sentBytes(0);
+			int sentBytes(0);
 			size_t totalSentBytes(0);
 			size_t bytesLeft = answer.size();
 
@@ -76,7 +88,7 @@ class TCPSocket
 			std::vector<unsigned char> buffer(30000);
 			int totalBytes(0);
 
-			int nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), 0);
+			int nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), MSG_DONTWAIT);
 			if (nbytes <= 0)
 			{
 				if (nbytes == 0)
@@ -97,7 +109,7 @@ class TCPSocket
 				totalBytes+= nbytes;
 				while (nbytes > 0)
 				{
-					nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), 0);
+					nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), MSG_DONTWAIT);
 					for (int k(0); k < nbytes; k++)
 					{
 						request[j] = buffer[k];
@@ -120,7 +132,6 @@ class TCPSocket
 		}
 
 	private:
-		TCPSocket();
 		int			_socketFd;
 		struct		sockaddr_in _address;
 		int			addrlen;
