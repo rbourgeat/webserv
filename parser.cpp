@@ -6,7 +6,11 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2021/10/14 15:29:37 by rbourgea         ###   ########.fr       */
+=======
+/*   Updated: 2021/10/15 19:26:05 by dgoudet          ###   ########.fr       */
+>>>>>>> 88eda0a4279093f4c3d7c63a49ff3e9468d42a75
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -423,7 +427,7 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 	// print_CGIenv();
 	
 	// NEW CGI SYSTEM
-	CGI *cgi = new CGI();
+	//CGI *cgi = new CGI();
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);
