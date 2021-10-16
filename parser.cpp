@@ -6,14 +6,9 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2021/10/14 15:29:37 by rbourgea         ###   ########.fr       */
-=======
-/*   Updated: 2021/10/15 19:26:05 by dgoudet          ###   ########.fr       */
->>>>>>> 88eda0a4279093f4c3d7c63a49ff3e9468d42a75
+/*   Updated: 2021/10/16 10:13:09 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 # include "webserv.hpp"
 # include "CGI.hpp"
