@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/11 13:58:55 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/15 18:10:41 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,4 +85,105 @@ cgi_status::status CGI::status()
 	}
 
 	return (_status);
+}
+
+int CGI::execute(std::string const &path)
+{
+	_status = cgi_status::NON_INIT;
+
+	int output[2];
+	int input[2];
+	// Openning file descriptors
+	if (pipe(output) < 0 || pipe(input) < 0)
+	{
+		_status = cgi_status::SYSTEM_ERROR;
+		return (-1);
+	}
+
+	size_t i = 0;
+	char *cgi = strdup(path.c_str());
+	if (cgi == NULL) //  + check if file is good
+	{
+		_status = cgi_status::SYSTEM_ERROR;
+		free(cgi);
+		return (-1);
+	}
+
+	char *env[_variables.size() + 1];
+	for (; i < _variables.size();)
+	{
+		env[i] = _variables[i];
+		i++;
+	}
+	env[i] = NULL;
+
+	char *args[] = {cgi, NULL};
+	
+	// Multi-threading....
+	_child_pid = fork();
+	if (_child_pid < 0)
+	{
+		std::cerr << "System Error : fork()" << std::endl;
+		_status = cgi_status::SYSTEM_ERROR;
+		free(cgi);
+		for (i = 0; i < _variables.size(); i++) {
+		free(env[i]);
+		}
+		return (-1);
+	}
+	
+	if (_child_pid == 0)
+	{
+		// Path of cgi file:
+		std::string exec_path = "42";
+		
+		if (dup2(output[1], 1) < 0 || dup2(input[0], 0) < 0)
+		{
+			close(input[1]);
+			close(input[0]);
+			close(output[1]);
+			close(output[0]);
+			exit(-1);
+		}
+		if (chdir(exec_path.c_str()) < 0)
+			exit(-1);
+		close(input[1]);
+		close(input[0]);
+		close(output[1]);
+		close(output[0]);
+		execve(args[0], args, env);
+		exit(-1);
+
+	} else {
+		// Starting timer for waiting server
+		// _cgiTimer.start();
+		_status = cgi_status::WAITING;
+		free(cgi);
+		for (i = 0; i < _variables.size(); i++)
+		{
+			free(env[i]);
+		}
+		close(input[0]);
+		close(output[1]);
+		_pipe = output[0];
+		fcntl(_pipe, F_SETFL, O_NONBLOCK);
+		// check if method == POST || body is empty
+		if (1)
+		{
+			close(input[1]);
+			return (-1);
+		}
+		else
+		{
+			fcntl(input[1], F_SETFL, O_NONBLOCK);
+			return input[1];
+		}
+	}
+
+	return (1);
+}
+
+int CGI::get_pipe() const
+{ 
+	return (_pipe); 
 }
