@@ -6,20 +6,20 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:42:20 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/15 18:18:13 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/20 13:19:10 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CGI_HPP
-#define CGI_HPP
+# define CGI_HPP
 
-#include "webserv.hpp"
+# include "webserv.hpp"
 
-#define IS_ERROR(x) \
+# define IS_ERROR(x) \
     (x == cgi_status::CGI_ERROR || x == cgi_status::SYSTEM_ERROR \
   || x == cgi_status::UNSUPPORTED || x == cgi_status::TIMEOUT)
 
-#define BAD_EXIT(x) \
+# define BAD_EXIT(x) \
     (WIFEXITED(x) &&  WEXITSTATUS(x) != 0) || WIFSIGNALED(x)
 
 namespace cgi_status
@@ -46,6 +46,14 @@ class CGI
 		int					unset_pid();
 		int					get_fd() const;
 		cgi_status::status	status();
+		std::vector<char *>	print_env();
+		template <typename T>
+		void add_variable(std::string name, T value)
+		{
+			std::ostringstream ss;
+			ss << name << "=" << value;
+			_variables.push_back(strdup(ss.str().c_str()));
+		}
 
 	private:
 		cgi_status::status	_status;
@@ -56,14 +64,6 @@ class CGI
 		bool				isPipeEmpty(int fd) const;
 		int execute(std::string const &cgi_path);
 		int get_pipe() const;
-
-		template <typename T>
-		void add_variable(std::string name, T value)
-		{
-			std::ostringstream ss;
-			ss << name << "=" << value;
-			_variables.push_back(strdup(ss.str().c_str()));
-		}
 };
 
 #endif

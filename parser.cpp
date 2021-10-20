@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/16 10:13:09 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/20 13:30:12 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,39 +225,39 @@ std::string countFileChar(std::string string)
     return (string);
 };
 
-void print_CGIenv()
-{
-	std::cout << "\n---------------------------" << std::endl;
-	std::cout << "| CGI Environment Variables:" << std::endl;
-	std::cout << "---------------------------" << std::endl;
-	std::cout << "| SERVER_SOFTWARE = " << getenv("SERVER_SOFTWARE") << std::endl;
-	std::cout << "| SERVER_NAME = " << "???" << std::endl;
-	std::cout << "| GATEWAY_INTERFACE = " << getenv("GATEWAY_INTERFACE") << std::endl;
-	std::cout << "|" << std::endl;
-	std::cout << "| SERVER_PROTOCOL = " << getenv("SERVER_PROTOCOL") << std::endl;
-	std::cout << "| SERVER_PORT = " << "???" << std::endl;
-	std::cout << "| REQUEST_METHOD = " << getenv("REQUEST_METHOD") << std::endl;
-	std::cout << "| PATH_INFO = " << getenv("PATH_INFO") << std::endl;
-	std::cout << "| PATH_TRANSLATED = " << "???" << std::endl;
-	std::cout << "| SCRIPT_NAME = " << getenv("SCRIPT_NAME") << std::endl;
-	std::cout << "| QUERY_STRING = " << getenv("QUERY_STRING") << std::endl;
-	std::cout << "| REMOTE_HOST = " << "???" << std::endl;
-	std::cout << "| REMOTE_ADDR = " << "???" << std::endl;
-	std::cout << "| AUTH_TYPE = " << getenv("AUTH_TYPE") << std::endl;
-	std::cout << "| REMOTE_USER = " << "???" << std::endl;
-	std::cout << "| REMOTE_IDENT = " << "???" << std::endl;
-	std::cout << "| CONTENT_TYPE = " << "???" << std::endl;
-	std::cout << "| CONTENT_LENGTH = " << getenv("CONTENT_LENGTH") << std::endl;
-	std::cout << "|" << std::endl;
-	std::cout << "| HTTP_ACCEPT = " << getenv("HTTP_ACCEPT") << std::endl;
-	std::cout << "| HTTP_ACCEPT_LANGUAGE = " << getenv("HTTP_ACCEPT_LANGUAGE") << std::endl;
-	std::cout << "| HTTP_USER_AGENT = " << getenv("HTTP_USER_AGENT") << std::endl;
-	std::cout << "| HTTP_COOKIE = " << "???" << std::endl;
-	std::cout << "| HTTP_REFERER = " << getenv("HTTP_REFERER") << std::endl;
-	std::cout << "---------------------------" << std::endl;
-}
+// void print_CGIenv()
+// {
+// 	std::cout << "\n---------------------------" << std::endl;
+// 	std::cout << "| CGI Environment Variables:" << std::endl;
+// 	std::cout << "---------------------------" << std::endl;
+// 	std::cout << "| SERVER_SOFTWARE = " << getenv("SERVER_SOFTWARE") << std::endl;
+// 	std::cout << "| SERVER_NAME = " << "???" << std::endl;
+// 	std::cout << "| GATEWAY_INTERFACE = " << getenv("GATEWAY_INTERFACE") << std::endl;
+// 	std::cout << "|" << std::endl;
+// 	std::cout << "| SERVER_PROTOCOL = " << getenv("SERVER_PROTOCOL") << std::endl;
+// 	std::cout << "| SERVER_PORT = " << "???" << std::endl;
+// 	std::cout << "| REQUEST_METHOD = " << getenv("REQUEST_METHOD") << std::endl;
+// 	std::cout << "| PATH_INFO = " << getenv("PATH_INFO") << std::endl;
+// 	std::cout << "| PATH_TRANSLATED = " << "???" << std::endl;
+// 	std::cout << "| SCRIPT_NAME = " << getenv("SCRIPT_NAME") << std::endl;
+// 	std::cout << "| QUERY_STRING = " << getenv("QUERY_STRING") << std::endl;
+// 	std::cout << "| REMOTE_HOST = " << "???" << std::endl;
+// 	std::cout << "| REMOTE_ADDR = " << "???" << std::endl;
+// 	std::cout << "| AUTH_TYPE = " << getenv("AUTH_TYPE") << std::endl;
+// 	std::cout << "| REMOTE_USER = " << "???" << std::endl;
+// 	std::cout << "| REMOTE_IDENT = " << "???" << std::endl;
+// 	std::cout << "| CONTENT_TYPE = " << "???" << std::endl;
+// 	std::cout << "| CONTENT_LENGTH = " << getenv("CONTENT_LENGTH") << std::endl;
+// 	std::cout << "|" << std::endl;
+// 	std::cout << "| HTTP_ACCEPT = " << getenv("HTTP_ACCEPT") << std::endl;
+// 	std::cout << "| HTTP_ACCEPT_LANGUAGE = " << getenv("HTTP_ACCEPT_LANGUAGE") << std::endl;
+// 	std::cout << "| HTTP_USER_AGENT = " << getenv("HTTP_USER_AGENT") << std::endl;
+// 	std::cout << "| HTTP_COOKIE = " << "???" << std::endl;
+// 	std::cout << "| HTTP_REFERER = " << getenv("HTTP_REFERER") << std::endl;
+// 	std::cout << "---------------------------" << std::endl;
+// }
 
-void CGIparsing(std::vector<unsigned char> buffer)
+void CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 {
 	std::vector<char> tmp;
 	int i = 0;
@@ -270,10 +270,10 @@ void CGIparsing(std::vector<unsigned char> buffer)
 	std::string s_tmp(tmp.begin(), tmp.end());
 	// std::cout << "[" << s_tmp << "] ";
 
-	setenv("SERVER_SOFTWARE", "webserv/1.0", 0);
-	setenv("GATEWAY_INTERFACE", "CGI/1.1", 0);
-	setenv("SERVER_PROTOCOL", "HTTP/1.1", 0);
-	setenv("AUTH_TYPE", "Basic", 0);
+	cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
+	cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
+	cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
+	cgi->add_variable("AUTH_TYPE", "Basic");
 
 	std::istringstream buffer2(s_tmp);
 	std::string line;
@@ -294,47 +294,30 @@ void CGIparsing(std::vector<unsigned char> buffer)
 			first = line.find(" HTTP/");
 			line.erase(first, 9);
 			first = line.find("/");
-			setenv("QUERY_STRING", line.substr(first + 2).c_str(), 0);
-			setenv("PATH_INFO", line.substr(first + 1).c_str(), 0);
+			cgi->add_variable("QUERY_STRING", line.substr(first + 2).c_str());
+			cgi->add_variable("PATH_INFO", line.substr(first + 1).c_str());
 			first = line.find("/");
 			line.erase(first, line.length());
-			setenv("SCRIPT_NAME", line.c_str(), 0);
+			cgi->add_variable("SCRIPT_NAME", line.c_str());
 		}
 
 		first = line.find("User-Agent: ");
 		if (first != std::string::npos)
-			setenv("HTTP_USER_AGENT", line.substr(first + 12).c_str(), 0);
+			cgi->add_variable("HTTP_USER_AGENT", line.substr(first + 12).c_str());
 
 		first = line.find("Referer: ");
 		if (first != std::string::npos)
-			setenv("HTTP_REFERER", line.substr(first + 9).c_str(), 0);
+			cgi->add_variable("HTTP_REFERER", line.substr(first + 9).c_str());
 
 		first = line.find("Accept: ");
 		if (first != std::string::npos)
-			setenv("HTTP_ACCEPT", line.substr(first + 8).c_str(), 0);
+			cgi->add_variable("HTTP_ACCEPT", line.substr(first + 8).c_str());
 
 		first = line.find("Accept-Language: ");
 		if (first != std::string::npos)
-			setenv("HTTP_ACCEPT_LANGUAGE", line.substr(first + 17).c_str(), 0);
+			cgi->add_variable("HTTP_ACCEPT_LANGUAGE", line.substr(first + 17).c_str());
 
 	}
-
-	if (!getenv("REQUEST_METHOD"))
-		setenv("REQUEST_METHOD", "NAN", 0);
-	if (!getenv("PATH_INFO"))
-		setenv("PATH_INFO", "NAN", 0);
-	if (!getenv("SCRIPT_NAME"))
-		setenv("SCRIPT_NAME", "NAN", 0);
-	if (!getenv("QUERY_STRING"))
-		setenv("QUERY_STRING", "NAN", 0);
-	if (!getenv("HTTP_USER_AGENT"))
-		setenv("HTTP_USER_AGENT", "NAN", 0);
-	if (!getenv("HTTP_REFERER"))
-		setenv("HTTP_REFERER", "NAN", 0);
-	if (!getenv("HTTP_ACCEPT"))
-		setenv("HTTP_ACCEPT", "NAN", 0);
-	if (!getenv("HTTP_ACCEPT_LANGUAGE"))
-		setenv("HTTP_ACCEPT_LANGUAGE", "NAN", 0);
 }
 
 std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
@@ -420,9 +403,11 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 	//  OLD CGI SYSTEM
 	// CGIparsing(buffer);
 	// print_CGIenv();
-	
+
 	// NEW CGI SYSTEM
-	//CGI *cgi = new CGI();
+	CGI *cgi;
+	CGIparsing(buffer, cgi);
+	cgi->print_env();
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);

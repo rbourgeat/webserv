@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/15 18:10:41 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/20 12:05:00 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@ CGI::CGI()
 	_pipe = -1;
 	_child_pid = -1;
 	_child_return = 0;
+	std::vector<char *> variables(0);
+	_variables = variables;
 }
 
 CGI::~CGI()
@@ -37,6 +39,7 @@ int CGI::unset_pid()
 { 
 	return _child_pid = -1; 
 }
+
 int CGI::get_fd() const
 { 
 	return (_pipe); 
@@ -186,4 +189,19 @@ int CGI::execute(std::string const &path)
 int CGI::get_pipe() const
 { 
 	return (_pipe); 
+}
+
+std::vector<char *> CGI::print_env()
+{
+	int i = 0;
+	std::cout << "\n---------------------------" << std::endl;
+	std::cout << "| CGI Environment Variables:" << std::endl;
+	std::cout << "---------------------------" << std::endl;
+	while (_variables[i] && i)
+	{
+		i++;
+		std::cout << "| " << _variables[i] << std::endl;
+	}
+	std::cout << "---------------------------" << std::endl;
+	return (_variables);
 }
