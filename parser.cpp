@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/22 16:53:02 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/22 16:56:43 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -298,34 +298,44 @@ void CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 		std::cout << "> " << line << "\n";
 
 		first = line.find("GET /cgi-bin/");
-		if (first != std::string::npos)
+		if (first != std::string::npos && (line.find(".cgi") != std::string::npos)) //MODIF BY CONFIG
 		{
 			line.erase(first, 13);
 			first = line.find(" HTTP/");
 			line.erase(first, 9);
-			first = line.find("/");
-			cgi->add_variable("QUERY_STRING", line.substr(first + 2).c_str());
-			cgi->add_variable("PATH_INFO", line.substr(first + 1).c_str());
-			first = line.find("/");
-			line.erase(first, line.length());
-			cgi->add_variable("SCRIPT_NAME", line.c_str());
+			first = line.find("?");
+			if (first != std::string::npos)
+			{
+				cgi->add_variable("QUERY_STRING", line.substr(first + 1));
+				std::string nscript = line.replace(line.find("?"), std::string::npos, "");
+				cgi->add_variable("SCRIPT_NAME", nscript);
+			}
+			else if (line.find(".cgi/") != std::string::npos)
+			{
+				first = line.find(".cgi/");
+				cgi->add_variable("PATH_INFO", line.substr(first + 5));
+				std::string nscript = line.replace(line.find("/"), std::string::npos, "");
+				cgi->add_variable("SCRIPT_NAME", nscript);
+			}
+			else
+				cgi->add_variable("SCRIPT_NAME", line);
 		}
 
 		first = line.find("User-Agent: ");
 		if (first != std::string::npos)
-			cgi->add_variable("HTTP_USER_AGENT", line.substr(first + 12).c_str());
+			cgi->add_variable("HTTP_USER_AGENT", line.substr(first + 12));
 
 		first = line.find("Referer: ");
 		if (first != std::string::npos)
-			cgi->add_variable("HTTP_REFERER", line.substr(first + 9).c_str());
+			cgi->add_variable("HTTP_REFERER", line.substr(first + 9));
 
 		first = line.find("Accept: ");
 		if (first != std::string::npos)
-			cgi->add_variable("HTTP_ACCEPT", line.substr(first + 8).c_str());
+			cgi->add_variable("HTTP_ACCEPT", line.substr(first + 8));
 
 		first = line.find("Accept-Language: ");
 		if (first != std::string::npos)
-			cgi->add_variable("HTTP_ACCEPT_LANGUAGE", line.substr(first + 17).c_str());
+			cgi->add_variable("HTTP_ACCEPT_LANGUAGE", line.substr(first + 17));
 
 	}
 }
@@ -448,9 +458,10 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct ser
 	// print_CGIenv();
 
 	// NEW CGI SYSTEM
-	/*CGI *cgi = NULL;
-	  CGIparsing(buffer, cgi);*/
-	//cgi->print_env();
+	CGI *cgi = new CGI;
+	CGIparsing(buffer, cgi);
+	cgi->print_env();
+	delete cgi;
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);
