@@ -1,19 +1,26 @@
 #include "TCPSocket.hpp"
 
-struct  server
+struct			errorPage
 {
-        std::string name;
-        int         port;
-        TCPSocket		sock;
+	int			num;
+	std::string	path;
 };
 
-struct	client
+struct  					server
 {
-				int					socket;
-				int					servIndex;
-				std::vector<unsigned char> answer;
+	std::string 			name;
+	int         			port;
+	TCPSocket				sock;
+	std::vector<errorPage>	error;
+	std::string				root;
+	size_t					max_body_size;
+};
+
+struct							client
+{
+	int							socket;
+	int							servIndex;
+	std::vector<unsigned char>	answer;
 };
 
 void  readConfig(char const *argv, std::vector<server> &server);
-
-

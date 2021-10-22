@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/15 19:17:34 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/22 11:22:51 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,32 +18,35 @@
 
 int		findClient(int fd, std::vector<struct client> clients)
 {
-		for (size_t i(0); i < clients.size(); i++)
-    {
-      if (fd == clients[i].socket)
-          return (i);
-    }
-    return (-1);
+	for (size_t i(0); i < clients.size(); i++)
+	{
+		if (fd == clients[i].socket)
+			return (i);
+	}
+	return (-1);
 }
 
 int		isServerFd(int fd, std::vector<struct server> servers)
 {
-		for (size_t i(0); i < servers.size(); i++)
-		{
-			if (fd == servers[i].sock.getSocketFd())
-					return (i);
-		}
-		return (-1);
+	for (size_t i(0); i < servers.size(); i++)
+	{
+		if (fd == servers[i].sock.getSocketFd())
+			return (i);
+	}
+	return (-1);
 }
 
 int		main(int argc, char const *argv[])
 {
-	(void)argc;
-	(void)argv;
+	const char *config_path; 
+	if (argc != 2)
+		config_path = "config/webserv.conf";
+	else
+		config_path = argv[1];
 	/*Read config file*/
 	std::vector<struct server> servers;
 	std::vector<struct client> clients;
-	readConfig("config/webserv.conf", &servers);
+	readConfig(config_path, &servers);
 
 	try
 	{
@@ -74,7 +77,7 @@ int		main(int argc, char const *argv[])
 						std::cout << "+++++++ " << servers[k].name << " accepting new connection ++++++++\n\n";
 						client c;
 						c.socket = servers[k].sock.socketAccept();
-						//set to be non-blocking also for new socket?
+						fcntl(c.socket, F_SETFL, O_NONBLOCK);
 						c.servIndex = k;
 						vPfd.addFd(c.socket);
 						clients.push_back(c);
@@ -86,38 +89,39 @@ int		main(int argc, char const *argv[])
 						/*2 Receive request message (i.e., request for accessing a file OR executing a file (CGI program) to get the output) from client and parse it to analyze what is client expectation*/
 						int k;
 						k = findClient(vPfd.getPfd()[i].fd, clients);
-						std::vector<unsigned char> request(30000);
+						std::vector<unsigned char> request(60000);
 						std::cout << GRN << "+++ Request received from fd " << vPfd.getPfd()[i].fd << " +++\n";
 						request = servers[clients[k].servIndex].sock.socketRecv(i, vPfd);
 						if (request.size() <= 0)
 						{
 							std::vector<struct client>::iterator it(clients.begin());
-              for (int m(0); m < k; m++)
-                  it++;
-              clients.erase(it);
+							for (int m(0); m < k; m++)
+								it++;
+							clients.erase(it);
 						}
 						else
 						{
 							for (size_t k(0); k < request.size(); k++)
 								std::cout << GRN << request[k];
 							std::cout << NC << std::endl;
-							std::vector<unsigned char> answer = parsing(request);
+							std::vector<unsigned char> answer = parsing(request, servers[clients[k].servIndex]);
 							clients[k].answer = answer;
 						}
 					}
 					/*3. Send response message to client: either succeed in fulfilling request (i.e., provide access to the file OR returns file execution output), or return appropriate error status code*/
 					if (vPfd.getPfd()[i].revents & POLLOUT)
 					{
-							int k;
-	            if ((k = findClient(vPfd.getPfd()[i].fd, clients)) != -1)
-							{
+						int k;
+						if ((k = findClient(vPfd.getPfd()[i].fd, clients)) != -1)
+						{
 							if (clients[k].answer.size() > 0)
 							{
-									servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
-		              std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
-									std::cout << std::endl;
+								servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
+								std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
+								//clients[k].answer.clear();
+								std::cout << std::endl;
 							}
-							}
+						}
 					}
 				}
 			}
