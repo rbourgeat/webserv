@@ -6,11 +6,12 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/22 17:24:38 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/22 17:31:33 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "webserv.hpp"
+# include "serverAndClient.hpp"
 # include "CGI.hpp"
 
 std::string findTypeofFile(std::string path)
@@ -110,7 +111,7 @@ std::string findTypeofFile(std::string path)
 	else if (str == "docx")
 		return ("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
 	else if (str == "bin" || str == "exe" || str == "ddl" || str == "deb" || str == "dmg" 
-				|| str == "iso" || str == "img" || str == "msi" || str == "msp" || str == "msm")
+			|| str == "iso" || str == "img" || str == "msi" || str == "msp" || str == "msm")
 		return ("application/octet-stream");
 	else if (str == "wmlc")
 		return ("application/vnd.wap.wmlc");
@@ -198,8 +199,8 @@ std::string getFileContent(const std::string& path)
 
 bool IsPathExist(const std::string &s)
 {
-  struct stat buffer;
-  return (stat (s.c_str(), &buffer) == 0);
+	struct stat buffer;
+	return (stat (s.c_str(), &buffer) == 0);
 }
 
 bool CheckFilePerm(std::string& path)
@@ -214,15 +215,24 @@ bool CheckFilePerm(std::string& path)
 	return (1);
 }
 
-std::string countFileChar(std::string string)
+size_t		fileSize(std::string string)
 {
 	std::ifstream in_file(string, std::ios::binary);
+    in_file.seekg(0, std::ios::end);
+    size_t file_size = in_file.tellg();
+	return (file_size);
+}
+
+std::string countFileChar(std::string string)
+{
+	size_t file_size = fileSize(string);
+	/*std::ifstream in_file(string, std::ios::binary);
 	in_file.seekg(0, std::ios::end);
-	int file_size = in_file.tellg();
+	int file_size = in_file.tellg();*/
 	std::stringstream ss;
 	ss << file_size;
 	ss >> string;
-    return (string);
+	return (string);
 };
 
 // void print_CGIenv()
@@ -332,12 +342,39 @@ void CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 	}
 }
 
-std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
+std::string	errorPageLocation(int code, struct server s)
 {
-	std::string location = "directory", METHOD = "NAN", PATH = "NAN", HTTP, s_tmp_previous;
+	std::string location, codeToString;
+	std::stringstream ss;
+	ss << code;
+	ss >> codeToString;
+	size_t i(0);
+
+	while (i < s.error.size() && s.error[i].num != code)
+		i++;
+	if (i < s.error.size() && s.error[i].num == code)
+		location = s.error[i].path;
+	else
+		location = "directory/" + codeToString + ".html";
+	return (location);
+
+}
+
+std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct server s)
+{
+	std::string location,  METHOD = "NAN", PATH = "NAN", HTTP, s_tmp_previous;
 	std::vector<char> tmp;
 	int i = 0;
-	
+	//size_t max; //maybe problem comes from size_t max value
+	/*if (s.max_body_size > 0)
+		max = s.max_body_size;
+	else
+		max = 1000000; //1 Megabyte (default for nginx)*/
+	if (s.root.size() > 0)
+		location = s.root;
+	else
+		location = "directory";
+	std::cout << "location before: " << location << std::endl;
 	while ((size_t)i < buffer.size())
 	{
 		while ((size_t)i < buffer.size() && buffer[i] != ' ')
@@ -345,7 +382,7 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 			tmp.push_back(buffer[i]);
 			i++;
 		}
-		
+
 		std::string s_tmp(tmp.begin(), tmp.end());
 		// GET METHODS
 		if (s_tmp == "GET" || s_tmp == "POST" || s_tmp == "DELETE")
@@ -356,58 +393,64 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 		// GET HTTP
 		if (s_tmp.find("HTTP/") != std::string::npos)
 			HTTP.assign(tmp.begin() + 5, tmp.begin() + 8);
-		
+
 		tmp.clear();
 		i++;
 	}
-	
+
 	std::string rep;
 	location += PATH;
+	std::cout << "location: " << location << std::endl;
 
 	setenv("REQUEST_METHOD", METHOD.c_str(), 0);
 
 	if (METHOD != "GET" && METHOD != "POST" && METHOD != "DELETE")
 	{
 		rep = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
-		location = "directory/405.html";
+		location = errorPageLocation(405, s);
 	}
-	else if ((METHOD == "GET" || METHOD == "POST" || METHOD == "DELETE")
-				&& location == "directory")
+	/*else if ((METHOD == "GET" || METHOD == "POST" || METHOD == "DELETE")
+			&& location == "directory")
 	{
 		rep = "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
-		location = "directory/400.html";
-	}
+		location = errorPageLocation(400, s);
+	}*/
 	else if (!IsPathExist(location))
 	{
 		rep = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
-		location = "directory/404.html";
+		location = errorPageLocation(404, s);
 	}
 	// else if (s.find("Content-Length") == std::string::npos)
 	// {
 	// 	message += "HTTP/1.1 411 Length Required";
 	// }
-	else if (location == "directory/")
+	else if (location == (s.root + "/"))
 	{
 		rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html";
-		location = "directory/index.html";
+		location += "index.html";
 	}
 	else if (HTTP != "1.1")
 	{
 		rep = "HTTP/1.1 505 HTTP Version not supported\r\nContent-Type: text/html";
-		location = "directory/505.html";
+		location = errorPageLocation(505, s);
 	}
 	else if (!CheckFilePerm(location))
 	{
 		rep = "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html";
-		location = "directory/505.html";
+		location = errorPageLocation(505, s); //ask Raph if this code is the right one
 	}
 	else
 	{
 		rep = "HTTP/1.1 200 OK\r\nContent-Type: ";
 		rep += findTypeofFile(location);
 	}
-	
-	rep += "\r\nContent-Length: ";
+	/*if (fileSize(location) > max)
+	{
+		std::cout << "file size: " << fileSize(location) << std::endl;
+		rep = "HTTP/1.1 413 Request Entity Too Large\r\nContent-Type: text/html";
+		location = errorPageLocation(505, s); //create a real page for that
+	}*/
+    rep += "\r\nContent-Length: ";
 	rep += countFileChar(location);
 	setenv("CONTENT_LENGTH", countFileChar(location).c_str(), 0);
 	rep += "\r\n\r\n" + getFileContent(location);

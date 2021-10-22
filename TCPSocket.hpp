@@ -73,8 +73,8 @@ class TCPSocket
 				totalSentBytes+= sentBytes;
 				while (totalSentBytes < answer.size())
 				{
-					if ((sentBytes = send(fd, &answer[0 + totalSentBytes], bytesLeft, 0)) < 0)
-						throw TCPSocketException("while sending");
+					/*if ((*/sentBytes = send(fd, &answer[0 + totalSentBytes], bytesLeft, 0);/*) < 0)*/
+						//throw TCPSocketException("while sending");
 					bytesLeft-= sentBytes;
 					totalSentBytes+= sentBytes;
 				}
