@@ -6,14 +6,15 @@
 #    By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/23 19:42:48 by rbourgea          #+#    #+#              #
-#    Updated: 2021/10/16 18:11:39 by rbourgea         ###   ########.fr        #
+#    Updated: 2021/10/21 14:55:31 by rbourgea         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	= 	webserv
 
 SRCS	=	parser.cpp \
-			webserv.cpp
+			webserv.cpp \
+			CGI.cpp
 
 OBJS	=	$(SRCS:.cpp=.o)
 
