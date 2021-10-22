@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/22 16:27:17 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/22 17:24:38 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,12 +297,14 @@ void CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			if (first != std::string::npos)
 			{
 				cgi->add_variable("QUERY_STRING", line.substr(first + 1));
+				cgi->add_variable("PATH_INFO", "");
 				std::string nscript = line.replace(line.find("?"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
 			}
-			else if (line.find(".cgi/") != std::string::npos)
+			else if (line.find(".cgi/") != std::string::npos) //CONFIG EXTENTION CGI
 			{
 				first = line.find(".cgi/");
+				cgi->add_variable("QUERY_STRING", "");
 				cgi->add_variable("PATH_INFO", line.substr(first + 5));
 				std::string nscript = line.replace(line.find("/"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
@@ -418,6 +420,7 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer)
 	CGI *cgi = new CGI;
 	CGIparsing(buffer, cgi);
 	cgi->print_env();
+	cgi->execute("test");
 	delete cgi;
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());

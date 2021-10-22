@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:42:20 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/21 14:55:38 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/22 17:12:54 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ class CGI
 		int					get_fd() const;
 		cgi_status::status	status();
 		std::vector<char *>	print_env();
+		int execute(std::string const &cgi_path);
 		template <typename T>
 		void add_variable(std::string name, T value)
 		{
@@ -62,7 +63,7 @@ class CGI
 		int					_child_return;
 		std::vector<char *>	_variables;
 		bool				isPipeEmpty(int fd) const;
-		int execute(std::string const &cgi_path);
+		// int execute(std::string const &cgi_path);
 		int get_pipe() const;
 };
 
