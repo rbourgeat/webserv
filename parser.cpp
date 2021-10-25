@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/22 17:31:33 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/24 18:03:23 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -460,11 +460,11 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct ser
 	// print_CGIenv();
 
 	// NEW CGI SYSTEM
-	CGI *cgi = new CGI;
-	CGIparsing(buffer, cgi);
-	cgi->print_env();
-	cgi->execute("test");
-	delete cgi;
+	// CGI *cgi = new CGI;
+	// CGIparsing(buffer, cgi);
+	// cgi->print_env();
+	// // cgi->execute("test");
+	// delete cgi;
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);

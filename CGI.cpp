@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/22 14:23:41 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/25 12:26:04 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ int CGI::execute(std::string const &path)
 		_status = cgi_status::SYSTEM_ERROR;
 		free(cgi);
 		for (i = 0; i < _variables.size(); i++) {
-		free(env[i]);
+			free(env[i]);
 		}
 		return (-1);
 	}
