@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/25 12:26:04 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/27 15:11:27 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ cgi_status::status CGI::status()
 	return (_status);
 }
 
-int CGI::execute(std::string const &path)
+int CGI::execute(std::string const &PATH, std::string METHOD)
 {
 	_status = cgi_status::NON_INIT;
 
@@ -102,7 +102,7 @@ int CGI::execute(std::string const &path)
 	}
 
 	size_t i = 0;
-	char *cgi = strdup(path.c_str());
+	char *cgi = strdup(PATH.c_str());
 	if (cgi == NULL) //  + check if file is good
 	{
 		_status = cgi_status::SYSTEM_ERROR;
@@ -132,12 +132,15 @@ int CGI::execute(std::string const &path)
 		}
 		return (-1);
 	}
-	
+
+	std::cout << "test debug 1" << std::endl;
+
 	if (_child_pid == 0)
 	{
 		// Path of cgi file:
-		std::string exec_path = "42";
-		
+		std::string exec_path = PATH;
+		std::cout << "test debug 2" << std::endl;
+
 		if (dup2(output[1], 1) < 0 || dup2(input[0], 0) < 0)
 		{
 			close(input[1]);
@@ -146,14 +149,18 @@ int CGI::execute(std::string const &path)
 			close(output[0]);
 			exit(-1);
 		}
+		std::cout << "test debug 3" << std::endl;
 		if (chdir(exec_path.c_str()) < 0)
 			exit(-1);
+		std::cout << "test debug 4" << std::endl;
 		close(input[1]);
 		close(input[0]);
 		close(output[1]);
 		close(output[0]);
+		std::cout << "test args: " << args << std::endl;
 		execve(args[0], args, env);
 		exit(-1);
+		std::cout << "test debug 5" << std::endl;
 
 	} else {
 		// Starting timer for waiting server
@@ -168,8 +175,8 @@ int CGI::execute(std::string const &path)
 		close(output[1]);
 		_pipe = output[0];
 		fcntl(_pipe, F_SETFL, O_NONBLOCK);
-		// check if method == POST || body is empty
-		if (1)
+		// check if method == POST || body is empty 🔍
+		if (METHOD == "POST")
 		{
 			close(input[1]);
 			return (-1);

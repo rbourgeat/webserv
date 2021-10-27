@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/24 18:03:23 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/27 17:19:19 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -267,9 +267,10 @@ std::string countFileChar(std::string string)
 // 	std::cout << "---------------------------" << std::endl;
 // }
 
-void CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
+std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 {
 	std::vector<char> tmp;
+	std::string FILE_PATH = "";
 	int i = 0;
 
 	while ((size_t)i < buffer.size())
@@ -318,6 +319,7 @@ void CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 				cgi->add_variable("PATH_INFO", line.substr(first + 5));
 				std::string nscript = line.replace(line.find("/"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
+				FILE_PATH = "directory/cgi-bin/" + nscript;
 			}
 			else
 				cgi->add_variable("SCRIPT_NAME", line);
@@ -340,6 +342,7 @@ void CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			cgi->add_variable("HTTP_ACCEPT_LANGUAGE", line.substr(first + 17));
 
 	}
+	return (FILE_PATH);
 }
 
 std::string	errorPageLocation(int code, struct server s)
@@ -460,11 +463,11 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct ser
 	// print_CGIenv();
 
 	// NEW CGI SYSTEM
-	// CGI *cgi = new CGI;
-	// CGIparsing(buffer, cgi);
-	// cgi->print_env();
-	// // cgi->execute("test");
-	// delete cgi;
+	CGI *cgi = new CGI;
+	std::string CGI_PATH = CGIparsing(buffer, cgi);
+	cgi->print_env();
+	cgi->execute(CGI_PATH, METHOD);
+	delete cgi;
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);
