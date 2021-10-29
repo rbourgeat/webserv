@@ -1,0 +1,15 @@
+1) Explain the basics of an HTTP server
+
+2) Which functin has been used for I/O multiplexing?
+poll()
+
+3) How does poll() work?
+
+4) Do you use only one poll()? How did you manage accept() and recv()?
+
+5)  - poll() or equivalent should be in the main() loop --> Yes, refer to main() function in webserv.cpp.
+    - should check fd for read and write at the same time --> Yes, refer to class PollFd, function addFd, in PollFd.hpp.
+
+6) Check that if an error returns on recv()/send(), the client socket is removed.
+
+7) Check that errors checked are 0 and -1.
