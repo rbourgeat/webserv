@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/27 17:19:19 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/28 18:25:05 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,17 +215,17 @@ bool CheckFilePerm(std::string& path)
 	return (1);
 }
 
-size_t		fileSize(std::string string)
+unsigned long long		fileSize(std::string string)
 {
 	std::ifstream in_file(string, std::ios::binary);
     in_file.seekg(0, std::ios::end);
-    size_t file_size = in_file.tellg();
+    unsigned long long file_size = in_file.tellg();
 	return (file_size);
 }
 
 std::string countFileChar(std::string string)
 {
-	size_t file_size = fileSize(string);
+	unsigned long long file_size = fileSize(string);
 	/*std::ifstream in_file(string, std::ios::binary);
 	in_file.seekg(0, std::ios::end);
 	int file_size = in_file.tellg();*/
@@ -368,8 +368,8 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct ser
 	std::string location,  METHOD = "NAN", PATH = "NAN", HTTP, s_tmp_previous;
 	std::vector<char> tmp;
 	int i = 0;
-	//size_t max; //maybe problem comes from size_t max value
-	/*if (s.max_body_size > 0)
+	unsigned long long max; //maybe problem comes from size_t max value
+	if (s.max_body_size > 0)
 		max = s.max_body_size;
 	else
 		max = 1000000; //1 Megabyte (default for nginx)*/
@@ -447,12 +447,12 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct ser
 		rep = "HTTP/1.1 200 OK\r\nContent-Type: ";
 		rep += findTypeofFile(location);
 	}
-	/*if (fileSize(location) > max)
+	if (fileSize(location) > max)
 	{
 		std::cout << "file size: " << fileSize(location) << std::endl;
 		rep = "HTTP/1.1 413 Request Entity Too Large\r\nContent-Type: text/html";
 		location = errorPageLocation(505, s); //create a real page for that
-	}*/
+	}
     rep += "\r\nContent-Length: ";
 	rep += countFileChar(location);
 	setenv("CONTENT_LENGTH", countFileChar(location).c_str(), 0);

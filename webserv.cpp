@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/22 11:22:51 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/29 14:47:53 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ int		main(int argc, char const *argv[])
 						/*2 Receive request message (i.e., request for accessing a file OR executing a file (CGI program) to get the output) from client and parse it to analyze what is client expectation*/
 						int k;
 						k = findClient(vPfd.getPfd()[i].fd, clients);
-						std::vector<unsigned char> request(60000);
+						std::vector<unsigned char> request;
 						std::cout << GRN << "+++ Request received from fd " << vPfd.getPfd()[i].fd << " +++\n";
 						request = servers[clients[k].servIndex].sock.socketRecv(i, vPfd);
 						if (request.size() <= 0)
@@ -109,17 +109,23 @@ int		main(int argc, char const *argv[])
 						}
 					}
 					/*3. Send response message to client: either succeed in fulfilling request (i.e., provide access to the file OR returns file execution output), or return appropriate error status code*/
-					if (vPfd.getPfd()[i].revents & POLLOUT)
+					if (i < vPfd.getFdCount())
 					{
-						int k;
-						if ((k = findClient(vPfd.getPfd()[i].fd, clients)) != -1)
+						if (vPfd.getPfd()[i].revents & POLLOUT)
 						{
-							if (clients[k].answer.size() > 0)
+							int k;
+							if ((k = findClient(vPfd.getPfd()[i].fd, clients)) != -1)
 							{
-								servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
-								std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
-								//clients[k].answer.clear();
-								std::cout << std::endl;
+								std::cout << clients[k].answer.size() << std::endl;
+								if (clients[k].answer.size() > 0)
+								{
+									servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
+									std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
+									for (size_t l(0); l < 75; l++)
+										std::cout << MAG << clients[k].answer[l];
+									//clients[k].answer.clear();
+									std::cout << std::endl;
+								}
 							}
 						}
 					}

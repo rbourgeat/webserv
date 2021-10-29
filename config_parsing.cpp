@@ -92,6 +92,9 @@ void	addServer(std::vector<struct server> *servers, std::string serverBlock)
             while (serverBlock[i] && serverBlock[i] != '\n')
                 i++;
 		}
+		if (serverBlock[i] == '#')
+			while (serverBlock[i] != '\n')
+				i++;
 		if (serverBlock[i] == '\n')
 			i++;
 	}
