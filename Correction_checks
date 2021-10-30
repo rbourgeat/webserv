@@ -1,9 +1,19 @@
 1) Explain the basics of an HTTP server
+- Basics:
+The HTTP protocol is a request/response protocol. A client sends a request to the server in the form of a request
+method, URI, and protocol version, followed by a MIME(Multipurpose Internet Mail Extensions )-like message containing request modifiers, client
+information, and possible body content over a connection with a server. The server responds with a status line,
+including the message’s protocol version and a success or error code, followed by a MIME-like message containing
+server information, entity metainformation, and possible entity-body content.
+Source: RFC 2616
+- How this is implemented in this project:
 
-2) Which functin has been used for I/O multiplexing?
+
+2) Which function has been used for I/O multiplexing?
 poll()
 
 3) How does poll() work?
+
 
 4) Do you use only one poll()? How did you manage accept() and recv()?
 
