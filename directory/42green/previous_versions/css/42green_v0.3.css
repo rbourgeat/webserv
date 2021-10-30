@@ -1,0 +1,120 @@
+*
+{
+	background-color: #f5f8f6;
+	color: #000036;
+	font-family: Ryman Eco, Arial, sans-serif;
+}
+
+.announcement
+{
+	font-size: xx-large;
+	width: 900px;
+	padding: 10px;
+	margin: 20px auto;
+	text-align: center;
+	font-weight: bold;
+	line-height: 50px;
+	background-color: transparent;
+	color: #dffaf4;
+}
+
+h1
+{
+	font-size: x-large;
+	font-weight: bold;
+}
+
+p, ul
+{
+	line-height: 30px;
+	font-size: medium;
+}
+
+li
+{
+	list-style-type: none; 
+}
+
+.logo
+{
+	float: left;
+	background-color: transparent;
+	height: 200px;
+}
+
+.transition
+{
+	font-size: x-large;
+	text-align: center;
+}
+
+.sources
+{
+	font-size: small;
+}
+
+strong
+{
+	font-weight: bold;
+}
+
+article
+{
+	padding: 10px;
+	margin: 20px auto;
+	text-align: center;
+	font-size: x-large;
+}
+
+mark
+{
+	background-color: #6aeb6a;
+}
+
+#top
+{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-content: center;
+	height: 200px;
+	text-align: center;
+	align-items: center;
+	margin-bottom: 50px;
+	margin-right: 40px;
+}
+
+.asso
+{
+	font-size: x-large;
+	text-align: left	
+}
+
+.slogan
+{
+	font-size: 50px;
+	text-align: center;
+}
+
+.table
+{
+	font-size: medium;
+	text-align: left;
+}
+
+#num_resp
+{
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	margin-bottom: 50px;
+}
+
+.element
+{
+	padding: 20px;
+	width: 800px;
+	border: 3px solid;
+	border-color: #000036;
+}
