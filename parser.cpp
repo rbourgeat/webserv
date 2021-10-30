@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/28 18:25:05 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/30 08:46:47 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -226,9 +226,6 @@ unsigned long long		fileSize(std::string string)
 std::string countFileChar(std::string string)
 {
 	unsigned long long file_size = fileSize(string);
-	/*std::ifstream in_file(string, std::ios::binary);
-	in_file.seekg(0, std::ios::end);
-	int file_size = in_file.tellg();*/
 	std::stringstream ss;
 	ss << file_size;
 	ss >> string;
@@ -363,12 +360,13 @@ std::string	errorPageLocation(int code, struct server s)
 
 }
 
+
 std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct server s)
 {
 	std::string location,  METHOD = "NAN", PATH = "NAN", HTTP, s_tmp_previous;
 	std::vector<char> tmp;
 	int i = 0;
-	unsigned long long max; //maybe problem comes from size_t max value
+	/*unsigned long long max; //maybe problem comes from size_t max value
 	if (s.max_body_size > 0)
 		max = s.max_body_size;
 	else
@@ -447,13 +445,16 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct ser
 		rep = "HTTP/1.1 200 OK\r\nContent-Type: ";
 		rep += findTypeofFile(location);
 	}
-	if (fileSize(location) > max)
+	if (s.max_body_size > 0)
+	{
+	if (fileSize(location) > s.max_body_size)
 	{
 		std::cout << "file size: " << fileSize(location) << std::endl;
 		rep = "HTTP/1.1 413 Request Entity Too Large\r\nContent-Type: text/html";
 		location = errorPageLocation(505, s); //create a real page for that
 	}
-    rep += "\r\nContent-Length: ";
+	}
+  rep += "\r\nContent-Length: ";
 	rep += countFileChar(location);
 	setenv("CONTENT_LENGTH", countFileChar(location).c_str(), 0);
 	rep += "\r\n\r\n" + getFileContent(location);

@@ -59,11 +59,11 @@ class TCPSocket
 			return (new_socket);
 		}
 
-		unsigned long long		socketSend(int fd, std::vector<unsigned char> answer)
+		size_t		socketSend(int fd, std::vector<unsigned char> answer)
 		{
-			unsigned long long sentBytes(0);
-			unsigned long long totalSentBytes(0);
-			unsigned long long bytesLeft = answer.size();
+			int sentBytes(0);
+			size_t totalSentBytes(0);
+			size_t bytesLeft = answer.size();
 
 			if ((sentBytes = send(fd, &answer[0], bytesLeft, 0)) < 0)
 				throw TCPSocketException("while sending");
