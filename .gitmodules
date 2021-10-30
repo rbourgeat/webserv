@@ -1,0 +1,3 @@
+[submodule "directory/42green"]
+	path = directory/42green
+	url = http://gitlab.com/alouis/42green_website.git
