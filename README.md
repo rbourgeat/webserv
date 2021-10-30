@@ -31,6 +31,7 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [accept](https://man7.org/linux/man-pages/man2/accept.2.html): accepts a connection on a socket.
 
 **CGI Doc**
+- [RFC 3875: CGI](https://www.rfc-editor.org/rfc/rfc3875.pdf)
 - [Best CGI Exemple](https://www.fi.muni.cz/usr/jkucera/tic/tic0305.html): Programmation CGI in C++.
 - [CGI Environmnent Variables](https://fr.wikipedia.org/wiki/Variables_d%27environnement_CGI)
 - [Good CGI Howto (and cookies)](http://www.purplepixie.org/cgi/howto.php)
