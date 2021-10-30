@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/29 14:47:53 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/30 16:20:47 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ int		main(int argc, char const *argv[])
 									for (size_t l(0); l < 75; l++)
 										std::cout << MAG << clients[k].answer[l];
 									//clients[k].answer.clear();
-									std::cout << std::endl;
+									std::cout << NC << std::endl;
 								}
 							}
 						}

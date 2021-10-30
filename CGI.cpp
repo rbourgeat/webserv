@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/27 15:11:27 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/30 18:07:42 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,17 +88,18 @@ cgi_status::status CGI::status()
 	return (_status);
 }
 
-int CGI::execute(std::string const &PATH, std::string METHOD)
+std::string CGI::execute(std::string PATH, std::string METHOD)
 {
 	_status = cgi_status::NON_INIT;
+	(void)METHOD;
 
 	int output[2];
-	int input[2];
+	// int input[2];
 	// Openning file descriptors
-	if (pipe(output) < 0 || pipe(input) < 0)
+	if (pipe(output) < 0)
 	{
 		_status = cgi_status::SYSTEM_ERROR;
-		return (-1);
+		return ("Error");
 	}
 
 	size_t i = 0;
@@ -107,7 +108,7 @@ int CGI::execute(std::string const &PATH, std::string METHOD)
 	{
 		_status = cgi_status::SYSTEM_ERROR;
 		free(cgi);
-		return (-1);
+		return ("Error");
 	}
 
 	char *env[_variables.size() + 1];
@@ -121,8 +122,7 @@ int CGI::execute(std::string const &PATH, std::string METHOD)
 	char *args[] = {cgi, NULL};
 	
 	// Multi-threading....
-	_child_pid = fork();
-	if (_child_pid < 0)
+	if ((_child_pid = fork()) < 0)
 	{
 		std::cerr << "System Error : fork()" << std::endl;
 		_status = cgi_status::SYSTEM_ERROR;
@@ -130,65 +130,53 @@ int CGI::execute(std::string const &PATH, std::string METHOD)
 		for (i = 0; i < _variables.size(); i++) {
 			free(env[i]);
 		}
-		return (-1);
+		return ("Error");
 	}
 
-	std::cout << "test debug 1" << std::endl;
+	std::cout << _child_pid << std::endl;
 
 	if (_child_pid == 0)
 	{
-		// Path of cgi file:
 		std::string exec_path = PATH;
-		std::cout << "test debug 2" << std::endl;
-
-		if (dup2(output[1], 1) < 0 || dup2(input[0], 0) < 0)
+		close(output[0]);
+		if (dup2(output[1], 1) < 0)
 		{
-			close(input[1]);
-			close(input[0]);
 			close(output[1]);
 			close(output[0]);
 			exit(-1);
 		}
-		std::cout << "test debug 3" << std::endl;
-		if (chdir(exec_path.c_str()) < 0)
-			exit(-1);
-		std::cout << "test debug 4" << std::endl;
-		close(input[1]);
-		close(input[0]);
-		close(output[1]);
-		close(output[0]);
-		std::cout << "test args: " << args << std::endl;
+
 		execve(args[0], args, env);
 		exit(-1);
-		std::cout << "test debug 5" << std::endl;
 
 	} else {
-		// Starting timer for waiting server
-		// _cgiTimer.start();
+		wait(NULL);
+		close(output[1]);
+		dup2(output[0], 0);
+
 		_status = cgi_status::WAITING;
 		free(cgi);
 		for (i = 0; i < _variables.size(); i++)
 		{
 			free(env[i]);
 		}
-		close(input[0]);
-		close(output[1]);
+		
 		_pipe = output[0];
-		fcntl(_pipe, F_SETFL, O_NONBLOCK);
-		// check if method == POST || body is empty 🔍
-		if (METHOD == "POST")
-		{
-			close(input[1]);
-			return (-1);
-		}
-		else
-		{
-			fcntl(input[1], F_SETFL, O_NONBLOCK);
-			return input[1];
-		}
+		_buffSize = read(_pipe, _buffer, 10000);
+		close(output[0]);
+		return (_buffer);
+		// std::cout << buff << std::endl;
+		// fcntl(_pipe, F_SETFL, O_NONBLOCK);
 	}
 
-	return (1);
+	return ("");
+}
+
+std::string CGI::get_buffer_size()
+{
+	std::ostringstream ss;
+     ss << _buffSize;
+    return ss.str();
 }
 
 int CGI::get_pipe() const

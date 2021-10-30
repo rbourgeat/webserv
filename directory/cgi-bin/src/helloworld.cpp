@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 12:58:22 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/22 16:51:54 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/30 14:27:09 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int main () {
    std::cout << "<title>Hello World - First CGI Program</title>\n";
    std::cout << "</head>\n";
    std::cout << "<body>\n";
-   std::cout << "<h2>Hello World! This is my first CGI program</h2>\n";
+   std::cout << "<h2>Hello World! This is our first CGI program</h2>\n";
    std::cout << "</body>\n";
    std::cout << "</html>\n";
    

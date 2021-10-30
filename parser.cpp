@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/30 08:46:47 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/30 18:06:59 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,7 @@ std::string findTypeofFile(std::string path)
 {
 	std::string str = path.substr(path.find_last_of(".") + 1);
 
-	if (str == "html")
-		return ("text/html");
-	else if (str == "htm")
-		return ("text/html");
-	else if (str == "shtml")
+	if (str == "html" || str == "htm" || str == "shtml")
 		return ("text/html");
 	else if (str == "css")
 		return ("text/css");
@@ -306,20 +302,27 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			{
 				cgi->add_variable("QUERY_STRING", line.substr(first + 1));
 				cgi->add_variable("PATH_INFO", "");
-				std::string nscript = line.replace(line.find("?"), std::string::npos, "");
+				std::string nscript = "/cgi-bin/" + line.replace(line.find("?"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
+				FILE_PATH = "directory" + nscript;
 			}
 			else if (line.find(".cgi/") != std::string::npos) //CONFIG EXTENTION CGI
 			{
 				first = line.find(".cgi/");
 				cgi->add_variable("QUERY_STRING", "");
 				cgi->add_variable("PATH_INFO", line.substr(first + 5));
-				std::string nscript = line.replace(line.find("/"), std::string::npos, "");
+				std::string nscript = "/cgi-bin/" + line.replace(line.find("/"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
-				FILE_PATH = "directory/cgi-bin/" + nscript;
+				FILE_PATH = "directory" + nscript;
 			}
 			else
-				cgi->add_variable("SCRIPT_NAME", line);
+			{
+				cgi->add_variable("QUERY_STRING", "");
+				cgi->add_variable("PATH_INFO", "");
+				std::string nscript = "/cgi-bin/" + line;
+				cgi->add_variable("SCRIPT_NAME", nscript);
+				FILE_PATH = "directory" + nscript;
+			}
 		}
 
 		first = line.find("User-Agent: ");
@@ -403,72 +406,75 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct ser
 	location += PATH;
 	std::cout << "location: " << location << std::endl;
 
-	setenv("REQUEST_METHOD", METHOD.c_str(), 0);
+	if (PATH.find(".cgi") == std::string::npos)
+	{
+		if (METHOD != "GET" && METHOD != "POST" && METHOD != "DELETE")
+		{
+			rep = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
+			location = errorPageLocation(405, s);
+		}
+		/*else if ((METHOD == "GET" || METHOD == "POST" || METHOD == "DELETE")
+				&& location == "directory")
+		{
+			rep = "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
+			location = errorPageLocation(400, s);
+		}*/
+		else if (!IsPathExist(location))
+		{
+			rep = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
+			location = errorPageLocation(404, s);
+		}
+		// else if (s.find("Content-Length") == std::string::npos)
+		// {
+		// 	message += "HTTP/1.1 411 Length Required";
+		// }
+		else if (location == (s.root + "/"))
+		{
+			rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html";
+			location += "index.html";
+		}
+		else if (HTTP != "1.1")
+		{
+			rep = "HTTP/1.1 505 HTTP Version not supported\r\nContent-Type: text/html";
+			location = errorPageLocation(505, s);
+		}
+		else if (!CheckFilePerm(location))
+		{
+			rep = "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html";
+			location = errorPageLocation(505, s); //ask Raph if this code is the right one
+		}
+		else
+		{
+			rep = "HTTP/1.1 200 OK\r\nContent-Type: ";
+			rep += findTypeofFile(location);
+		}
+		
+		if (s.max_body_size > 0)
+		{
+			if (fileSize(location) > s.max_body_size)
+			{
+				std::cout << "file size: " << fileSize(location) << std::endl;
+				rep = "HTTP/1.1 413 Request Entity Too Large\r\nContent-Type: text/html";
+				location = errorPageLocation(505, s); //create a real page for that
+			}
+		}
 
-	if (METHOD != "GET" && METHOD != "POST" && METHOD != "DELETE")
-	{
-		rep = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
-		location = errorPageLocation(405, s);
-	}
-	/*else if ((METHOD == "GET" || METHOD == "POST" || METHOD == "DELETE")
-			&& location == "directory")
-	{
-		rep = "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
-		location = errorPageLocation(400, s);
-	}*/
-	else if (!IsPathExist(location))
-	{
-		rep = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
-		location = errorPageLocation(404, s);
-	}
-	// else if (s.find("Content-Length") == std::string::npos)
-	// {
-	// 	message += "HTTP/1.1 411 Length Required";
-	// }
-	else if (location == (s.root + "/"))
-	{
-		rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html";
-		location += "index.html";
-	}
-	else if (HTTP != "1.1")
-	{
-		rep = "HTTP/1.1 505 HTTP Version not supported\r\nContent-Type: text/html";
-		location = errorPageLocation(505, s);
-	}
-	else if (!CheckFilePerm(location))
-	{
-		rep = "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html";
-		location = errorPageLocation(505, s); //ask Raph if this code is the right one
+		rep += "\r\nContent-Length: ";
+		rep += countFileChar(location); // verif le bon nombre !!
+		rep += "\r\n\r\n" + getFileContent(location);
 	}
 	else
 	{
-		rep = "HTTP/1.1 200 OK\r\nContent-Type: ";
-		rep += findTypeofFile(location);
+		CGI *cgi = new CGI;
+		std::string CGI_PATH = CGIparsing(buffer, cgi);
+		cgi->print_env();
+		rep += "HTTP/1.1 200 OK\r\n";
+		rep += "Content-Length: ";
+		rep += cgi->get_buffer_size();
+		rep += "\r\n" + cgi->execute(CGI_PATH, METHOD);
+		delete cgi;
 	}
-	if (s.max_body_size > 0)
-	{
-	if (fileSize(location) > s.max_body_size)
-	{
-		std::cout << "file size: " << fileSize(location) << std::endl;
-		rep = "HTTP/1.1 413 Request Entity Too Large\r\nContent-Type: text/html";
-		location = errorPageLocation(505, s); //create a real page for that
-	}
-	}
-  rep += "\r\nContent-Length: ";
-	rep += countFileChar(location);
-	setenv("CONTENT_LENGTH", countFileChar(location).c_str(), 0);
-	rep += "\r\n\r\n" + getFileContent(location);
 
-	//  OLD CGI SYSTEM
-	// CGIparsing(buffer);
-	// print_CGIenv();
-
-	// NEW CGI SYSTEM
-	CGI *cgi = new CGI;
-	std::string CGI_PATH = CGIparsing(buffer, cgi);
-	cgi->print_env();
-	cgi->execute(CGI_PATH, METHOD);
-	delete cgi;
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);
