@@ -1,4 +1,8 @@
+#ifndef SERVERANDCLIENT_HPP
+# define SERVERANDCLIENT_HPP
+
 #include "TCPSocket.hpp"
+#include "HTTPRequest.hpp"
 
 struct			errorPage
 {
@@ -20,7 +24,10 @@ struct							client
 {
 	int							socket;
 	int							servIndex;
+	HTTPRequest					request;
 	std::vector<unsigned char>	answer;
 };
 
 void  readConfig(char const *argv, std::vector<server> &server);
+
+#endif

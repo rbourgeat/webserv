@@ -6,7 +6,11 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2021/10/30 16:20:47 by rbourgea         ###   ########.fr       */
+=======
+/*   Updated: 2021/10/30 11:42:19 by dgoudet          ###   ########.fr       */
+>>>>>>> 993326a77c5c144ef7f254ebef46c7c5f6ae3bb5
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +96,7 @@ int		main(int argc, char const *argv[])
 						std::vector<unsigned char> request;
 						std::cout << GRN << "+++ Request received from fd " << vPfd.getPfd()[i].fd << " +++\n";
 						request = servers[clients[k].servIndex].sock.socketRecv(i, vPfd);
+						parseRequest(request, clients[k].request);						
 						if (request.size() <= 0)
 						{
 							std::vector<struct client>::iterator it(clients.begin());
