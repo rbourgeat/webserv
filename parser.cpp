@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/31 15:32:28 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/31 16:05:00 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -455,7 +455,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		cgi->print_env();
 		rep += "HTTP/1.1 200 OK\r\n";
 		rep += "Content-Length: ";
-		rep += cgi->get_buffer_size();
+		rep += "100";//cgi->get_buffer_size();
 		rep += "\r\n" + cgi->execute(CGI_PATH, METHOD);
 		delete cgi;
 	}
