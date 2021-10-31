@@ -6,11 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2021/10/30 16:20:47 by rbourgea         ###   ########.fr       */
-=======
-/*   Updated: 2021/10/30 11:42:19 by dgoudet          ###   ########.fr       */
->>>>>>> 993326a77c5c144ef7f254ebef46c7c5f6ae3bb5
+/*   Updated: 2021/10/31 09:45:14 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,8 +102,8 @@ int		main(int argc, char const *argv[])
 						}
 						else
 						{
-							for (size_t k(0); k < request.size(); k++)
-								std::cout << GRN << request[k];
+							for (size_t l(0); l < request.size(); l++)
+								std::cout << GRN << request[l];
 							std::cout << NC << std::endl;
 							std::vector<unsigned char> answer = parsing(request, servers[clients[k].servIndex]);
 							clients[k].answer = answer;

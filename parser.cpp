@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/30 18:08:37 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/10/31 09:33:55 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,7 +186,7 @@ std::string findTypeofFile(std::string path)
 
 std::string getFileContent(const std::string& path)
 {
-	std::basic_ifstream<char> fin(path, std::ios::binary);
+	std::basic_ifstream<char> fin(path.c_str(), std::ios::binary);
 	std::ostringstream oss;
 	oss << fin.rdbuf();
 	std::string data(oss.str());
@@ -201,11 +201,13 @@ bool IsPathExist(const std::string &s)
 
 bool CheckFilePerm(std::string& path)
 {
+	int errno(0);
+
 	if (access (path.c_str(), F_OK) != 0)
 	{
-		if (errno == ENOENT)
+		if (errno == 2) //2 = ENOENT --> No such file or directory.
 			return (1);
-		else if (errno == EACCES)
+		else if (errno == 13) //13 = EACCES --> Permission denied.
 			return (0);
 	}
 	return (1);
@@ -213,7 +215,7 @@ bool CheckFilePerm(std::string& path)
 
 unsigned long long		fileSize(std::string string)
 {
-	std::ifstream in_file(string, std::ios::binary);
+	std::ifstream in_file(string.c_str(), std::ios::binary);
     in_file.seekg(0, std::ios::end);
     unsigned long long file_size = in_file.tellg();
 	return (file_size);
@@ -287,7 +289,7 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 	{
 		if (line.empty() || line == "\r")
 			break;
-		if (line.back() == '\r')
+		if (line[line.size() - 1] == '\r')/*(line.back() == '\r') back() is a c++11 function*/
 			line.resize(line.size() - 1);
 		std::cout << "> " << line << "\n";
 
