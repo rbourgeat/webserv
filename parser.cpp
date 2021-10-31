@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/31 09:33:55 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/31 15:32:28 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -366,11 +366,10 @@ std::string	errorPageLocation(int code, struct server s)
 }
 
 
-std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct server s)
+std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned char> buffer, struct server s)
 {
 	std::string location,  METHOD = "NAN", PATH = "NAN", HTTP, s_tmp_previous;
 	std::vector<char> tmp;
-	int i = 0;
 	/*unsigned long long max; //maybe problem comes from size_t max value
 	if (s.max_body_size > 0)
 		max = s.max_body_size;
@@ -380,29 +379,13 @@ std::vector<unsigned char> parsing(std::vector<unsigned char> buffer, struct ser
 		location = s.root;
 	else
 		location = "directory";
+	
 	std::cout << "location before: " << location << std::endl;
-	while ((size_t)i < buffer.size())
-	{
-		while ((size_t)i < buffer.size() && buffer[i] != ' ')
-		{
-			tmp.push_back(buffer[i]);
-			i++;
-		}
-
-		std::string s_tmp(tmp.begin(), tmp.end());
-		// GET METHODS
-		if (s_tmp == "GET" || s_tmp == "POST" || s_tmp == "DELETE")
-			METHOD = s_tmp;
-		// GET PATH
-		if (s_tmp.rfind("/", 0) == 0)
-			PATH = s_tmp;
-		// GET HTTP
-		if (s_tmp.find("HTTP/") != std::string::npos)
-			HTTP.assign(tmp.begin() + 5, tmp.begin() + 8);
-
-		tmp.clear();
-		i++;
-	}
+	
+	METHOD.assign(request.rL.method.begin(), request.rL.method.end());
+	PATH.assign(request.rL.requestTarget.begin(), request.rL.requestTarget.end());
+	HTTP.assign(request.rL.httpVersion.begin() + 5, request.rL.httpVersion.begin() + 8);
+	std::cout << METHOD << " " << PATH << " " << HTTP << "\n";
 
 	std::string rep;
 	location += PATH;

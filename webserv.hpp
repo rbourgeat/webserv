@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/30 11:41:36 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/31 15:26:53 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@
 #define CYN "\e[0;36m"
 #include "HTTPRequest.hpp"
 
-std::vector<unsigned char>	parsing(std::vector<unsigned char> buffer, struct server s);
+std::vector<unsigned char>	parsing(HTTPRequest &request, std::vector<unsigned char> buffer, struct server s);
 void												cgi_get();
 void						parseRequest(std::vector<unsigned char> message, HTTPRequest &request);
 

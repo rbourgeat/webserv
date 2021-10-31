@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/31 12:30:36 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/31 15:23:09 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,7 +107,7 @@ int		main(int argc, char const *argv[])
 							std::cout << NC << std::endl;
 							if (clients[k].request.isComplete == true)
 							{
-								std::vector<unsigned char> answer = parsing(request, servers[clients[k].servIndex]);
+								std::vector<unsigned char> answer = parsing(clients[k].request, request, servers[clients[k].servIndex]);
 								clients[k].answer = answer;
 							}
 						}
