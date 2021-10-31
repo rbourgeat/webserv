@@ -20,18 +20,46 @@ class	HTTPRequest
 		HTTPRequest()
 		{
 			isBody = false;
+			isChunked = false;
 			isHeaderComplete = false;
 			isRequestLineComplete = false;
-			isMessageComplete = false;
+			isComplete = false;
 		}
 		~HTTPRequest(){;}
+
+		void		clearAll()
+		{
+						isBody = false;
+						body.clear();
+						isHeaderComplete = false;
+						isRequestLineComplete = false;
+						rL.method.clear();
+						rL.requestTarget.clear();
+						rL.httpVersion.clear();
+						isComplete = false;
+						headerFields.clear();
+		}
+		
+		void		determineIfBody()
+		{
+						std::map<std::string, std::string>::iterator it;
+						it = headerFields.find("Content-Length");
+						if (it != headerFields.end())
+								isBody = true;
+						it = headerFields.find("Transfer-Encoding");
+						if (it != headerFields.end())
+						{
+                isBody = true;
+								isChunked = true;
+						}
+		}
 
 		void		insertHeaderLine()
 		{
 			size_t i(0);
 			size_t j(0);
-			std::vector<unsigned char> temp1;
-			std::vector<unsigned char> temp2;
+			std::string temp1;
+			std::string temp2;
 			if (isRequestLineComplete == false)
 			{
 				insertHeaderRequestLine();
@@ -44,19 +72,19 @@ class	HTTPRequest
 					i++;
 					j++;
 				}
-				temp1 = std::vector<unsigned char>(tmp.begin() + (i - j), tmp.begin() + i);
+				temp1 = std::string(tmp.begin() + (i - j), tmp.begin() + i);
 				j = 0;
 				if (i < tmp.size() && tmp[i] == ':')
 					i++;
 				if (tmp[i] == ' ')
 					i++;
-				while (i < tmp.size() && tmp[i] != ' ' && tmp[i] != '\r')
+				while (i < tmp.size() && tmp[i] != ' ')
 				{
 					i++;
 					j++;
 				}
-				temp2 = std::vector<unsigned char>(tmp.begin() + (i - j), tmp.begin() + i);
-				headerFields.insert(std::pair<std::vector<unsigned char>, std::vector<unsigned char> >(temp1, temp2));
+				temp2 = std::string(tmp.begin() + (i - j), tmp.begin() + i);
+				headerFields.insert(std::pair<std::string, std::string>(temp1, temp2));
 			}
 			tmp.clear();
 		}
@@ -94,14 +122,15 @@ class	HTTPRequest
 		}
 
 	public: 
-		struct requestLine								rL;
-		std::map<std::vector<unsigned char>, std::vector<unsigned char> > headerFields;
-		std::vector<unsigned char>						body;
-		std::vector<unsigned char>						tmp;
-		bool											isBody;
-		bool											isHeaderComplete;
-		bool											isRequestLineComplete;
-		bool											isMessageComplete;
+		struct requestLine									rL;
+		std::map<std::string, std::string>	headerFields;
+		std::vector<unsigned char>					body;
+		std::vector<unsigned char>					tmp;
+		bool																isBody;
+		bool																isChunked;
+		bool																isHeaderComplete;
+		bool																isRequestLineComplete;
+		bool																isComplete;
 };
 
 #endif

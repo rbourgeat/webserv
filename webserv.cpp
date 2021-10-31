@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/31 09:45:14 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/10/31 12:30:36 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,6 @@ int		main(int argc, char const *argv[])
 						std::vector<unsigned char> request;
 						std::cout << GRN << "+++ Request received from fd " << vPfd.getPfd()[i].fd << " +++\n";
 						request = servers[clients[k].servIndex].sock.socketRecv(i, vPfd);
-						parseRequest(request, clients[k].request);						
 						if (request.size() <= 0)
 						{
 							std::vector<struct client>::iterator it(clients.begin());
@@ -102,11 +101,15 @@ int		main(int argc, char const *argv[])
 						}
 						else
 						{
+							parseRequest(request, clients[k].request);
 							for (size_t l(0); l < request.size(); l++)
 								std::cout << GRN << request[l];
 							std::cout << NC << std::endl;
-							std::vector<unsigned char> answer = parsing(request, servers[clients[k].servIndex]);
-							clients[k].answer = answer;
+							if (clients[k].request.isComplete == true)
+							{
+								std::vector<unsigned char> answer = parsing(request, servers[clients[k].servIndex]);
+								clients[k].answer = answer;
+							}
 						}
 					}
 					/*3. Send response message to client: either succeed in fulfilling request (i.e., provide access to the file OR returns file execution output), or return appropriate error status code*/
@@ -124,7 +127,8 @@ int		main(int argc, char const *argv[])
 									std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
 									for (size_t l(0); l < 75; l++)
 										std::cout << MAG << clients[k].answer[l];
-									//clients[k].answer.clear();
+									clients[k].answer.clear();
+									clients[k].request.clearAll();
 									std::cout << NC << std::endl;
 								}
 							}
