@@ -2,7 +2,7 @@
 
 void	printRequestHeader(HTTPRequest &request)
 {
-		  std::map<std::string, std::string>::iterator it(request.headerFields.begin());
+	std::map<std::string, std::string>::iterator it(request.headerFields.begin());
   std::cout << CYN << "PARSE REQUEST" << std::endl;
   for (size_t i(0); i < request.rL.method.size(); i++)
     std::cout << request.rL.method[i];

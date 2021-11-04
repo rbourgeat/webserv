@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/31 16:05:00 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/04 15:47:48 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -199,9 +199,10 @@ bool IsPathExist(const std::string &s)
 	return (stat (s.c_str(), &buffer) == 0);
 }
 
+
 bool CheckFilePerm(std::string& path)
 {
-	int errno(0);
+	int errno;
 
 	if (access (path.c_str(), F_OK) != 0)
 	{
@@ -303,6 +304,8 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			if (first != std::string::npos)
 			{
 				cgi->add_variable("QUERY_STRING", line.substr(first + 1));
+				setenv("QUERY_STRING", line.substr(first + 1).c_str(), 1);
+				// cgi->set_QUERY_STRING(line.substr(first + 1).c_str());
 				cgi->add_variable("PATH_INFO", "");
 				std::string nscript = "/cgi-bin/" + line.replace(line.find("?"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
@@ -453,10 +456,11 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		CGI *cgi = new CGI;
 		std::string CGI_PATH = CGIparsing(buffer, cgi);
 		cgi->print_env();
+		std::string message = cgi->execute(CGI_PATH, METHOD);
 		rep += "HTTP/1.1 200 OK\r\n";
 		rep += "Content-Length: ";
-		rep += "100";//cgi->get_buffer_size();
-		rep += "\r\n" + cgi->execute(CGI_PATH, METHOD);
+		rep += cgi->get_buffer_size();
+		rep += "\r\n" + message;
 		delete cgi;
 	}
 
