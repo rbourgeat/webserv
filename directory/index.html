@@ -27,7 +27,17 @@
   ➤ <a href="krolhm">Test Bad Path file</a><br><br>
   <ins>❖ CGI tests:</ins><br>
   ➤ <a href="cgi-bin/helloworld.cgi">Test hello_world.cgi</a><br>
-  ➤ <a href="cgi-bin/multiplication.cgi?a=2&b=4">Test multiplication.cgi 2 * 4</a><br>
-  ➤ <Form method="GET" ACTION="/cgi-bin/multiplication.cgi">
-      <p>a = <INPUT TYPE="number" NAME="a" VALUE="42" size="40"> b = <INPUT TYPE="number" NAME="b" VALUE="2567" size="40"> <input type="submit" name="submit"> </p>
-    </Form><br>
+  <p>METHODS:</p>
+  <Form method="GET" action="/cgi-bin/multiplication.cgi">
+    <p>➤ GET a = <INPUT type="number" NAME="a" value="42" size="40"> x b = <INPUT type="number" NAME="b" VALUE="42" size="40"> <input type="submit" name="submit"> </p>
+  </Form><br>
+  <Form method="POST" action="/cgi-bin/postdata.cgi">
+    <p>➤ POST data = <INPUT type="text" NAME="data" value="ecole 42" size="40"><input type="submit" name="submit"> </p>
+  </Form><br>
+  <form method="POST" action="/upload/" enctype="multipart/form-data">
+    <p>➤ POST file = <input type="file" name="file1"> <button type="submit">Upload</button></p>
+  </form><br>
+  ➤ DELETE (use telnet or curl)
+  <Form method="RANDOM" ACTION="/cgi-bin/postdata.cgi">
+    <p>➤ RANDOM data = <INPUT TYPE="text" NAME="data" VALUE="ecole 42" size="40"><input type="submit" name="submit"> </p>
+  </Form><br>

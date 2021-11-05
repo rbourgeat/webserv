@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/05 15:13:46 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/05 17:57:52 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -433,6 +433,14 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			rep = "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html";
 			location = errorPageLocation(403, s);
 		}
+		else if (METHOD == "DELETE")
+		{
+			if (remove(PATH.c_str()) == 0) {
+				std::cout << "The file is deleted successfully." << std::endl;
+			} else {
+				std::cout << "The file is not deleted." << std::endl;
+			}
+		}
 		else
 		{
 			rep = "HTTP/1.1 200 OK\r\nContent-Type: ";
@@ -460,11 +468,10 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		cgi->print_env();
 		std::string message = cgi->execute(CGI_PATH, METHOD);
 		size_t position = message.find("\n");
-		std::string mBody = message.substr(position);
-	
+		size_t position2 = message.find("\n", position + 1);
 		rep += "HTTP/1.1 200 OK\r\n";
 		rep += "Content-Length: ";
-		rep += cgi->get_buffer_size();
+		rep += cgi->get_buffer_size(position2);
 		rep += "\r\n" + message;
 		delete cgi;
 	}
