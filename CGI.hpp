@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:42:20 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/04 15:41:11 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/05 16:50:36 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,7 @@ class CGI
 		cgi_status::status	status();
 		std::vector<char *>	print_env();
 		std::string execute(std::string PATH, std::string METHOD);
-		std::string			get_buffer_size();
-		const char*			get_QUERY_STRING();
-		void				set_QUERY_STRING(const char* str);
+		std::string			get_buffer_size(int count);
 		template <typename T>
 		void add_variable(std::string name, T value)
 		{
@@ -67,7 +65,6 @@ class CGI
 		std::vector<char *>	_variables;
 		char				_buffer[10000];
 		ssize_t				_buffSize;
-		const char*			_QUERY_STRING;
 		bool				isPipeEmpty(int fd) const;
 		// int execute(std::string const &cgi_path);
 		int get_pipe() const;
