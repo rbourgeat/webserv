@@ -33,6 +33,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 				i+= 2;
 				if (message[i] == '\r' && message[i + 1] == '\n')
 				{
+					i+= 2;
 					request.insertHeaderLine();
 					request.isHeaderComplete = true;
 					printRequestHeader(request);
@@ -50,11 +51,18 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 			}
 		}
 	}
-	/*if (request.isBody == true)
+	if (request.isBody == true)
 	{
-					if (request.isChunked == false)
-					{
-					}
-
-	}*/
+		std::cout << "ici\n";
+		if (request.isChunked == false)
+		{
+			while (i < message.size())
+			{
+				request.body.push_back(message[i]);
+				i++;
+			}
+			if (request.body.size() == request.bodySize)
+				request.isComplete = true;
+		}
+	}
 }
