@@ -4,6 +4,9 @@
 #include <vector>
 #include <map>
 #include <iostream>
+#define NC "\e[0m"
+#define GRN "\e[0;32m"
+#define MAG "\e[0;35m"
 #define CYN "\e[0;36m"
 
 struct	requestLine
@@ -24,6 +27,7 @@ class	HTTPRequest
 			isHeaderComplete = false;
 			isRequestLineComplete = false;
 			isComplete = false;
+			currentBodySize = 0;
 		}
 		~HTTPRequest(){;}
 
@@ -129,6 +133,7 @@ class	HTTPRequest
 		std::map<std::string, std::string>	headerFields;
 		std::vector<unsigned char>					body;
 		size_t										bodySize;
+		size_t										currentBodySize;
 		std::vector<unsigned char>					tmp;
 		bool																isBody;
 		bool																isChunked;

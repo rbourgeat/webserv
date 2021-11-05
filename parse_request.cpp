@@ -20,12 +20,20 @@ void	printRequestHeader(HTTPRequest &request)
   }
 }
 
+void	printRequestBody(HTTPRequest &request)
+{
+	for (size_t i(0); i < request.body.size(); i++)
+		std::cout << request.body[i];
+	std::cout << std::endl;
+}
+
 void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 {
 	size_t i(0);
 
 	if (request.isHeaderComplete == false)
 	{
+		std::cout << "ici???\n";
 		while (i < message.size() && request.isHeaderComplete == false)
 		{
 			if (message[i] == '\r' && message[i + 1] == '\n')
@@ -51,18 +59,21 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 			}
 		}
 	}
-	if (request.isBody == true)
+	if (request.isBody == true && request.isHeaderComplete == true && request.isComplete == false)
 	{
-		std::cout << "ici\n";
 		if (request.isChunked == false)
 		{
-			while (i < message.size())
+			while (i < message.size() && request.currentBodySize < request.bodySize)
 			{
 				request.body.push_back(message[i]);
 				i++;
+				request.currentBodySize++;
 			}
 			if (request.body.size() == request.bodySize)
+			{
 				request.isComplete = true;
+				printRequestBody(request);
+			}
 		}
 	}
 }
