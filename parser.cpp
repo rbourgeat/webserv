@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/04 15:47:48 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/05 15:13:46 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -315,6 +315,7 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			{
 				first = line.find(".cgi/");
 				cgi->add_variable("QUERY_STRING", "");
+				setenv("QUERY_STRING", line.substr(first + 1).c_str(), 1);
 				cgi->add_variable("PATH_INFO", line.substr(first + 5));
 				std::string nscript = "/cgi-bin/" + line.replace(line.find("/"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
@@ -323,6 +324,7 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			else
 			{
 				cgi->add_variable("QUERY_STRING", "");
+				setenv("QUERY_STRING", line.substr(first + 1).c_str(), 1);
 				cgi->add_variable("PATH_INFO", "");
 				std::string nscript = "/cgi-bin/" + line;
 				cgi->add_variable("SCRIPT_NAME", nscript);
@@ -429,7 +431,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		else if (!CheckFilePerm(location))
 		{
 			rep = "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html";
-			location = errorPageLocation(505, s); //ask Raph if this code is the right one
+			location = errorPageLocation(403, s);
 		}
 		else
 		{
@@ -457,6 +459,9 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		std::string CGI_PATH = CGIparsing(buffer, cgi);
 		cgi->print_env();
 		std::string message = cgi->execute(CGI_PATH, METHOD);
+		size_t position = message.find("\n");
+		std::string mBody = message.substr(position);
+	
 		rep += "HTTP/1.1 200 OK\r\n";
 		rep += "Content-Length: ";
 		rep += cgi->get_buffer_size();
