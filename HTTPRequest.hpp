@@ -29,29 +29,32 @@ class	HTTPRequest
 
 		void		clearAll()
 		{
-						isBody = false;
-						body.clear();
-						isHeaderComplete = false;
-						isRequestLineComplete = false;
-						rL.method.clear();
-						rL.requestTarget.clear();
-						rL.httpVersion.clear();
-						isComplete = false;
-						headerFields.clear();
+			isBody = false;
+			body.clear();
+			isHeaderComplete = false;
+			isRequestLineComplete = false;
+			rL.method.clear();
+			rL.requestTarget.clear();
+			rL.httpVersion.clear();
+			isComplete = false;
+			headerFields.clear();
 		}
-		
+
 		void		determineIfBody()
 		{
-						std::map<std::string, std::string>::iterator it;
-						it = headerFields.find("Content-Length");
-						if (it != headerFields.end())
-								isBody = true;
-						it = headerFields.find("Transfer-Encoding");
-						if (it != headerFields.end())
-						{
-                isBody = true;
-								isChunked = true;
-						}
+			std::map<std::string, std::string>::iterator it;
+			it = headerFields.find("Content-Length");
+			if (it != headerFields.end())
+			{
+				isBody = true;
+				bodySize = std::stoi(it->second.c_str());
+			}
+			it = headerFields.find("Transfer-Encoding");
+			if (it != headerFields.end())
+			{
+				isBody = true;
+				isChunked = true;
+			}
 		}
 
 		void		insertHeaderLine()
@@ -94,7 +97,7 @@ class	HTTPRequest
 		{
 			size_t i(0);
 			size_t j(0);
-			
+
 			while (i < tmp.size() && tmp[i] != ' ')
 			{
 				i++;
@@ -125,6 +128,7 @@ class	HTTPRequest
 		struct requestLine									rL;
 		std::map<std::string, std::string>	headerFields;
 		std::vector<unsigned char>					body;
+		size_t										bodySize;
 		std::vector<unsigned char>					tmp;
 		bool																isBody;
 		bool																isChunked;

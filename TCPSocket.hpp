@@ -132,6 +132,10 @@ class TCPSocket
 		{
 			return (_socketFd);
 		}
+		int getAddrlen()
+		{
+			return (addrlen);
+		}
 
 	private:
 		int			_socketFd;
