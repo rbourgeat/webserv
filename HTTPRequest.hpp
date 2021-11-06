@@ -27,6 +27,7 @@ class	HTTPRequest
 			isHeaderComplete = false;
 			isRequestLineComplete = false;
 			isComplete = false;
+			chunkSize = -1;
 		}
 		~HTTPRequest(){;}
 
@@ -41,6 +42,7 @@ class	HTTPRequest
 			rL.httpVersion.clear();
 			isComplete = false;
 			headerFields.clear();
+			chunkSize = -1;
 		}
 
 		void		determineIfBody()
@@ -128,16 +130,18 @@ class	HTTPRequest
 		}
 
 	public: 
-		struct requestLine									rL;
+		struct requestLine					rL;
 		std::map<std::string, std::string>	headerFields;
-		std::vector<unsigned char>					body;
-		size_t										bodySize;
-		std::vector<unsigned char>					tmp;
-		bool																isBody;
-		bool																isChunked;
-		bool																isHeaderComplete;
-		bool																isRequestLineComplete;
-		bool																isComplete;
+		std::vector<unsigned char>			body;
+		size_t								bodySize;
+		std::vector<unsigned char>			tmp;
+		int									chunkSize;
+		std::vector<unsigned char>			chunkData;
+		bool								isBody;
+		bool								isChunked;
+		bool								isHeaderComplete;
+		bool								isRequestLineComplete;
+		bool								isComplete;
 };
 
 #endif
