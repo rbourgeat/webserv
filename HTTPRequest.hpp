@@ -27,7 +27,6 @@ class	HTTPRequest
 			isHeaderComplete = false;
 			isRequestLineComplete = false;
 			isComplete = false;
-			currentBodySize = 0;
 		}
 		~HTTPRequest(){;}
 
@@ -133,7 +132,6 @@ class	HTTPRequest
 		std::map<std::string, std::string>	headerFields;
 		std::vector<unsigned char>					body;
 		size_t										bodySize;
-		size_t										currentBodySize;
 		std::vector<unsigned char>					tmp;
 		bool																isBody;
 		bool																isChunked;
