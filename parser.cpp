@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/07 12:51:47 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/08 17:50:15 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,8 +292,8 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			break;
 		if (line[line.size() - 1] == '\r')/*(line.back() == '\r') back() is a c++11 function*/
 			line.resize(line.size() - 1);
-		std::cout << "> " << line << "\n";
 
+		// demander si le cgi doit fonctionner en dehors du /cgi-bin/
 		first = line.find("GET /cgi-bin/");
 		if (first != std::string::npos && (line.find(".cgi") != std::string::npos)) //MODIF BY CONFIG
 		{
@@ -305,7 +305,6 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			{
 				cgi->add_variable("QUERY_STRING", line.substr(first + 1));
 				setenv("QUERY_STRING", line.substr(first + 1).c_str(), 1);
-				// cgi->set_QUERY_STRING(line.substr(first + 1).c_str());
 				cgi->add_variable("PATH_INFO", "");
 				std::string nscript = "/cgi-bin/" + line.replace(line.find("?"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
