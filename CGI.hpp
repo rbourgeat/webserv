@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:42:20 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/05 16:50:36 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/11 17:27:23 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define CGI_HPP
 
 # include "webserv.hpp"
+# include <stdlib.h>
 
 # define IS_ERROR(x) \
     (x == cgi_status::CGI_ERROR || x == cgi_status::SYSTEM_ERROR \
@@ -49,11 +50,11 @@ class CGI
 		std::vector<char *>	print_env();
 		std::string execute(std::string PATH, std::string METHOD);
 		std::string			get_buffer_size(int count);
-		template <typename T>
-		void add_variable(std::string name, T value)
+		void add_variable(std::string name, std::string value)
 		{
 			std::ostringstream ss;
 			ss << name << "=" << value;
+			setenv(name.c_str(), value.c_str(), 1);
 			_variables.push_back(strdup(ss.str().c_str()));
 		}
 
@@ -66,7 +67,6 @@ class CGI
 		char				_buffer[10000];
 		ssize_t				_buffSize;
 		bool				isPipeEmpty(int fd) const;
-		// int execute(std::string const &cgi_path);
 		int get_pipe() const;
 };
 

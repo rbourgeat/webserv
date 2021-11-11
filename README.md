@@ -19,6 +19,7 @@ This project is here to make you write your HTTP server. You will be able to tes
 - [Content-Type Full List](https://www.iana.org/assignments/media-types/media-types.xhtml)
 - [Tres bon site aussi !](https://developer.mozilla.org/fr/docs/Web/HTTP/Status/)
 - [HTTP messages](https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages)
+- [Redirections](https://developer.mozilla.org/fr/docs/Web/HTTP/Redirections)
 
 **Useful RFCs**
 - [RFC editor](https://www.rfc-editor.org/retrieve/): official source for RFCs on the World Wide Web.

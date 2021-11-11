@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/11 18:58:42 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/11 19:50:05 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,9 +102,9 @@ int		main(int argc, char const *argv[])
 						else
 						{
 							parseRequest(request, clients[k].request);
-							for (size_t l(0); l < request.size(); l++)
+							/*for (size_t l(0); l < request.size(); l++)
 								std::cout << GRN << request[l];
-							std::cout << NC << std::endl;
+							std::cout << NC << std::endl;*/
 							if (clients[k].request.isComplete == true)
 							{
 								std::vector<unsigned char> answer = parsing(clients[k].request, request, servers[clients[k].servIndex]);
@@ -126,7 +126,10 @@ int		main(int argc, char const *argv[])
 									servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
 									std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
 									for (size_t l(0); l < 75; l++)
-										std::cout << MAG << clients[k].answer[l];
+									{
+										if (l < clients[k].answer.size())
+											std::cout << MAG << clients[k].answer[l];
+									}
 									clients[k].answer.clear();
 									clients[k].request.clearAll();
 									std::cout << NC << std::endl;

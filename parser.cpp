@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/11 19:33:34 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/11 19:35:21 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -295,11 +295,12 @@ std::string CGIparsing(HTTPRequest &request, std::vector<unsigned char> buffer, 
 		i++;
 	}
 	std::string s_tmp(tmp.begin(), tmp.end());
-	// std::cout << "[" << s_tmp << "] ";
 
-	cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
+	cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");	// A changer (get celui du conf)
+	cgi->add_variable("SERVER_NAME", "webserv");			// same
 	cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 	cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
+	cgi->add_variable("SERVER_PROTOCOL", "8080");			// remplacer
 	cgi->add_variable("AUTH_TYPE", "Basic");
 
 	std::istringstream buffer2(s_tmp);
@@ -324,7 +325,6 @@ std::string CGIparsing(HTTPRequest &request, std::vector<unsigned char> buffer, 
 			if (first != std::string::npos)
 			{
 				cgi->add_variable("QUERY_STRING", line.substr(first + 1));
-				setenv("QUERY_STRING", line.substr(first + 1).c_str(), 1);
 				cgi->add_variable("PATH_INFO", "");
 				std::string nscript = "/cgi-bin/" + line.replace(line.find("?"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
@@ -334,7 +334,6 @@ std::string CGIparsing(HTTPRequest &request, std::vector<unsigned char> buffer, 
 			{
 				first = line.find(".cgi/");
 				cgi->add_variable("QUERY_STRING", "");
-				setenv("QUERY_STRING", line.substr(first + 1).c_str(), 1);
 				cgi->add_variable("PATH_INFO", line.substr(first + 5));
 				std::string nscript = "/cgi-bin/" + line.replace(line.find("/"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
@@ -343,7 +342,6 @@ std::string CGIparsing(HTTPRequest &request, std::vector<unsigned char> buffer, 
 			else
 			{
 				cgi->add_variable("QUERY_STRING", "");
-				setenv("QUERY_STRING", line.substr(first + 1).c_str(), 1);
 				cgi->add_variable("PATH_INFO", "");
 				std::string nscript = "/cgi-bin/" + line;
 				cgi->add_variable("SCRIPT_NAME", nscript);
@@ -382,7 +380,7 @@ std::string	errorPageLocation(int code, struct server s)
 	while (i < s.error.size() && s.error[i].num != code)
 		i++;
 	if (i < s.error.size() && s.error[i].num == code)
-		location = s.error[i].path;
+		location = "directory/" + s.error[i].path;
 	else
 		location = "directory/" + codeToString + ".html";
 	return (location);
@@ -414,7 +412,8 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 	std::string rep;
 	location += PATH;
 	std::cout << "location: " << location << std::endl;
-
+	
+	std::cout << "!!!METHOD!! = " << METHOD << std::endl;
 	if (PATH.find(".cgi") == std::string::npos)
 	{
 		if (METHOD != "GET" && METHOD != "POST" && METHOD != "DELETE")
@@ -454,11 +453,13 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		}
 		else if (METHOD == "DELETE")
 		{
-			if (remove(PATH.c_str()) == 0) {
+			if (unlink(location.c_str()) == 0) {
 				std::cout << "The file is deleted successfully." << std::endl;
 			} else {
 				std::cout << "The file is not deleted." << std::endl;
+				perror("error");
 			}
+			rep = "HTTP/1.1 200 OK\r\n";
 		}
 		else
 		{
@@ -476,9 +477,13 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			}
 		}
 
-		rep += "\r\nContent-Length: ";
-		rep += countFileChar(location); // verif le bon nombre !!
-		rep += "\r\n\r\n" + getFileContent(location);
+		if (METHOD != "DELETE")
+		{
+			rep += "\r\nContent-Length: ";
+			rep += countFileChar(location);
+			rep += "\r\n\r\n" + getFileContent(location);
+		}
+		std::cout << "LOCATION="<< location << std::endl;
 	}
 	else
 	{
