@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/11 17:38:01 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/11 17:48:14 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -360,7 +360,7 @@ std::string	errorPageLocation(int code, struct server s)
 	while (i < s.error.size() && s.error[i].num != code)
 		i++;
 	if (i < s.error.size() && s.error[i].num == code)
-		location = s.error[i].path;
+		location = "directory/" + s.error[i].path;
 	else
 		location = "directory/" + codeToString + ".html";
 	return (location);
@@ -441,10 +441,6 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			}
 			rep = "HTTP/1.1 200 OK\r\n";
 		}
-		else if (METHOD == "POST")
-		{
-			
-		}
 		else
 		{
 			rep = "HTTP/1.1 200 OK\r\nContent-Type: ";
@@ -464,12 +460,10 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		if (METHOD != "DELETE")
 		{
 			rep += "\r\nContent-Length: ";
-			if (IsPathExist(location))
-				rep += countFileChar(location);
-			else
-				rep += "0";
+			rep += countFileChar(location);
 			rep += "\r\n\r\n" + getFileContent(location);
 		}
+		std::cout << "LOCATION="<< location << std::endl;
 	}
 	else
 	{
