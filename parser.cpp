@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/11 19:35:21 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/11 19:57:17 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -269,8 +269,8 @@ std::string CGIparsing(HTTPRequest &request, std::vector<unsigned char> buffer, 
 	std::string FILE_PATH = "";
 	if (request.isCGI == true)
 	{
-		std::cout << "YOOOU " << request.defineQueryString() << std::endl;
-		std::cout << "YAAAAA " << request.defineScriptName() << std::endl;
+		//std::cout << "YOOOU " << request.defineQueryString() << std::endl;
+		//std::cout << "YAAAAA " << request.defineScriptName() << std::endl;
 		cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
     	cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
     	cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
