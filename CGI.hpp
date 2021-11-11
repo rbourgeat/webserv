@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:42:20 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/05 16:50:36 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/11 15:37:37 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,6 @@ class CGI
 		char				_buffer[10000];
 		ssize_t				_buffSize;
 		bool				isPipeEmpty(int fd) const;
-		// int execute(std::string const &cgi_path);
 		int get_pipe() const;
 };
 

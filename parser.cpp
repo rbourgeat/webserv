@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/08 17:50:15 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/11 16:23:59 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -394,7 +394,8 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 	std::string rep;
 	location += PATH;
 	std::cout << "location: " << location << std::endl;
-
+	
+	std::cout << "!!!METHOD!! = " << METHOD << std::endl;
 	if (PATH.find(".cgi") == std::string::npos)
 	{
 		if (METHOD != "GET" && METHOD != "POST" && METHOD != "DELETE")
@@ -434,11 +435,17 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		}
 		else if (METHOD == "DELETE")
 		{
-			if (remove(PATH.c_str()) == 0) {
+			if (unlink(location.c_str()) == 0) {
 				std::cout << "The file is deleted successfully." << std::endl;
 			} else {
 				std::cout << "The file is not deleted." << std::endl;
+				perror("error");
 			}
+			rep = "HTTP/1.1 200 OK\r\n";
+		}
+		else if (METHOD == "POST")
+		{
+			
 		}
 		else
 		{
@@ -456,9 +463,12 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			}
 		}
 
-		rep += "\r\nContent-Length: ";
-		rep += countFileChar(location); // verif le bon nombre !!
-		rep += "\r\n\r\n" + getFileContent(location);
+		if (METHOD != "DELETE")
+		{
+			rep += "\r\nContent-Length: ";
+			rep += countFileChar(location); // verif le bon nombre !!
+			rep += "\r\n\r\n" + getFileContent(location);
+		}
 	}
 	else
 	{
