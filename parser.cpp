@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/11 17:31:48 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/11 17:38:01 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -464,7 +464,10 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		if (METHOD != "DELETE")
 		{
 			rep += "\r\nContent-Length: ";
-			rep += countFileChar(location); // verif le bon nombre !!
+			if (IsPathExist(location))
+				rep += countFileChar(location);
+			else
+				rep += "0";
 			rep += "\r\n\r\n" + getFileContent(location);
 		}
 	}
