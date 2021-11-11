@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/05 16:50:46 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/10 18:30:08 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,6 @@ std::string CGI::execute(std::string PATH, std::string METHOD)
 		_buffSize = read(_pipe, _buffer, 10000);
 		close(output[0]);
 		return (_buffer);
-		// std::cout << buff << std::endl;
 		// fcntl(_pipe, F_SETFL, O_NONBLOCK);
 	}
 
