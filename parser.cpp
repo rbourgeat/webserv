@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/11 16:23:59 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/11 17:31:48 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -275,11 +275,12 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 		i++;
 	}
 	std::string s_tmp(tmp.begin(), tmp.end());
-	// std::cout << "[" << s_tmp << "] ";
 
-	cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
+	cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");	// A changer (get celui du conf)
+	cgi->add_variable("SERVER_NAME", "webserv");			// same
 	cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 	cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
+	cgi->add_variable("SERVER_PROTOCOL", "8080");			// remplacer
 	cgi->add_variable("AUTH_TYPE", "Basic");
 
 	std::istringstream buffer2(s_tmp);
@@ -304,7 +305,6 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			if (first != std::string::npos)
 			{
 				cgi->add_variable("QUERY_STRING", line.substr(first + 1));
-				setenv("QUERY_STRING", line.substr(first + 1).c_str(), 1);
 				cgi->add_variable("PATH_INFO", "");
 				std::string nscript = "/cgi-bin/" + line.replace(line.find("?"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
@@ -314,7 +314,6 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			{
 				first = line.find(".cgi/");
 				cgi->add_variable("QUERY_STRING", "");
-				setenv("QUERY_STRING", line.substr(first + 1).c_str(), 1);
 				cgi->add_variable("PATH_INFO", line.substr(first + 5));
 				std::string nscript = "/cgi-bin/" + line.replace(line.find("/"), std::string::npos, "");
 				cgi->add_variable("SCRIPT_NAME", nscript);
@@ -323,7 +322,6 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 			else
 			{
 				cgi->add_variable("QUERY_STRING", "");
-				setenv("QUERY_STRING", line.substr(first + 1).c_str(), 1);
 				cgi->add_variable("PATH_INFO", "");
 				std::string nscript = "/cgi-bin/" + line;
 				cgi->add_variable("SCRIPT_NAME", nscript);
