@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/08 17:50:15 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/11 19:33:34 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -263,8 +263,28 @@ std::string countFileChar(std::string string)
 // 	std::cout << "---------------------------" << std::endl;
 // }
 
-std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
+std::string CGIparsing(HTTPRequest &request, std::vector<unsigned char> buffer, CGI *cgi)
 {
+	(void)buffer;
+	std::string FILE_PATH = "";
+	if (request.isCGI == true)
+	{
+		std::cout << "YOOOU " << request.defineQueryString() << std::endl;
+		std::cout << "YAAAAA " << request.defineScriptName() << std::endl;
+		cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
+    	cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
+    	cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
+    	cgi->add_variable("AUTH_TYPE", "Basic");
+		cgi->add_variable("QUERY_STRING", request.defineQueryString());
+		cgi->add_variable("PATH_INFO", "");
+		cgi->add_variable("SCRIPT_NAME", request.defineScriptName());
+		FILE_PATH = "directory" + request.defineScriptName();
+		cgi->add_variable("HTTP_USER_AGENT", request.headerFields.find("User-Agent")->second);
+		cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
+		cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
+		cgi->add_variable("HTTP_ACCEPT_LANGUAGE", request.headerFields.find("Accept-Language")->second);
+	}
+	/*
 	std::vector<char> tmp;
 	std::string FILE_PATH = "";
 	int i = 0;
@@ -290,8 +310,8 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 	{
 		if (line.empty() || line == "\r")
 			break;
-		if (line[line.size() - 1] == '\r')/*(line.back() == '\r') back() is a c++11 function*/
-			line.resize(line.size() - 1);
+		if (line[line.size() - 1] == '\r')*//*(line.back() == '\r') back() is a c++11 function*/
+		/*	line.resize(line.size() - 1);
 
 		// demander si le cgi doit fonctionner en dehors du /cgi-bin/
 		first = line.find("GET /cgi-bin/");
@@ -347,7 +367,7 @@ std::string CGIparsing(std::vector<unsigned char> buffer, CGI *cgi)
 		if (first != std::string::npos)
 			cgi->add_variable("HTTP_ACCEPT_LANGUAGE", line.substr(first + 17));
 
-	}
+	}*/
 	return (FILE_PATH);
 }
 
@@ -463,7 +483,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 	else
 	{
 		CGI *cgi = new CGI;
-		std::string CGI_PATH = CGIparsing(buffer, cgi);
+		std::string CGI_PATH = CGIparsing(request, buffer, cgi);
 		cgi->print_env();
 		std::string message = cgi->execute(CGI_PATH, METHOD);
 		size_t position = message.find("\n");

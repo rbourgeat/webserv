@@ -70,7 +70,8 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 			}
 			else
 			{
-				request.tmp.push_back(message[i]);
+				if (message[i] != '\0')
+					request.tmp.push_back(message[i]);
 				i++;
 			}
 		}

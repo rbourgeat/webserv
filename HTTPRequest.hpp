@@ -37,6 +37,7 @@ class	HTTPRequest
 			body.clear();
 			isHeaderComplete = false;
 			isRequestLineComplete = false;
+			isCGI = false;
 			rL.method.clear();
 			rL.requestTarget.clear();
 			rL.httpVersion.clear();
@@ -45,17 +46,25 @@ class	HTTPRequest
 			chunkSize = -1;
 		}
 
+		std::string defineScriptName()
+		{
+			std::string scriptName(rL.requestTarget.begin(), rL.requestTarget.end());
+			return (std::string(scriptName, 0, scriptName.find("?")));
+		}
+		std::string	defineQueryString()
+		{
+			std::string queryString(rL.requestTarget.begin(), rL.requestTarget.end());
+			return (std::string(queryString, queryString.find("?") + 1));
+		}
+		
 		void		determineIfBody()
 		{
-			std::map<std::string, std::string>::iterator it;
-			it = headerFields.find("Content-Length");
-			if (it != headerFields.end())
+			if (headerFields.find("Content-Length") != headerFields.end())
 			{
 				isBody = true;
-				bodySize = std::stoi(it->second.c_str());
+				bodySize = std::stoi(headerFields.find("Content-Length")->second.c_str());
 			}
-			it = headerFields.find("Transfer-Encoding");
-			if (it != headerFields.end())
+			if (headerFields.find("Transfer-Encoding") != headerFields.end())
 			{
 				isBody = true;
 				isChunked = true;
@@ -65,7 +74,6 @@ class	HTTPRequest
 		void		insertHeaderLine()
 		{
 			size_t i(0);
-			size_t j(0);
 			std::string temp1;
 			std::string temp2;
 			if (isRequestLineComplete == false)
@@ -77,22 +85,19 @@ class	HTTPRequest
 			{
 				while (i < tmp.size() && tmp[i] != ':')
 				{
+					temp1.push_back(tmp[i]);
 					i++;
-					j++;
 				}
-				temp1 = std::string(tmp.begin() + (i - j), tmp.begin() + i);
-				j = 0;
 				if (i < tmp.size() && tmp[i] == ':')
 					i++;
 				if (tmp[i] == ' ')
 					i++;
 				while (i < tmp.size() && tmp[i] != ' ')
 				{
+					temp2.push_back(tmp[i]);
 					i++;
-					j++;
 				}
-				temp2 = std::string(tmp.begin() + (i - j), tmp.begin() + i);
-				headerFields.insert(std::pair<std::string, std::string>(temp1, temp2));
+				headerFields[temp1] = temp2;
 			}
 			tmp.clear();
 		}
@@ -118,6 +123,9 @@ class	HTTPRequest
 				j++;
 			}
 			rL.requestTarget = std::vector<unsigned char>(tmp.begin() + (i - j), tmp.begin() + i);
+			std::string rT(tmp.begin() + (i - j), tmp.begin() + i);
+			if (rT.find(".cgi") != std::string::npos)
+					isCGI = true;
 			j = 0;
 			if (i < tmp.size() && tmp[i] == ' ')
 				i++;
@@ -138,6 +146,7 @@ class	HTTPRequest
 		int									chunkSize;
 		std::vector<unsigned char>			chunkData;
 		bool								isBody;
+		bool								isCGI;
 		bool								isChunked;
 		bool								isHeaderComplete;
 		bool								isRequestLineComplete;

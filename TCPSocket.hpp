@@ -86,9 +86,9 @@ class TCPSocket
 
 		std::vector<unsigned char>	socketRecv(int i, PollFd &objectPoll)
 		{
-			std::vector<unsigned char> request(30000);
+			//std::vector<unsigned char> request(30000);
 			std::vector<unsigned char> buffer(10000);
-			int totalBytes(0);
+			//int totalBytes(0);
 
 			int nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), MSG_DONTWAIT);	
 			if (nbytes <= 0)
@@ -100,7 +100,7 @@ class TCPSocket
 				close(objectPoll.getPfd()[i].fd);
 				objectPoll.deleteFd(i);
 			}
-			else
+			/*else
 			{
 				int j(0);
 				for (int k(0); k < nbytes; k++)
@@ -120,7 +120,8 @@ class TCPSocket
 					totalBytes+= nbytes;
 				}
 			}
-			return (request);
+			return (request);*/
+			return (buffer);
 		}
 
 		/*GETTERS*/

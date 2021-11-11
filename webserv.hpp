@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/10/31 15:38:29 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/11 18:44:18 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@
 # include <sys/types.h>
 # include <sys/ioctl.h>
 # include <cstdlib>
+#include <string>
+#include <map>
 
 #define NC "\e[0m"
 #define GRN "\e[0;32m"
