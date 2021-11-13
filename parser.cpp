@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/11 19:57:17 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/13 17:28:27 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -390,7 +390,7 @@ std::string	errorPageLocation(int code, struct server s)
 
 std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned char> buffer, struct server s)
 {
-	std::string location,  METHOD = "NAN", PATH = "NAN", HTTP, s_tmp_previous;
+	std::string location, s_tmp_previous;
 	std::vector<char> tmp;
 	/*unsigned long long max; //maybe problem comes from size_t max value
 	if (s.max_body_size > 0)
@@ -404,19 +404,14 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 	
 	std::cout << "location before: " << location << std::endl;
 	
-	METHOD.assign(request.rL.method.begin(), request.rL.method.end());
-	PATH.assign(request.rL.requestTarget.begin(), request.rL.requestTarget.end());
-	HTTP.assign(request.rL.httpVersion.begin() + 5, request.rL.httpVersion.begin() + 8);
-	std::cout << METHOD << " " << PATH << " " << HTTP << "\n";
 
 	std::string rep;
-	location += PATH;
+	location += request.rL.requestTarget;
 	std::cout << "location: " << location << std::endl;
 	
-	std::cout << "!!!METHOD!! = " << METHOD << std::endl;
-	if (PATH.find(".cgi") == std::string::npos)
+	if (request.isCGI == false)
 	{
-		if (METHOD != "GET" && METHOD != "POST" && METHOD != "DELETE")
+		if (request.rL.method != "GET" && request.rL.method != "POST" && request.rL.method != "DELETE")
 		{
 			rep = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
 			location = errorPageLocation(405, s);
@@ -441,7 +436,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html";
 			location += "index.html";
 		}
-		else if (HTTP != "1.1")
+		else if (request.rL.httpVersion.find("1.1") == std::string::npos)
 		{
 			rep = "HTTP/1.1 505 HTTP Version not supported\r\nContent-Type: text/html";
 			location = errorPageLocation(505, s);
@@ -451,7 +446,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			rep = "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html";
 			location = errorPageLocation(403, s);
 		}
-		else if (METHOD == "DELETE")
+		else if (request.rL.method == "DELETE")
 		{
 			if (unlink(location.c_str()) == 0) {
 				std::cout << "The file is deleted successfully." << std::endl;
@@ -477,7 +472,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			}
 		}
 
-		if (METHOD != "DELETE")
+		if (request.rL.method != "DELETE")
 		{
 			rep += "\r\nContent-Length: ";
 			rep += countFileChar(location);
@@ -490,7 +485,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		CGI *cgi = new CGI;
 		std::string CGI_PATH = CGIparsing(request, buffer, cgi);
 		cgi->print_env();
-		std::string message = cgi->execute(CGI_PATH, METHOD);
+		std::string message = cgi->execute(CGI_PATH, request.rL.method);
 		size_t position = message.find("\n");
 		size_t position2 = message.find("\n", position + 1);
 		rep += "HTTP/1.1 200 OK\r\n";

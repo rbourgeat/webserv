@@ -11,9 +11,9 @@
 
 struct	requestLine
 {
-	std::vector<unsigned char>	method;
-	std::vector<unsigned char>	requestTarget;
-	std::vector<unsigned char>	httpVersion;
+	std::string	method;
+	std::string	requestTarget;
+	std::string	httpVersion;
 };
 
 class	HTTPRequest
@@ -106,35 +106,28 @@ class	HTTPRequest
 		void	insertHeaderRequestLine()
 		{
 			size_t i(0);
-			size_t j(0);
 
 			while (i < tmp.size() && tmp[i] != ' ')
 			{
+				rL.method.push_back(tmp[i]);
 				i++;
-				j++;
 			}
-			rL.method = std::vector<unsigned char>(tmp.begin() + (i - j), tmp.begin() + i);
-			j = 0;
 			if (i < tmp.size() && tmp[i] == ' ')
 				i++;
 			while (i < tmp.size() && tmp[i] != ' ')
 			{
+				rL.requestTarget.push_back(tmp[i]);
 				i++;
-				j++;
 			}
-			rL.requestTarget = std::vector<unsigned char>(tmp.begin() + (i - j), tmp.begin() + i);
-			std::string rT(tmp.begin() + (i - j), tmp.begin() + i);
-			if (rT.find(".cgi") != std::string::npos)
+			if (rL.requestTarget.find(".cgi") != std::string::npos)
 					isCGI = true;
-			j = 0;
 			if (i < tmp.size() && tmp[i] == ' ')
 				i++;
 			while (i < tmp.size() && tmp[i] != '\n')
 			{
+				rL.httpVersion.push_back(tmp[i]);
 				i++;
-				j++;
 			}
-			rL.httpVersion = std::vector<unsigned char>(tmp.begin() + (i - j), tmp.begin() + i);
 		}
 
 	public: 
