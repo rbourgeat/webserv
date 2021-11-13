@@ -41,7 +41,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 			if (message[i] == '\r' && message[i + 1] == '\n')
 			{
 				i+= 2;
-				if ((i - 2) == 0)
+				if (request.tmp.size() == 0)
 				{
 					request.isHeaderComplete = true;
 					printRequestHeader(request);

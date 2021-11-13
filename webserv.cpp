@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/11 19:50:05 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/13 16:21:40 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,13 +102,15 @@ int		main(int argc, char const *argv[])
 						else
 						{
 							parseRequest(request, clients[k].request);
-							/*for (size_t l(0); l < request.size(); l++)
+							for (size_t l(0); l < request.size(); l++)
 								std::cout << GRN << request[l];
-							std::cout << NC << std::endl;*/
+							std::cout << NC << std::endl;
 							if (clients[k].request.isComplete == true)
 							{
 								std::vector<unsigned char> answer = parsing(clients[k].request, request, servers[clients[k].servIndex]);
 								clients[k].answer = answer;
+								clients[k].bytesToSend = answer.size();
+								clients[k].totalSentBytes = 0;
 							}
 						}
 					}
@@ -120,19 +122,24 @@ int		main(int argc, char const *argv[])
 							int k;
 							if ((k = findClient(vPfd.getPfd()[i].fd, clients)) != -1)
 							{
-								std::cout << clients[k].answer.size() << std::endl;
+								//std::cout << clients[k].answer.size() << std::endl;
 								if (clients[k].answer.size() > 0)
 								{
-									servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
+									clients[k].sentBytes = servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
+									clients[k].totalSentBytes+= clients[k].sentBytes;
+									clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
 									std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
-									for (size_t l(0); l < 75; l++)
+									/*for (size_t l(0); l < 75; l++)
 									{
 										if (l < clients[k].answer.size())
 											std::cout << MAG << clients[k].answer[l];
-									}
+									}*/
+									if (clients[k].answer.size() == 0)
+									{
 									clients[k].answer.clear();
 									clients[k].request.clearAll();
 									std::cout << NC << std::endl;
+									}
 								}
 							}
 						}

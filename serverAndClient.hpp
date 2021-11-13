@@ -26,6 +26,9 @@ struct							client
 	int							servIndex;
 	HTTPRequest					request;
 	std::vector<unsigned char>	answer;
+	int							sentBytes;
+	int							totalSentBytes;
+	int							bytesToSend;
 };
 
 void  readConfig(char const *argv, std::vector<server> &server);
