@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rbourgeat <rbourgeat@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/13 17:28:27 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/17 18:23:56 by rbourgeat        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -482,17 +482,28 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 	}
 	else
 	{
-		CGI *cgi = new CGI;
+		CGI *cgi = new CGI; 
 		std::string CGI_PATH = CGIparsing(request, buffer, cgi);
 		cgi->print_env();
 		std::string message = cgi->execute(CGI_PATH, request.rL.method);
-		size_t position = message.find("\n");
-		size_t position2 = message.find("\n", position + 1);
-		rep += "HTTP/1.1 200 OK\r\n";
-		rep += "Content-Length: ";
-		rep += cgi->get_buffer_size(position2);
-		setenv("CONTENT_LENGTH", cgi->get_buffer_size(position2).c_str(), 1);
-		rep += "\r\n" + message;
+		if (message != "Error")
+		{
+			size_t position = message.find("\n");
+			size_t position2 = message.find("\n", position + 1);
+			rep += "HTTP/1.1 200 OK\r\n";
+			rep += "Content-Length: ";
+			rep += cgi->get_buffer_size(position2);
+			setenv("CONTENT_LENGTH", cgi->get_buffer_size(position2).c_str(), 1);
+			rep += "\r\n" + message;
+		}
+		else
+		{
+			rep = "HTTP/1.1 500 Internal Server Error\r\nContent-Type: text/html";
+			location = errorPageLocation(500, s);
+			rep += "\r\nContent-Length: ";
+			rep += countFileChar(location);
+			rep += "\r\n\r\n" + getFileContent(location);
+		}
 		delete cgi;
 	}
 
