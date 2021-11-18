@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbourgeat <rbourgeat@student.42.fr>        +#+  +:+       +#+        */
+/*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/17 18:44:32 by rbourgeat        ###   ########.fr       */
+/*   Updated: 2021/11/18 15:55:09 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,7 +280,8 @@ std::string CGIparsing(HTTPRequest &request, std::vector<unsigned char> buffer, 
 		cgi->add_variable("SCRIPT_NAME", request.defineScriptName());
 		FILE_PATH = "directory" + request.defineScriptName();
 		cgi->add_variable("HTTP_USER_AGENT", request.headerFields.find("User-Agent")->second);
-		cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
+		if (request.headerFields.find("Referer") != request.headerFields.end())
+			cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
 		cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
 		cgi->add_variable("HTTP_ACCEPT_LANGUAGE", request.headerFields.find("Accept-Language")->second);
 	}
@@ -476,6 +477,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		{
 			rep += "\r\nContent-Length: ";
 			rep += countFileChar(location);
+			setenv("CONTENT_LENGTH", countFileChar(location).c_str(), 1);
 			rep += "\r\n\r\n" + getFileContent(location);
 		}
 		std::cout << "LOCATION="<< location << std::endl;
@@ -491,9 +493,13 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			size_t position = message.find("\n");
 			size_t position2 = message.find("\n", position + 1);
 			rep += "HTTP/1.1 200 OK\r\n";
+			if (request.rL.requestTarget.find(".php") != std::string::npos)
+				rep += "Content-Type: text/html\r\n";
 			rep += "Content-Length: ";
 			rep += cgi->get_buffer_size(position2);
 			setenv("CONTENT_LENGTH", cgi->get_buffer_size(position2).c_str(), 1);
+			if (request.rL.requestTarget.find(".php") != std::string::npos)
+				rep += "\r\n";
 			rep += "\r\n" + message;
 		}
 		else
@@ -506,7 +512,6 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		}
 		delete cgi;
 	}
-
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);

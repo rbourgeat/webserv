@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:42:20 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/11 17:27:23 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/18 15:26:18 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,9 @@ class CGI
 		std::string			get_buffer_size(int count);
 		void add_variable(std::string name, std::string value)
 		{
+			if (value.size() == 0)
+				value = "";
+			std::cout << "name=" << name << " / value=" << value << std::endl;
 			std::ostringstream ss;
 			ss << name << "=" << value;
 			setenv(name.c_str(), value.c_str(), 1);
