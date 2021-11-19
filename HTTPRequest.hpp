@@ -122,8 +122,10 @@ class	HTTPRequest
 				rL.requestTarget.push_back(tmp[i]);
 				i++;
 			}
+			// Replace by CGI config !!!
 			if (rL.requestTarget.find(".cgi") != std::string::npos
-				|| rL.requestTarget.find(".php") != std::string::npos)
+				|| rL.requestTarget.find(".php") != std::string::npos
+				|| rL.requestTarget.find(".py") != std::string::npos)
 					isCGI = true;
 			if (i < tmp.size() && tmp[i] == ' ')
 				i++;

@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   post.cpp                                           :+:      :+:    :+:   */
+/*   postdata.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/05 16:22:58 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/05 16:23:06 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/19 16:48:33 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
-#include <stdlib.h> // Ne pas oublier pour getenv()
+#include <stdlib.h>
 
 void haut(char *);
 void bas();
@@ -19,7 +19,7 @@ void bas();
 int main(void)
 {
      char montexte[80] = "";
-     printf("Content-Type: text/html;\n\n");
+     printf("Content-Type: text/html\r\n\r\n");
      haut("Ma page en C !");
      if(fscanf(stdin, "data=%80[^&]s", montexte) < 0)
           printf("<p>Le formulaire a été mal rempli !</p>");

@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:42:20 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/18 15:26:18 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/19 16:54:57 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ class CGI
 		int					get_fd() const;
 		cgi_status::status	status();
 		std::vector<char *>	print_env();
-		std::string execute(std::string PATH, std::string METHOD);
+		std::string execute(std::string PATH, HTTPRequest &request);
 		std::string			get_buffer_size(int count);
 		void add_variable(std::string name, std::string value)
 		{

@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/18 15:55:33 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/19 18:13:11 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,12 @@ int		main(int argc, char const *argv[])
 	std::vector<struct server> servers;
 	std::vector<struct client> clients;
 	readConfig(config_path, &servers);
-
-	try
+	
+	/*Create pollfd structure to monitor sockets with poll()*/		
+	PollFd vPfd;
+	while(1)
 	{
-		/*Create pollfd structure to monitor sockets with poll()*/
-		PollFd vPfd;
-		while(1)
+		try
 		{
 			poll(vPfd.getPfd().data(), vPfd.getFdCount(), 0); //Check all events on all fds at once with poll()
 			if (vPfd.getFdCount() == 0)
@@ -127,11 +127,11 @@ int		main(int argc, char const *argv[])
 								{
 									clients[k].sentBytes = servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
 									clients[k].totalSentBytes+= clients[k].sentBytes;
-									// for (size_t l(0); l < clients[k].answer.size(); l++)
-									// {
-									// 	if (l < clients[k].answer.size())
-									// 		std::cout << MAG << clients[k].answer[l];
-									// }
+									for (size_t l(0); l < clients[k].answer.size(); l++)
+									{
+										if (l < clients[k].answer.size())
+											std::cout << MAG << clients[k].answer[l];
+									}
 									clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
 									std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
 									if (clients[k].answer.size() == 0)
@@ -147,11 +147,12 @@ int		main(int argc, char const *argv[])
 				}
 			}
 		}
+		catch(TCPSocket::TCPSocketException const& e)
+		{
+			std::cerr << "ERROR: " << e.what() << std::endl;
+			// exit(EXIT_FAILURE);
+		}
 	}
-	catch(TCPSocket::TCPSocketException const& e)
-	{
-		std::cerr << "ERROR: " << e.what() << std::endl;
-		exit(EXIT_FAILURE);
-	}
+	
 	return 0;
 }
