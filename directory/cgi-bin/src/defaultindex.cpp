@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/08 17:03:35 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/11 17:00:15 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/18 15:38:39 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ int main(void)
 {
     char path[80] = "";
     char *data = getenv("QUERY_STRING");
+    if (!data)
+        data = "";
     DIR *d;
     struct dirent *dir;
     if (sscanf(data, "path=%s", &path) < 0)

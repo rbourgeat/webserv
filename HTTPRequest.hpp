@@ -54,7 +54,10 @@ class	HTTPRequest
 		std::string	defineQueryString()
 		{
 			std::string queryString(rL.requestTarget.begin(), rL.requestTarget.end());
-			return (std::string(queryString, queryString.find("?") + 1));
+			if (queryString.find("?") != std::string::npos)
+				return (std::string(queryString, queryString.find("?") + 1));
+			else
+				return ("");
 		}
 		
 		void		determineIfBody()
@@ -119,7 +122,10 @@ class	HTTPRequest
 				rL.requestTarget.push_back(tmp[i]);
 				i++;
 			}
-			if (rL.requestTarget.find(".cgi") != std::string::npos)
+			// Replace by CGI config !!!
+			if (rL.requestTarget.find(".cgi") != std::string::npos
+				|| rL.requestTarget.find(".php") != std::string::npos
+				|| rL.requestTarget.find(".py") != std::string::npos)
 					isCGI = true;
 			if (i < tmp.size() && tmp[i] == ' ')
 				i++;

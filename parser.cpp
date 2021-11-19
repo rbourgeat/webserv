@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbourgeat <rbourgeat@student.42.fr>        +#+  +:+       +#+        */
+/*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/18 14:54:07 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/19 18:35:59 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,10 +279,14 @@ std::string CGIparsing(HTTPRequest &request, std::vector<unsigned char> buffer, 
 		cgi->add_variable("PATH_INFO", "");
 		cgi->add_variable("SCRIPT_NAME", request.defineScriptName());
 		FILE_PATH = "directory" + request.defineScriptName();
-		cgi->add_variable("HTTP_USER_AGENT", request.headerFields.find("User-Agent")->second);
-		cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
-		cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
-		cgi->add_variable("HTTP_ACCEPT_LANGUAGE", request.headerFields.find("Accept-Language")->second);
+		if (request.headerFields.find("User-Agent") != request.headerFields.end())
+			cgi->add_variable("HTTP_USER_AGENT", request.headerFields.find("User-Agent")->second);
+		if (request.headerFields.find("Referer") != request.headerFields.end())
+			cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
+		if (request.headerFields.find("Accept") != request.headerFields.end())
+			cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
+		if (request.headerFields.find("Accept-Language") != request.headerFields.end())
+			cgi->add_variable("HTTP_ACCEPT_LANGUAGE", request.headerFields.find("Accept-Language")->second);
 	}
 	/*
 	std::vector<char> tmp;
@@ -476,6 +480,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		{
 			rep += "\r\nContent-Length: ";
 			rep += countFileChar(location);
+			setenv("CONTENT_LENGTH", countFileChar(location).c_str(), 1);
 			rep += "\r\n\r\n" + getFileContent(location);
 		}
 		std::cout << "LOCATION="<< location << std::endl;
@@ -485,7 +490,8 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		CGI *cgi = new CGI; 
 		std::string CGI_PATH = CGIparsing(request, buffer, cgi);
 		cgi->print_env();
-		std::string message = cgi->execute(CGI_PATH, request.rL.method);
+		std::string message = cgi->execute(CGI_PATH, request);
+		std::cout << "test" << std::endl;
 		if (message != "Error")
 		{
 			size_t position = message.find("\n");
@@ -506,7 +512,6 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		}
 		delete cgi;
 	}
-
 
 	std::vector<unsigned char> response(rep.begin(), rep.end());
 	return (response);

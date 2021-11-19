@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/10 18:30:08 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/11/19 17:57:15 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,15 +88,115 @@ cgi_status::status CGI::status()
 	return (_status);
 }
 
-std::string CGI::execute(std::string PATH, std::string METHOD)
+std::string CGI::execute(std::string PATH, HTTPRequest &request)
 {
 	_status = cgi_status::NON_INIT;
-	(void)METHOD;
-
-	int output[2];
+	(void)request;
+	// fd1[0] = lecture
+	// fd1[1] = ecriture
+	int fd1[2];
+	int fd_in = 0;
 	// int input[2];
 	// Openning file descriptors
-	if (pipe(output) < 0)
+	std::cout << "Request body\n";
+for (size_t j(0); j < request.body.size(); j++)
+					{
+					std::cout << request.body[j];
+					}	
+
+	if (request.rL.method == "POST")
+	{
+		for (int l(0); l < 2; l++)
+		{
+			std::cout << "l = " << l << std::endl;
+			if (pipe(fd1) < 0)
+			{
+				_status = cgi_status::SYSTEM_ERROR;
+				return ("Error");
+			}
+
+			size_t i = 0;
+			char *cgi = strdup(PATH.c_str());
+			if (cgi == NULL) //  + check if file is good
+			{
+				_status = cgi_status::SYSTEM_ERROR;
+				free(cgi);
+				return ("Error");
+			}
+
+			char *env[_variables.size() + 1];
+			for (; i < _variables.size();)
+			{
+				env[i] = _variables[i];
+				i++;
+			}
+			env[i] = NULL;
+
+			char *args[] = {cgi, NULL};
+	
+			// Multi-threading....
+			if ((_child_pid = fork()) < 0)
+			{
+				std::cerr << "System Error : fork()" << std::endl;
+				_status = cgi_status::SYSTEM_ERROR;
+				free(cgi);
+				for (i = 0; i < _variables.size(); i++) {
+					free(env[i]);
+				}
+				return ("Error");
+			}
+			if (_child_pid == 0)
+			{
+				dup2(fd_in, 0);
+				close(fd1[0]);
+				if (dup2(fd1[1], 1) < 0)
+				{
+					close(fd1[1]);
+					close(fd1[0]);
+					exit(-1);
+				}
+				if (l == 0)
+				{
+					for (size_t j(0); j < request.body.size(); j++)
+					{
+					std::cout << request.body[j];
+					}
+					exit(0);
+				}
+				else
+				{
+					execve(args[0], args, env);
+					exit(-1);
+				}
+
+			} else {
+				wait(NULL);
+				close(fd1[1]);
+				dup2(fd1[0], 0);
+				if (l == 0)
+				{
+					fd_in = fd1[0];
+				}
+				else
+				{
+				_status = cgi_status::WAITING;
+				free(cgi);
+				for (size_t k = 0; k < _variables.size(); k++)
+				{
+					free(env[k]);
+				}
+				
+				_pipe = fd1[0];
+				_buffSize = read(_pipe, _buffer, 10000);
+				close(fd1[0]);
+				return (_buffer);
+			}
+		}
+	}
+}
+else
+{
+		if (pipe(fd1) < 0)
 	{
 		_status = cgi_status::SYSTEM_ERROR;
 		return ("Error");
@@ -132,17 +232,14 @@ std::string CGI::execute(std::string PATH, std::string METHOD)
 		}
 		return ("Error");
 	}
-
-	std::cout << _child_pid << std::endl;
-
 	if (_child_pid == 0)
 	{
 		std::string exec_path = PATH;
-		close(output[0]);
-		if (dup2(output[1], 1) < 0)
+		close(fd1[0]);
+		if (dup2(fd1[1], 1) < 0)
 		{
-			close(output[1]);
-			close(output[0]);
+			close(fd1[1]);
+			close(fd1[0]);
 			exit(-1);
 		}
 
@@ -151,23 +248,23 @@ std::string CGI::execute(std::string PATH, std::string METHOD)
 
 	} else {
 		wait(NULL);
-		close(output[1]);
-		dup2(output[0], 0);
+		close(fd1[1]);
+		dup2(fd1[0], 0);
 
 		_status = cgi_status::WAITING;
 		free(cgi);
-		for (i = 0; i < _variables.size(); i++)
+		for (size_t k = 0; k < _variables.size(); k++)
 		{
-			free(env[i]);
+			free(env[k]);
 		}
 		
-		_pipe = output[0];
+		_pipe = fd1[0];
 		_buffSize = read(_pipe, _buffer, 10000);
-		close(output[0]);
+		close(fd1[0]);
 		return (_buffer);
 		// fcntl(_pipe, F_SETFL, O_NONBLOCK);
 	}
-
+}
 	return ("");
 }
 
