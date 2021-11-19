@@ -90,7 +90,7 @@ class	HTTPRequest
 				}
 				if (i < tmp.size() && tmp[i] == ':')
 					i++;
-				if (tmp[i] == ' ')
+				if (i < tmp.size() && tmp[i] == ' ')
 					i++;
 				while (i < tmp.size() && tmp[i] != ' ')
 				{

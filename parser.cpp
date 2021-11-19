@@ -6,7 +6,7 @@
 /*   By: rbourgeat <rbourgeat@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/17 18:44:32 by rbourgeat        ###   ########.fr       */
+/*   Updated: 2021/11/18 14:54:07 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -407,10 +407,10 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 
 	std::string rep;
 	location += request.rL.requestTarget;
-	std::cout << "location: " << location << std::endl;
-	
+	std::cout << "location: " << location << std::endl;	
 	if (request.isCGI == false)
 	{
+		//std::cout << "********************NO CGI*************************\n";
 		if (request.rL.method != "GET" && request.rL.method != "POST" && request.rL.method != "DELETE")
 		{
 			rep = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
