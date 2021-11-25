@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/25 15:17:53 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/25 18:25:03 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,8 +271,10 @@ else
 std::string CGI::get_buffer_size(int count)
 {
 	std::ostringstream ss;
-     ss << (_buffSize - (count + 1));
-    return ss.str();
+	std::string string;
+    ss << (_buffSize - (count + 1));
+	string = ss.str();
+	return string;
 }
 
 int CGI::get_pipe() const

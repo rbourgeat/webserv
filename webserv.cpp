@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/25 14:41:30 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/25 19:02:11 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,10 +107,10 @@ int		main(int argc, char const *argv[])
 							std::cout << NC << std::endl;
 							if (clients[k].request.isComplete == true)
 							{
-								std::vector<unsigned char> answer = parsing(clients[k].request, request, servers[clients[k].servIndex]);
+								//std::vector<unsigned char> answer = parsing(clients[k].request, request, servers[clients[k].servIndex]);
 								std::vector<unsigned char> answer2 = createResponse(clients[k].request, servers[clients[k].servIndex]);
-								clients[k].answer = answer;
-								clients[k].bytesToSend = answer.size();
+								clients[k].answer = answer2;
+								clients[k].bytesToSend = answer2.size();
 								clients[k].totalSentBytes = 0;
 							}
 						}

@@ -30,31 +30,36 @@ class HTTPResponse
 				else
 					fileLocation = "directory";
 				fileLocation+= r.rL.requestTarget;
-				if (!checkFile())
+				std::cout << "WOOOOOOOOOOO fileLocation: " << fileLocation << std::endl;
 				{
 					if (!r.isCGI)
 					{
-						if (r.rL.method == "DELETE")
+						if (!checkFile())
 						{
-							if (unlink(fileLocation.c_str()) == 0) {
-								std::cout << "The file is deleted successfully." << std::endl;
-							} else {
-								std::cout << "The file is not deleted." << std::endl;
-								perror("error");
-							}
-						}
-						else
-						{
-							if (fileLocation == (s.root + "/")) //REDIRECTION TO INDEX.HTML in case we're looking in root directory => TO DEFINE IN CONFIG FILE
+							if (r.rL.method == "DELETE")
 							{
-								contentType = "text/html";
-								fileLocation+= "index.html";
+								if (unlink(fileLocation.c_str()) == 0) {
+									std::cout << "The file is deleted successfully." << std::endl;
+								} else {
+									std::cout << "The file is not deleted." << std::endl;
+									perror("error");
+								}
 							}
 							else
-								contentType = findFileType(fileLocation);
+							{
+								if (fileLocation == (s.root + "/")) //REDIRECTION TO INDEX.HTML in case we're looking in root directory => TO DEFINE IN CONFIG FILE
+								{
+									contentType = "text/html";
+									fileLocation+= "index.html";
+								}
+								else
+									contentType = findFileType(fileLocation);
+							}
+							sL.statusCode = "200";
+							sL.reasonPhrase = "OK";
+							contentLength = countFileChar(fileLocation);
+							setenv("CONTENT_LENGTH", contentLength.c_str(), 1); //Ask Raph if this is still necessary
 						}
-						sL.statusCode = "200";
-						sL.reasonPhrase = "OK";
 					}
 					else
 					{
@@ -70,8 +75,8 @@ class HTTPResponse
 							sL.statusCode = "200";
 							sL.reasonPhrase = "OK";
 							contentLength = cgi->get_buffer_size(position2);
-							setenv("CONTENT_LENGTH", cgi->get_buffer_size(position2).c_str(), 1);
-							body = "\r\n" + message;
+							setenv("CONTENT_LENGTH", contentLength.c_str(), 1);
+							body = message;
 						}
 						else
 						{
@@ -80,12 +85,6 @@ class HTTPResponse
 							fileLocation = errorPageLocation(500);
 						}
 						delete cgi;
-
-					}
-					if (r.rL.method != "DELETE")
-					{
-						contentLength = countFileChar(fileLocation);
-						setenv("CONTENT_LENGTH", contentLength.c_str(), 1); //Ask Raph if this is still necessary
 					}
 				}
 			}
@@ -93,7 +92,7 @@ class HTTPResponse
 
 		void	defineResponseBody()
 		{
-			if (contentLength.size() > 0)
+			if (!r.isCGI && contentLength.size() > 0)
 				body = getFileContent(fileLocation);
 		}
 
@@ -101,14 +100,17 @@ class HTTPResponse
 		{
 			resp+= sL.httpVersion + " " + sL.statusCode + " " + sL.reasonPhrase + "\r\n";
 			if (r.rL.method != "DELETE")
-			{ if
-			resp+= "Content-Type: " + contentType + "\r\n";
-			resp+= "Content-Length: " + contentLength + "\r\n";
-			resp+= "\r\n\r\n";
-			resp+= body;
+			{
+				resp+= "Content-Length: " + contentLength + "\r\n";
+				if (!r.isCGI)
+				{
+					resp+= "Content-Type: " + contentType + "\r\n";
+					resp+= "\r\n";
+				}
+				resp+= body;
 			}
 			else
-				resp+= "\r\n\r\n";
+				resp+= "\r\n";
 		}
 
 	private:
