@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/19 18:35:59 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/25 14:34:32 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -415,7 +415,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 	if (request.isCGI == false)
 	{
 		//std::cout << "********************NO CGI*************************\n";
-		if (request.rL.method != "GET" && request.rL.method != "POST" && request.rL.method != "DELETE")
+		if (request.rL.method != "GET" && request.rL.method != "POST" && request.rL.method != "DELETE") //OK
 		{
 			rep = "HTTP/1.1 405 Method Not Allowed\r\nContent-Type: text/html";
 			location = errorPageLocation(405, s);
@@ -426,7 +426,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			rep = "HTTP/1.1 400 Method Not Allowed\r\nContent-Type: text/html";
 			location = errorPageLocation(400, s);
 		}*/
-		else if (!IsPathExist(location))
+		else if (!IsPathExist(location)) //OK
 		{
 			rep = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html";
 			location = errorPageLocation(404, s);
@@ -435,22 +435,22 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		// {
 		// 	message += "HTTP/1.1 411 Length Required";
 		// }
-		else if (location == (s.root + "/"))
+		else if (location == (s.root + "/")) //OK
 		{
 			rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html";
 			location += "index.html";
 		}
-		else if (request.rL.httpVersion.find("1.1") == std::string::npos)
+		else if (request.rL.httpVersion.find("1.1") == std::string::npos) //OK
 		{
 			rep = "HTTP/1.1 505 HTTP Version not supported\r\nContent-Type: text/html";
 			location = errorPageLocation(505, s);
 		}
-		else if (!CheckFilePerm(location))
+		else if (!CheckFilePerm(location)) //OK
 		{
 			rep = "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html";
 			location = errorPageLocation(403, s);
 		}
-		else if (request.rL.method == "DELETE")
+		else if (request.rL.method == "DELETE") //OK
 		{
 			if (unlink(location.c_str()) == 0) {
 				std::cout << "The file is deleted successfully." << std::endl;
@@ -460,7 +460,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			}
 			rep = "HTTP/1.1 200 OK\r\n";
 		}
-		else
+		else //OK
 		{
 			rep = "HTTP/1.1 200 OK\r\nContent-Type: ";
 			rep += findTypeofFile(location);
@@ -476,7 +476,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 			}
 		}
 
-		if (request.rL.method != "DELETE")
+		if (request.rL.method != "DELETE") //OK
 		{
 			rep += "\r\nContent-Length: ";
 			rep += countFileChar(location);
@@ -485,7 +485,7 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		}
 		std::cout << "LOCATION="<< location << std::endl;
 	}
-	else
+	else //OK
 	{
 		CGI *cgi = new CGI; 
 		std::string CGI_PATH = CGIparsing(request, buffer, cgi);
