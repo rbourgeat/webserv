@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rbourgeat <rbourgeat@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/26 14:40:23 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/26 20:48:02 by rbourgeat        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -449,6 +449,44 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		{
 			rep = "HTTP/1.1 403 Forbidden\r\nContent-Type: text/html";
 			location = errorPageLocation(403, s);
+		}
+		else if (0 == 1) // Trouver comment parser ?!
+		{
+			struct stat buf = {};
+			std::string file_path = "????"; // Parser la requête !!!
+			int uploadFd = open(file_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			std::string m = "File Updated !";
+			
+			// check file
+			if (stat(file_path.c_str(), &buf) == -1) {
+				if (errno != ENOENT) {
+					if (errno == ENOTDIR)
+						location = errorPageLocation(404, s);
+					else
+						location = errorPageLocation(500, s);
+					return;
+				}
+				m = "File Created!";
+			}
+			else {
+				if (!S_ISREG(buf.st_mode)) {
+					location = errorPageLocation(403, s); // not a regular file = 403 error
+					return;
+				}
+			}
+			
+			// create file
+			if (uploadFd == -1) {
+				if (errno == ENOENT)
+					location = errorPageLocation(404, s);
+				else
+					location = errorPageLocation(500, s);
+				return;
+			}
+			
+			rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html";
+			rep = std::string("<h1>") + m + "</h1>";
+			location += "index.html";
 		}
 		else if (request.rL.method == "DELETE") //OK
 		{
