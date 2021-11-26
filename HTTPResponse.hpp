@@ -21,80 +21,31 @@ class HTTPResponse
 	}
 		~HTTPResponse(){;}
 
-		void	defineResponseHeader()
+		std::string	defineResponse()
 		{
 			if (!checkRequest())
 			{
-				if (s.root.size() > 0)
-					fileLocation = s.root; //I think here this should be 1 instead of 0, because there should be at least this caracter: /. --> to check
+				if (s.root.size() > 1)
+					fileLocation = s.root;
 				else
 					fileLocation = "directory";
 				fileLocation+= r.rL.requestTarget;
-				std::cout << "WOOOOOOOOOOO fileLocation: " << fileLocation << std::endl;
 				{
 					if (!r.isCGI)
 					{
-						if (!checkFile())
-						{
-							if (r.rL.method == "DELETE")
-							{
-								if (unlink(fileLocation.c_str()) == 0) {
-									std::cout << "The file is deleted successfully." << std::endl;
-								} else {
-									std::cout << "The file is not deleted." << std::endl;
-									perror("error");
-								}
-							}
-							else
-							{
-								if (fileLocation == (s.root + "/")) //REDIRECTION TO INDEX.HTML in case we're looking in root directory => TO DEFINE IN CONFIG FILE
-								{
-									contentType = "text/html";
-									fileLocation+= "index.html";
-								}
-								else
-									contentType = findFileType(fileLocation);
-							}
-							sL.statusCode = "200";
-							sL.reasonPhrase = "OK";
-							contentLength = countFileChar(fileLocation);
-							setenv("CONTENT_LENGTH", contentLength.c_str(), 1); //Ask Raph if this is still necessary
-						}
+						defineResponseHeaderForNonCGI();
+						if (contentLength.size() > 0)
+							body = getFileContent(fileLocation);
 					}
 					else
-					{
-						CGI *cgi = new CGI;
-						std::string CGI_PATH = CGIparsing(r, cgi);
-						cgi->print_env();
-						std::string message = cgi->execute(CGI_PATH, r);
-						std::cout << "test" << std::endl;
-						if (message != "Error")
-						{
-							size_t position = message.find("\n");
-							size_t position2 = message.find("\n", position + 1);
-							sL.statusCode = "200";
-							sL.reasonPhrase = "OK";
-							contentLength = cgi->get_buffer_size(position2);
-							setenv("CONTENT_LENGTH", contentLength.c_str(), 1);
-							body = message;
-						}
-						else
-						{
-							sL.statusCode = "500";
-							sL.reasonPhrase = "Internal Server Error";
-							fileLocation = errorPageLocation(500);
-						}
-						delete cgi;
-					}
+						defineResponseForCGI();
 				}
 			}
+			aggregateResponse();
+			return (resp);
 		}
 
-		void	defineResponseBody()
-		{
-			if (!r.isCGI && contentLength.size() > 0)
-				body = getFileContent(fileLocation);
-		}
+	private:
 
 		void	aggregateResponse()
 		{
@@ -113,15 +64,67 @@ class HTTPResponse
 				resp+= "\r\n";
 		}
 
-	private:
+		void		defineResponseHeaderForNonCGI()
+		{                        
+			if (!checkFile())
+			{
+				if (r.rL.method == "DELETE")
+					deleteFile();
+				else
+				{
+					if (fileLocation == (s.root + "/")) //REDIRECTION TO INDEX.HTML in case we're looking in root directory => TO DEFINE IN CONFIG FILE
+						fileLocation+= "index.html";
+					contentType = findFileType(fileLocation);
+				}
+				sL.statusCode = "200";
+				sL.reasonPhrase = "OK";
+				contentLength = countFileChar(fileLocation);
+				setenv("CONTENT_LENGTH", contentLength.c_str(), 1); //Ask Raph if this is still necessary
+			}
+		}
+
+		void		defineResponseForCGI()
+		{
+			CGI *cgi = new CGI;
+			std::string CGI_PATH = CGIparsing(r, cgi);
+			cgi->print_env();
+			std::string message = cgi->execute(CGI_PATH, r);
+			std::cout << "test" << std::endl;
+			if (message != "Error")
+			{
+				size_t position = message.find("\n");
+				size_t position2 = message.find("\n", position + 1);
+				sL.statusCode = "200";
+				sL.reasonPhrase = "OK";
+				contentLength = cgi->get_buffer_size(position2);
+				setenv("CONTENT_LENGTH", contentLength.c_str(), 1);
+				body = message;
+			}
+			else
+			{
+				sL.statusCode = "500";
+				sL.reasonPhrase = "Internal Server Error";
+				fileLocation = errorPageLocation(500);
+			}
+			delete cgi;
+		}
+
+		void		deleteFile()
+		{                                
+			if (unlink(fileLocation.c_str()) == 0) 
+				std::cout << "The file is deleted successfully." << std::endl;
+			else
+			{
+				std::cout << "The file is not deleted." << std::endl;
+				perror("error");
+			}
+		}
 
 		std::string CGIparsing(HTTPRequest &request, CGI *cgi)
 		{
 			std::string FILE_PATH = "";
 			if (request.isCGI == true)
 			{
-				//std::cout << "YOOOU " << request.defineQueryString() << std::endl;
-				//std::cout << "YAAAAA " << request.defineScriptName() << std::endl;
 				cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
 				cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 				cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
@@ -130,7 +133,7 @@ class HTTPResponse
 				cgi->add_variable("PATH_INFO", "");
 				cgi->add_variable("SCRIPT_NAME", request.defineScriptName());
 				FILE_PATH = "directory" + request.defineScriptName();
-				if (request.headerFields.find("User-Agent") != request.headerFields.end())
+				if (request.headerFields.find("User-Agent") != request.headerFields.end()) //Ask Raph if test can be performed directly in add_variables
 					cgi->add_variable("HTTP_USER_AGENT", request.headerFields.find("User-Agent")->second);
 				if (request.headerFields.find("Referer") != request.headerFields.end())
 					cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);

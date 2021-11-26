@@ -38,10 +38,13 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 	{
 		while (i < message.size() && request.isHeaderComplete == false)
 		{
-			if (message[i] == '\r' && message[i + 1] == '\n')
+			if ((message[i] == '\r' && message[i + 1] == '\n') || message[i] == '\n')
 			{
-				i+= 2;
-				if (request.tmp.size() == 0)
+				if (message[i] == '\r')
+					i+= 2;
+				else
+					i++;
+				if (request.tmp.size() == 0 || (request.tmp.size() == 1 && message[0] == '\n')) //in case there is only a /n as last caracter
 				{
 					request.isHeaderComplete = true;
 					printRequestHeader(request);
