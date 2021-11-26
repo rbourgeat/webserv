@@ -23,23 +23,23 @@ class HTTPResponse
 
 		std::string	defineResponse()
 		{
-			if (!checkRequest() && !checkClientBodySize())
+			if (s.redi.path.size() > 0)
+				redirectClient();
+			else if (!checkRequest() && !checkClientBodySize())
 			{
 				if (s.root.size() > 1)
 					fileLocation = s.root;
 				else
 					fileLocation = "directory";
 				fileLocation+= r.rL.requestTarget;
+				if (!r.isCGI)
 				{
-					if (!r.isCGI)
-					{
-						defineResponseHeaderForNonCGI();
-						if (contentLength.size() > 0)
-							body = getFileContent(fileLocation);
-					}
-					else
-						defineResponseForCGI();
+					defineResponseHeaderForNonCGI();
+					if (contentLength.size() > 0)
+						body = getFileContent(fileLocation);
 				}
+				else
+					defineResponseForCGI();
 			}
 			aggregateResponse();
 			return (resp);
@@ -47,10 +47,16 @@ class HTTPResponse
 
 	private:
 
+		void	redirectClient()
+		{
+			sL.statusCode = s.redi.num;
+			sL.reasonPhrase = "Moved permanently";
+			redirectionLocation = s.redi.path;
+		}
 		void	aggregateResponse()
 		{
 			resp+= sL.httpVersion + " " + sL.statusCode + " " + sL.reasonPhrase + "\r\n";
-			if (r.rL.method != "DELETE")
+			if (r.rL.method != "DELETE" && redirectionLocation.size() == 0)
 			{
 				resp+= "Content-Length: " + contentLength + "\r\n";
 				if (contentType.size() > 0)
@@ -61,7 +67,11 @@ class HTTPResponse
 				resp+= body;
 			}
 			else
+			{
+				if (redirectionLocation.size() > 0)
+					resp+= "Location: " + redirectionLocation + "\r\n";
 				resp+= "\r\n";
+			}
 		}
 
 		void		defineResponseHeaderForNonCGI()
@@ -178,8 +188,8 @@ class HTTPResponse
 			else
 				fileLocation = "directory/" + codeToString + ".html";
 			contentLength = countFileChar(fileLocation);	
-            if (contentLength.size() > 0)
-                body = getFileContent(fileLocation);
+			if (contentLength.size() > 0)
+				body = getFileContent(fileLocation);
 		}
 
 		bool isPathExist(const std::string &s)
@@ -447,6 +457,7 @@ class HTTPResponse
 		std::string			contentType;
 		std::string			contentLength;
 		std::string			body;
+		std::string			redirectionLocation;
 
 	public:
 		std::string			resp;

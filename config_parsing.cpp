@@ -66,9 +66,9 @@ void	addServer(std::vector<struct server> *servers, std::string serverBlock)
 		if ((strcmp(serverBlock.substr(i, 4).c_str(), "root")) == 0)
 		{
 			i+= 4;
-            int j = 0;
+			int j = 0;
 			while (serverBlock[i] && (serverBlock[i] == ' ' || serverBlock[i] == '\t'))
-                i++;
+				i++;
 			while (serverBlock[i] && serverBlock[i] != ';')
 			{
 				i++;
@@ -82,16 +82,41 @@ void	addServer(std::vector<struct server> *servers, std::string serverBlock)
 		{
 			i+= 20;
 			int j = 0;
-            while (serverBlock[i] && (serverBlock[i] == ' ' || serverBlock[i] == '\t'))
-                i++;
-            while (serverBlock[i] && serverBlock[i] != ';')
-            {
-                i++;
-                j++;
-            }
-            s.max_body_size = atoi(serverBlock.substr(i - j, j).c_str());
-            while (serverBlock[i] && serverBlock[i] != '\n')
-                i++;
+			while (serverBlock[i] && (serverBlock[i] == ' ' || serverBlock[i] == '\t'))
+				i++;
+			while (serverBlock[i] && serverBlock[i] != ';')
+			{
+				i++;
+				j++;
+			}
+			s.max_body_size = atoi(serverBlock.substr(i - j, j).c_str());
+			while (serverBlock[i] && serverBlock[i] != '\n')
+				i++;
+		}
+		if ((strcmp(serverBlock.substr(i, 6).c_str(), "return")) == 0)
+		{
+			struct redirection redirect;
+			redirect.num = 0;
+			int j = 0;
+			i+= 6;
+			while (serverBlock[i] && (serverBlock[i] == ' ' || serverBlock[i] == '\t'))
+				i++;
+			while (serverBlock[i] && serverBlock[i] >= '0' && serverBlock[i] <= '9')
+			{
+				i++;
+				j++;
+			}
+			redirect.num = atoi(serverBlock.substr(i - j, j).c_str());
+			while (serverBlock[i] && (serverBlock[i] == ' ' || serverBlock[i] == '\t'))
+				i++;
+			while (serverBlock[i] && serverBlock[i] != ';')
+			{
+				redirect.path += serverBlock[i];
+				i++;
+			}
+			s.redi = redirect;
+			while (serverBlock[i] && serverBlock[i] != '\n')
+				i++;
 		}
 		if (serverBlock[i] == '#')
 			while (serverBlock[i] != '\n')
@@ -156,6 +181,8 @@ void	readConfig(char const *argv, std::vector<struct server> *servers)
 		}
 		std::cout << "root: " << (*servers)[i].root << std::endl;
 		std::cout << "client_max_body_size: " << (*servers)[i].max_body_size << std::endl;
+        std::cout << "redirection num: " << (*servers)[i].redi.num << std::endl;
+        std::cout << "redirection path: " << (*servers)[i].redi.path << std::endl;
 		std::cout << std::endl;
 	}
 	//close file?

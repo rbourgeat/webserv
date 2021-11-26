@@ -10,6 +10,12 @@ struct			errorPage
 	std::string	path;
 };
 
+struct			redirection
+{
+	int			num;
+	std::string	path;
+};
+
 struct  					server
 {
 	std::string 			name;
@@ -18,6 +24,7 @@ struct  					server
 	std::vector<errorPage>	error;
 	std::string				root;
 	size_t					max_body_size;
+	struct redirection		redi;	
 };
 
 struct							client
