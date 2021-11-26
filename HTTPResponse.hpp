@@ -50,7 +50,7 @@ class HTTPResponse
 		void	redirectClient()
 		{
 			sL.statusCode = s.redi.num;
-			if (s.redi.num == "301")
+			if (s.redi.num == 301)
 				sL.reasonPhrase = "Moved permanently";
 			redirectionLocation = s.redi.path;
 		}
