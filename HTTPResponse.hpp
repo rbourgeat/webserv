@@ -23,7 +23,7 @@ class HTTPResponse
 
 		std::string	defineResponse()
 		{
-			if (!checkRequest())
+			if (!checkRequest() && !checkClientBodySize())
 			{
 				if (s.root.size() > 1)
 					fileLocation = s.root;
@@ -53,7 +53,7 @@ class HTTPResponse
 			if (r.rL.method != "DELETE")
 			{
 				resp+= "Content-Length: " + contentLength + "\r\n";
-				if (!r.isCGI)
+				if (contentType.size() > 0)
 				{
 					resp+= "Content-Type: " + contentType + "\r\n";
 					resp+= "\r\n";
@@ -104,7 +104,7 @@ class HTTPResponse
 			{
 				sL.statusCode = "500";
 				sL.reasonPhrase = "Internal Server Error";
-				fileLocation = errorPageLocation(500);
+				errorPageLocation(500);
 			}
 			delete cgi;
 		}
@@ -162,9 +162,9 @@ class HTTPResponse
 			return (string);
 		}
 
-		std::string errorPageLocation(int code)
+		void errorPageLocation(int code)
 		{
-			std::string location, codeToString;
+			std::string codeToString;
 			std::stringstream ss;
 			ss << code;
 			ss >> codeToString;
@@ -174,11 +174,12 @@ class HTTPResponse
 			while (i < s.error.size() && s.error[i].num != code)
 				i++;
 			if (i < s.error.size() && s.error[i].num == code)
-				location = "directory/" + s.error[i].path;
+				fileLocation = "directory/" + s.error[i].path;
 			else
-				location = "directory/" + codeToString + ".html";
-			contentLength = countFileChar(location);
-			return (location);
+				fileLocation = "directory/" + codeToString + ".html";
+			contentLength = countFileChar(fileLocation);	
+            if (contentLength.size() > 0)
+                body = getFileContent(fileLocation);
 		}
 
 		bool isPathExist(const std::string &s)
@@ -207,14 +208,14 @@ class HTTPResponse
 			{                
 				sL.statusCode = "404";
 				sL.reasonPhrase = "Not found";
-				fileLocation = errorPageLocation(404);
+				errorPageLocation(404);
 				return (true);
 			}
 			if (!checkFilePerm(fileLocation))
 			{
 				sL.statusCode = "403";
 				sL.reasonPhrase = "Forbidden";
-				fileLocation = errorPageLocation(403);
+				errorPageLocation(403);
 				return (true);
 			}
 			return (false);
@@ -226,22 +227,37 @@ class HTTPResponse
 			{
 				sL.statusCode = "400";
 				sL.reasonPhrase = "Bad request";
-				fileLocation = errorPageLocation(400);
+				errorPageLocation(400);
 				return (true);
 			}
 			if (r.rL.method != "GET" && r.rL.method != "POST" && r.rL.method != "DELETE")
 			{
 				sL.statusCode = "405";
 				sL.reasonPhrase = "Method not allowed";
-				fileLocation = errorPageLocation(405);
+				errorPageLocation(405);
 				return (true);
 			}
 			if (r.rL.httpVersion.find("1.1") == std::string::npos)
 			{
 				sL.statusCode = "505";
 				sL.reasonPhrase = "HTTP version not supported";
-				fileLocation = errorPageLocation(505);
+				errorPageLocation(505);
 				return (true);
+			}
+			return (false);
+		}
+
+		bool	checkClientBodySize()
+		{
+			if (s.max_body_size > 0)
+			{
+				if (r.bodySize > s.max_body_size)
+				{
+					sL.statusCode = "413";
+					sL.reasonPhrase = "Request Entity Too Large";
+					errorPageLocation(413);
+					return (true);
+				}
 			}
 			return (false);
 		}

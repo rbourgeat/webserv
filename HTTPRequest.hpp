@@ -28,6 +28,7 @@ class	HTTPRequest
 			isRequestLineComplete = false;
 			isComplete = false;
 			chunkSize = -1;
+			bodySize = 0;
 		}
 		~HTTPRequest(){;}
 
