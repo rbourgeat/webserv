@@ -62,32 +62,15 @@ class TCPSocket
 		int		socketSend(int fd, std::vector<unsigned char> answer)
 		{
 			int sentBytes(0);
-			/*size_t totalSentBytes(0);
-			size_t bytesLeft = answer.size();*/
 
 			if ((sentBytes = send(fd, &answer[0], answer.size(), 0)) < 0)
 				throw TCPSocketException("while sending");
-			/*else
-			{
-				bytesLeft-= sentBytes;
-				totalSentBytes+= sentBytes;
-				while (totalSentBytes < answer.size())
-				{
-					if ((sentBytes = send(fd, &answer[0 + totalSentBytes], bytesLeft, 0)) < 0)
-						throw TCPSocketException("while sending");
-					bytesLeft-= sentBytes;
-					totalSentBytes+= sentBytes;
-				}
-			}*/
-			//std::cout << "*********************totalSentBytes**************" << totalSentBytes << std::endl;
 			return (sentBytes);
 		}
 
 		std::vector<unsigned char>	socketRecv(int i, PollFd &objectPoll)
 		{
-			//std::vector<unsigned char> request(30000);
 			std::vector<unsigned char> buffer(10000);
-			//int totalBytes(0);
 
 			int nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), MSG_DONTWAIT);	
 			if (nbytes <= 0)
@@ -99,27 +82,6 @@ class TCPSocket
 				close(objectPoll.getPfd()[i].fd);
 				objectPoll.deleteFd(i);
 			}
-			/*else
-			{
-				int j(0);
-				for (int k(0); k < nbytes; k++)
-				{
-					request[j] = buffer[k];
-					j++;
-				}
-				totalBytes+= nbytes;
-				while (nbytes > 0)
-				{
-					nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), MSG_DONTWAIT);
-					for (int k(0); k < nbytes; k++)
-					{
-						request[j] = buffer[k];
-						j++;
-					}
-					totalBytes+= nbytes;
-				}
-			}
-			return (request);*/
 			return (buffer);
 		}
 

@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/25 19:02:11 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/26 14:13:10 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int		main(int argc, char const *argv[])
 	std::vector<struct server> servers;
 	std::vector<struct client> clients;
 	readConfig(config_path, &servers);
-	
+
 	/*Create pollfd structure to monitor sockets with poll()*/		
 	PollFd vPfd;
 	while(1)
@@ -134,12 +134,12 @@ int		main(int argc, char const *argv[])
 											std::cout << MAG << clients[k].answer[l];
 									}
 									clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
-									std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
 									if (clients[k].answer.size() == 0)
 									{
-									clients[k].answer.clear();
-									clients[k].request.clearAll();
-									std::cout << NC << std::endl;
+										std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
+										clients[k].answer.clear();
+										clients[k].request.clearAll();
+										std::cout << NC << std::endl;
 									}
 								}
 							}
@@ -154,6 +154,6 @@ int		main(int argc, char const *argv[])
 			// exit(EXIT_FAILURE);
 		}
 	}
-	
+
 	return 0;
 }

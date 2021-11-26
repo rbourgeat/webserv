@@ -112,7 +112,8 @@ class	HTTPRequest
 
 			while (i < tmp.size() && tmp[i] != ' ')
 			{
-				rL.method.push_back(tmp[i]);
+				if (tmp[i] >= 32 && tmp[i] <= 126)
+					rL.method.push_back(tmp[i]);
 				i++;
 			}
 			if (i < tmp.size() && tmp[i] == ' ')
