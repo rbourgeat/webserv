@@ -6,13 +6,14 @@
 /*   By: rbourgeat <rbourgeat@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/26 20:48:02 by rbourgeat        ###   ########.fr       */
+/*   Updated: 2021/11/28 18:30:24 by rbourgeat        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "webserv.hpp"
 # include "serverAndClient.hpp"
 # include "CGI.hpp"
+# include <sys/time.h>
 
 std::string findTypeofFile(std::string path)
 {
@@ -373,6 +374,27 @@ std::string CGIparsing(HTTPRequest &request, std::vector<unsigned char> buffer, 
 	return (FILE_PATH);
 }
 
+int pathType(std::string path, time_t *file_date)
+{
+	struct stat buffer;
+	struct timezone tz;
+	struct timeval t;
+
+	gettimeofday(&t, &tz);
+	int exist = stat(path.c_str(), &buffer);
+	if (file_date)
+		*file_date = buffer.st_mtime + tz.tz_minuteswest * 60;
+	if (exist == 0)
+	{
+		if (S_ISREG(buffer.st_mode))
+			return (1);
+		else
+			return (2);
+	}
+	else
+		return (0);
+}
+
 std::string	errorPageLocation(int code, struct server s)
 {
 	std::string location, codeToString;
@@ -452,41 +474,41 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		}
 		else if (0 == 1) // Trouver comment parser ?!
 		{
-			struct stat buf = {};
-			std::string file_path = "????"; // Parser la requête !!!
-			int uploadFd = open(file_path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			std::string m = "File Updated !";
-			
-			// check file
-			if (stat(file_path.c_str(), &buf) == -1) {
-				if (errno != ENOENT) {
-					if (errno == ENOTDIR)
-						location = errorPageLocation(404, s);
-					else
-						location = errorPageLocation(500, s);
-					return;
+			int fd = -1;
+			std::string path, filename; // Récupérer le nom du fichier
+			std::string upload_path; // Chemin par défaut pour upload
+			const std::string content_file; // Trouver le moyen de recup le contenu du fichier
+
+			path = upload_path + "/" + filename;
+			int type = pathType(path, NULL);
+			try
+			{
+				if (type == 1)
+				{
+					if ((fd = open(path.c_str(), O_WRONLY | O_TRUNC, 0644)) == -1)
+						throw(location = errorPageLocation(500, s));
+					write(fd, content_file.c_str(), content_file.length());
+					close(fd);
+					rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html";
+					location += "index.html";
 				}
-				m = "File Created!";
-			}
-			else {
-				if (!S_ISREG(buf.st_mode)) {
-					location = errorPageLocation(403, s); // not a regular file = 403 error
-					return;
+				else if (type == 0)
+				{
+					if ((fd = open(path.c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644)) == -1)
+						throw (location = errorPageLocation(500, s));
+					write(fd, content_file.c_str(), content_file.length());
+					close(fd);
+					rep = "HTTP/1.1 201 OK\r\nContent-Type: text/html";
+					location += "index.html";
 				}
-			}
-			
-			// create file
-			if (uploadFd == -1) {
-				if (errno == ENOENT)
-					location = errorPageLocation(404, s);
 				else
 					location = errorPageLocation(500, s);
-				return;
 			}
-			
-			rep = "HTTP/1.1 200 OK\r\nContent-Type: text/html";
-			rep = std::string("<h1>") + m + "</h1>";
-			location += "index.html";
+			catch (std::exception & ex)
+			{
+				location = errorPageLocation(500, s);
+			}
+
 		}
 		else if (request.rL.method == "DELETE") //OK
 		{
