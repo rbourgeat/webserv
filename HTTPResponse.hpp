@@ -23,7 +23,7 @@ class HTTPResponse
 
 		std::string	defineResponse()
 		{
-			if (s.redi.path.size() > 0)
+			if (s.redi.num > -1)
 				redirectClient();
 			else if (!checkRequest() && !checkClientBodySize())
 			{
@@ -49,7 +49,10 @@ class HTTPResponse
 
 		void	redirectClient()
 		{
-			sL.statusCode = s.redi.num;
+			std::cout << "ICIIIIIIIIIIIIIIIIII???\n";
+			std::stringstream ss;
+			ss << s.redi.num;
+			ss >> sL.statusCode;
 			if (s.redi.num == 301)
 				sL.reasonPhrase = "Moved permanently";
 			redirectionLocation = s.redi.path;

@@ -7,6 +7,7 @@ void	addServer(std::vector<struct server> *servers, std::string serverBlock)
 	struct server	s;
 
 	s.max_body_size = 0;
+	s.redi.num = -1;
 	while (serverBlock[i])
 	{
 		if ((strcmp(serverBlock.substr(i, 6).c_str(), "listen")) == 0)
