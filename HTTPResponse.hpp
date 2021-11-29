@@ -4,6 +4,7 @@
 # include "webserv.hpp"
 # include "CGI.hpp"
 # include "serverAndClient.hpp"
+# include <sys/time.h>
 
 struct	statusLine
 {
@@ -131,6 +132,71 @@ class HTTPResponse
 			{
 				std::cout << "The file is not deleted." << std::endl;
 				perror("error");
+			}
+		}
+
+		int pathType(std::string path, time_t *file_date)
+		{
+			struct stat buffer;
+			struct timezone tz;
+			struct timeval t;
+
+			gettimeofday(&t, &tz);
+			int exist = stat(path.c_str(), &buffer);
+			if (file_date)
+				*file_date = buffer.st_mtime + tz.tz_minuteswest * 60;
+			if (exist == 0)
+			{
+				if (S_ISREG(buffer.st_mode))
+					return (1);
+				else
+					return (2);
+			}
+			else
+				return (0);
+		}
+
+		void		uploadFile()
+		{
+			int fd = -1;
+			std::string path, filename; // Récupérer le nom du fichier
+			std::string upload_path; // Chemin par défaut pour upload
+			const std::string content_file; // Trouver le moyen de recup le contenu du fichier
+
+			path = upload_path + "/" + filename;
+			int type = pathType(path, NULL);
+			try
+			{
+				if (type == 1)
+				{
+					if ((fd = open(path.c_str(), O_WRONLY | O_TRUNC, 0644)) == -1)
+						throw("Error 500");
+					write(fd, content_file.c_str(), content_file.length());
+					close(fd);
+					sL.statusCode = "200";
+					sL.reasonPhrase = "OK";
+				}
+				else if (type == 0)
+				{
+					if ((fd = open(path.c_str(), O_WRONLY | O_APPEND | O_CREAT, 0644)) == -1)
+						throw ("Error 500");
+					write(fd, content_file.c_str(), content_file.length());
+					close(fd);
+					sL.statusCode = "201";
+					sL.reasonPhrase = "OK";
+				}
+				else
+				{
+					sL.statusCode = "500";
+					sL.reasonPhrase = "Internal Server Error";
+					errorPageLocation(500);
+				}
+			}
+			catch (std::exception & ex)
+			{
+				sL.statusCode = "500";
+				sL.reasonPhrase = "Internal Server Error";
+				errorPageLocation(500);
 			}
 		}
 
