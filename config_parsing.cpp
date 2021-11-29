@@ -1,5 +1,63 @@
 #include "webserv.hpp"
 
+struct location	addLocation(std::string serverBlock, size_t *i)
+{
+	struct location loc;
+
+	(*i)+= 8;
+	while (serverBlock[*i] == ' ' || serverBlock[*i] == '\t')
+		(*i)++;
+	while (serverBlock[*i] != ' ' && serverBlock[*i] != '\t')
+	{
+		loc.path.push_back(serverBlock[*i]);
+		(*i)++;
+	}
+	while (serverBlock[*i] != '\n')
+		(*i)++;
+	(*i)++;
+	while (serverBlock[*i] && serverBlock[*i] != '}')
+	{   
+		if ((strcmp(serverBlock.substr(*i, 4).c_str(), "root")) == 0)
+		{
+			(*i)+= 4;
+			int j = 0;
+			while (serverBlock[*i] && (serverBlock[*i] == ' ' || serverBlock[*i] == '\t'))
+				(*i)++;
+			while (serverBlock[*i] && serverBlock[*i] != ';')
+			{
+				(*i)++;
+				j++;
+			}
+			loc.root = serverBlock.substr(*i - j, j);
+			while (serverBlock[*i] && serverBlock[*i] != '\n')
+				(*i)++;
+		}
+		if ((strcmp(serverBlock.substr(*i, 6).c_str(), "method")) == 0)
+		{
+			(*i)+= 6;
+			int j = 0;
+			while (serverBlock[*i] && (serverBlock[*i] == ' ' || serverBlock[*i] == '\t'))
+				(*i)++;
+			while (serverBlock[*i] && serverBlock[*i] != ';')
+			{
+				while (serverBlock[*i] && serverBlock[*i] != ' ' && serverBlock[*i] != ';')
+				{
+					(*i)++;
+					j++;
+				}
+				loc.method.push_back(serverBlock.substr(*i - j, j));
+				j = 0;
+				if (serverBlock[*i] == ' ')
+					(*i)++;
+			}
+			while (serverBlock[*i] && serverBlock[*i] != '\n')
+				(*i)++;
+		}
+		(*i)++;
+	}
+	return (loc);
+}
+
 void	addServer(std::vector<struct server> *servers, std::string serverBlock)
 {
 	size_t	i(0);
@@ -119,6 +177,8 @@ void	addServer(std::vector<struct server> *servers, std::string serverBlock)
 			while (serverBlock[i] && serverBlock[i] != '\n')
 				i++;
 		}
+		if ((strcmp(serverBlock.substr(i, 8).c_str(), "location")) == 0)
+			s.loc.push_back(addLocation(serverBlock, &i));
 		if (serverBlock[i] == '#')
 			while (serverBlock[i] != '\n')
 				i++;
@@ -180,10 +240,19 @@ void	readConfig(char const *argv, std::vector<struct server> *servers)
 			std::cout << "error num: " << (*servers)[i].error[j].num << std::endl;
 			std::cout << "error path: " << (*servers)[i].error[j].path << std::endl;
 		}
+		for (size_t j(0); j < (*servers)[i].loc.size(); j++)
+		{
+			std::cout << "Location [" << (*servers)[i].loc[j].path << "]" << std::endl;
+			std::cout << "-->root: " << (*servers)[i].loc[j].root << std::endl;
+			std::cout << "-->method: ";
+			for (size_t k(0); k < (*servers)[i].loc[j].method.size(); k++)
+				std::cout << (*servers)[i].loc[j].method[k] << " ";
+			std::cout << std::endl;
+		}
 		std::cout << "root: " << (*servers)[i].root << std::endl;
 		std::cout << "client_max_body_size: " << (*servers)[i].max_body_size << std::endl;
-        std::cout << "redirection num: " << (*servers)[i].redi.num << std::endl;
-        std::cout << "redirection path: " << (*servers)[i].redi.path << std::endl;
+		std::cout << "redirection num: " << (*servers)[i].redi.num << std::endl;
+		std::cout << "redirection path: " << (*servers)[i].redi.path << std::endl;
 		std::cout << std::endl;
 	}
 	//close file?

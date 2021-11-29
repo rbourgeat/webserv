@@ -16,12 +16,20 @@ struct			redirection
 	std::string	path;
 };
 
+struct			location
+{
+	std::string					path;
+	std::vector<std::string>	method;
+	std::string					root;
+};
+
 struct  					server
 {
 	std::string 			name;
 	int         			port;
 	TCPSocket				sock;
 	std::vector<errorPage>	error;
+	std::vector<location>	loc;
 	std::string				root;
 	size_t					max_body_size;
 	struct redirection		redi;	

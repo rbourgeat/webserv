@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/29 16:03:32 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/11/29 18:27:13 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,8 +156,8 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request)
 						std::cout << request.body[j];
 					}
 					close(fd1[0]);
-					close(1);
-					close(0);
+					//close(1);
+					//close(0);
 					exit(0);
 				}
 				else

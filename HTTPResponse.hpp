@@ -60,7 +60,7 @@ class HTTPResponse
 		void	aggregateResponse()
 		{
 			resp+= sL.httpVersion + " " + sL.statusCode + " " + sL.reasonPhrase + "\r\n";
-			if (r.rL.method != "DELETE" && redirectionLocation.size() == 0)
+			if (r.rL.method != "DELETE" && s.redi.num == -1)
 			{
 				resp+= "Content-Length: " + contentLength + "\r\n";
 				if (contentType.size() > 0)
