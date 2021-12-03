@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get.cpp                                            :+:      :+:    :+:   */
+/*   multiplication.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rbourgeat <rbourgeat@student.42.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/04 15:43:36 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/04 15:49:03 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/03 15:34:44 by rbourgeat        ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int main(void)
 {
      int a=0, b=0;
 
-     printf("Content-Type: text/html;\n\n");
+     printf("Content-Type: text/html;\r\n\r\n");
      haut("Ma page en C !");
 
      char *data = getenv("QUERY_STRING"); // Les variables

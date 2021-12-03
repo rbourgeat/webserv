@@ -206,21 +206,32 @@ class HTTPResponse
 			if (request.isCGI == true)
 			{
 				cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
+				cgi->add_variable("SERVER_NAME", ""); // Le nom d'hôte, alias DNS ou adresse IP du serveur.
 				cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 				cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
-				cgi->add_variable("AUTH_TYPE", "Basic");
-				cgi->add_variable("QUERY_STRING", request.defineQueryString());
+				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
+				cgi->add_variable("REQUEST_METHOD", ""); // La method utilisée pour faire la requête.
 				cgi->add_variable("PATH_INFO", "");
+				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
 				cgi->add_variable("SCRIPT_NAME", request.defineScriptName());
+				cgi->add_variable("QUERY_STRING", request.defineQueryString());
+				cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
+				cgi->add_variable("REMOTE_ADDR", ""); // IP du client ??? Demander si on doit vraiment le faire
+				cgi->add_variable("AUTH_TYPE", "Basic");
+				cgi->add_variable("REMOTE_USER", "");
+				cgi->add_variable("CONTENT_TYPE", ""); // Récuperer le contenu du POST
+				cgi->add_variable("CONTENT_LENGTH", ""); // Je n'arrive pas à le récup :(
 				FILE_PATH = "directory" + request.defineScriptName();
-				if (request.headerFields.find("User-Agent") != request.headerFields.end()) //Ask Raph if test can be performed directly in add_variables
-					cgi->add_variable("HTTP_USER_AGENT", request.headerFields.find("User-Agent")->second);
-				if (request.headerFields.find("Referer") != request.headerFields.end())
-					cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
 				if (request.headerFields.find("Accept") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
 				if (request.headerFields.find("Accept-Language") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT_LANGUAGE", request.headerFields.find("Accept-Language")->second);
+				if (request.headerFields.find("User-Agent") != request.headerFields.end()) //Ask Raph if test can be performed directly in add_variables
+					cgi->add_variable("HTTP_USER_AGENT", request.headerFields.find("User-Agent")->second);
+				if (request.headerFields.find("Referer") != request.headerFields.end())
+					cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
+				if (request.headerFields.find("Cookie") != request.headerFields.end())
+					cgi->add_variable("HTTP_COOKIE", request.headerFields.find("Cookie")->second);
 			}
 			return (FILE_PATH);
 		}
