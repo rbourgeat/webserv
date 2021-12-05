@@ -210,7 +210,7 @@ class HTTPResponse
 				cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 				cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
 				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
-				cgi->add_variable("REQUEST_METHOD", ""); // La method utilisée pour faire la requête.
+				cgi->add_variable("REQUEST_METHOD", r.rL.method);
 				cgi->add_variable("PATH_INFO", "");
 				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
 				cgi->add_variable("SCRIPT_NAME", request.defineScriptName());
@@ -220,7 +220,7 @@ class HTTPResponse
 				cgi->add_variable("AUTH_TYPE", "Basic");
 				cgi->add_variable("REMOTE_USER", "");
 				cgi->add_variable("CONTENT_TYPE", ""); // Récuperer le contenu du POST
-				cgi->add_variable("CONTENT_LENGTH", ""); // Je n'arrive pas à le récup :(
+				// cgi->add_variable("CONTENT_LENGTH", ""); ✅
 				FILE_PATH = "directory" + request.defineScriptName();
 				if (request.headerFields.find("Accept") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
