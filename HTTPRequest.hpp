@@ -26,6 +26,7 @@ class	HTTPRequest
 			isChunked = false;
 			isHeaderComplete = false;
 			isRequestLineComplete = false;
+			isCGI = false;
 			isComplete = false;
 			chunkSize = -1;
 			bodySize = 0;

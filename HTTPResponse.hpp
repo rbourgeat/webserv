@@ -28,6 +28,7 @@ class HTTPResponse
 				redirectClient();
 			else if (!checkRequest() && !checkClientBodySize())
 			{
+				std::cout << r.isCGI << std::endl;
 				if (s.root.size() > 1)
 					fileLocation = s.root;
 				else
@@ -50,7 +51,6 @@ class HTTPResponse
 
 		void	redirectClient()
 		{
-			std::cout << "ICIIIIIIIIIIIIIIIIII???\n";
 			std::stringstream ss;
 			ss << s.redi.num;
 			ss >> sL.statusCode;
@@ -93,6 +93,7 @@ class HTTPResponse
 				}
 				sL.statusCode = "200";
 				sL.reasonPhrase = "OK";
+				std::cout << "fileLocation????? " << fileLocation << std::endl;
 				contentLength = countFileChar(fileLocation);
 				setenv("CONTENT_LENGTH", contentLength.c_str(), 1); //Ask Raph if this is still necessary
 			}
@@ -295,6 +296,7 @@ class HTTPResponse
 
 		bool	checkFile()
 		{
+			std::cout << "fileLocation????? " << fileLocation << std::endl;
 			if (!isPathExist(fileLocation))
 			{                
 				sL.statusCode = "404";
