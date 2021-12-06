@@ -36,9 +36,16 @@ class HTTPResponse
 				fileLocation+= r.rL.requestTarget;
 				if (!r.isCGI)
 				{
-					defineResponseHeaderForNonCGI();
-					if (contentLength.size() > 0)
-						body = getFileContent(fileLocation);
+					if (r.isUpload)
+					{
+						uploadParsing();
+					}
+					else
+					{
+						defineResponseHeaderForNonCGI();
+						if (contentLength.size() > 0)
+							body = getFileContent(fileLocation);
+					}
 				}
 				else
 					defineResponseForCGI();
@@ -158,7 +165,14 @@ class HTTPResponse
 
 		void		uploadParsing()
 		{
-			
+			std::string upload_body(r.body.begin(), r.body.end());
+
+			unsigned first = upload_body.find("filename=");
+			unsigned last = upload_body.find("Content");
+			upload_filename = upload_body.substr (first,last-first);
+			std::cout << "upload_filename= " << upload_filename << std::endl;
+
+			//uploadFile();
 		}
 
 		void		uploadFile()
@@ -545,6 +559,7 @@ class HTTPResponse
 		std::string			contentLength;
 		std::string			body;
 		std::string			redirectionLocation;
+		std::string			upload_filename;
 
 	public:
 		std::string			resp;

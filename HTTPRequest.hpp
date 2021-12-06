@@ -27,6 +27,7 @@ class	HTTPRequest
 			isHeaderComplete = false;
 			isRequestLineComplete = false;
 			isCGI = false;
+			isUpload = false;
 			isComplete = false;
 			chunkSize = -1;
 			bodySize = 0;
@@ -74,6 +75,19 @@ class	HTTPRequest
 				isBody = true;
 				isChunked = true;
 			}
+			determineIfUpload();
+		}
+
+		void		determineIfUpload()
+		{
+			// std::string upload_body(r.body.begin(), r.body.end());
+			if (headerFields.find("Content-Type") != headerFields.end())
+			{
+				if (headerFields.find("Content-Type")->second.find("boundary"))
+					isUpload = true;
+				else
+					isUpload = false;
+			}
 		}
 
 		void		insertHeaderLine()
@@ -97,7 +111,7 @@ class	HTTPRequest
 					i++;
 				if (i < tmp.size() && tmp[i] == ' ')
 					i++;
-				while (i < tmp.size() && tmp[i] != ' ')
+				while (i < tmp.size())
 				{
 					temp2.push_back(tmp[i]);
 					i++;
@@ -149,6 +163,7 @@ class	HTTPRequest
 		std::vector<unsigned char>			chunkData;
 		bool								isBody;
 		bool								isCGI;
+		bool								isUpload;
 		bool								isChunked;
 		bool								isHeaderComplete;
 		bool								isRequestLineComplete;
