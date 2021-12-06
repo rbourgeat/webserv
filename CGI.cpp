@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/29 18:27:13 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/06 15:19:04 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,7 +236,6 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request)
 				close(fd1[0]);
 				exit(-1);
 			}
-
 			execve(args[0], args, env);
 			exit(-1);
 
@@ -266,7 +265,7 @@ std::string CGI::get_buffer_size(int count)
 {
 	std::ostringstream ss;
 	std::string string;
-	ss << (_buffSize - (count + 1));
+	ss << (_buffSize - count);
 	string = ss.str();
 	return string;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   setcookie.cpp                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbourgeat <rbourgeat@student.42.fr>        +#+  +:+       +#+        */
+/*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/03 14:49:18 by rbourgeat         #+#    #+#             */
-/*   Updated: 2021/12/03 15:50:43 by rbourgeat        ###   ########.fr       */
+/*   Updated: 2021/12/06 15:03:25 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 
 int main(void)
 {
-     printf("Content-Type: text/html;\n");
-     printf("Set-Cookie: %s=%s\r\n\r\n", "webserv", "42");
-     printf("<br><a href='getcookie.cgi'>Clique ici pour verifier</a>");
+     std::cout << "Content-Type: text/html\r\n";
+     std::cout << "Set-Cookie: webserv=42\r\n\r\n";
+     std::cout << "Creation du Cookie: nom = webserv, value = 42";
+     std::cout << "<br><a href='getcookie.cgi'>Clique ici pour verifier</a>";
      return 0;
 }

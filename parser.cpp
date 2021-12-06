@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbourgeat <rbourgeat@student.42.fr>        +#+  +:+       +#+        */
+/*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:30:12 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/06 13:46:23 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/06 14:23:34 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -551,7 +551,6 @@ std::vector<unsigned char> parsing(HTTPRequest &request, std::vector<unsigned ch
 		std::string CGI_PATH = CGIparsing(request, buffer, cgi);
 		cgi->print_env();
 		std::string message = cgi->execute(CGI_PATH, request);
-		std::cout << "test" << std::endl;
 		if (message != "Error")
 		{
 			size_t position = message.find("\n");
