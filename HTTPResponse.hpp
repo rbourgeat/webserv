@@ -95,12 +95,12 @@ class HTTPResponse
 				sL.reasonPhrase = "OK";
 				std::cout << "fileLocation????? " << fileLocation << std::endl;
 				contentLength = countFileChar(fileLocation);
-				setenv("CONTENT_LENGTH", contentLength.c_str(), 1); //Ask Raph if this is still necessary
 			}
 		}
 
 		void		defineResponseForCGI()
 		{
+			std::cout << "HELOOOOOOOOOOOOOOOOOO\n";
 			CGI *cgi = new CGI;
 			std::string CGI_PATH = CGIparsing(r, cgi);
 			cgi->print_env();
@@ -113,7 +113,6 @@ class HTTPResponse
 				sL.statusCode = "200";
 				sL.reasonPhrase = "OK";
 				contentLength = cgi->get_buffer_size(position2);
-				setenv("CONTENT_LENGTH", contentLength.c_str(), 1);
 				body = message;
 			}
 			else
@@ -221,7 +220,7 @@ class HTTPResponse
 				cgi->add_variable("AUTH_TYPE", "Basic");
 				cgi->add_variable("REMOTE_USER", "");
 				cgi->add_variable("CONTENT_TYPE", ""); // Récuperer le contenu du POST
-				// cgi->add_variable("CONTENT_LENGTH", ""); ✅
+				cgi->add_variable("CONTENT_LENGTH", contentLength.c_str());
 				FILE_PATH = "directory" + request.defineScriptName();
 				if (request.headerFields.find("Accept") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
