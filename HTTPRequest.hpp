@@ -49,11 +49,17 @@ class	HTTPRequest
 			chunkSize = -1;
 		}
 
-		std::string defineScriptName()
+		std::string defineScriptName(std::string str)
 		{
 			std::string scriptName(rL.requestTarget.begin(), rL.requestTarget.end());
-			return (std::string(scriptName, 0, scriptName.find("?")));
+			if (str == "?")
+				return (std::string(scriptName, 0, scriptName.find("?")));
+			else if (str == "/")
+				return (std::string(scriptName, 0, scriptName.find("/")));
+			else
+				return (scriptName);
 		}
+
 		std::string	defineQueryString()
 		{
 			std::string queryString(rL.requestTarget.begin(), rL.requestTarget.end());
@@ -62,7 +68,16 @@ class	HTTPRequest
 			else
 				return ("");
 		}
-		
+
+		std::string	definePathInfo()
+		{
+			std::string queryString(rL.requestTarget.begin(), rL.requestTarget.end());
+			if (queryString.find(".cgi/") != std::string::npos)
+				return (std::string(queryString, queryString.find(".cgi/") + 5));
+			else
+				return ("");
+		}
+
 		void		determineIfBody()
 		{
 			if (headerFields.find("Content-Length") != headerFields.end())
