@@ -4,6 +4,7 @@ struct location	addLocation(std::string serverBlock, size_t *i)
 {
 	struct location loc;
 
+	loc.redi.num = -1;
 	(*i)+= 8;
 	while (serverBlock[*i] == ' ' || serverBlock[*i] == '\t')
 		(*i)++;
@@ -53,8 +54,79 @@ struct location	addLocation(std::string serverBlock, size_t *i)
 			while (serverBlock[*i] && serverBlock[*i] != '\n')
 				(*i)++;
 		}
+		if ((strcmp(serverBlock.substr(*i, 6).c_str(), "return")) == 0)
+		{
+			struct redirection redirect;
+			redirect.num = 0;
+			int j = 0;
+			(*i)+= 6;
+			while (serverBlock[*i] && (serverBlock[*i] == ' ' || serverBlock[*i] == '\t'))
+				(*i)++;
+			while (serverBlock[*i] && serverBlock[*i] >= '0' && serverBlock[*i] <= '9')
+			{
+				(*i)++;
+				j++;
+			}
+			redirect.num = atoi(serverBlock.substr(*i - j, j).c_str());
+			while (serverBlock[*i] && (serverBlock[*i] == ' ' || serverBlock[*i] == '\t'))
+				(*i)++;
+			while (serverBlock[*i] && serverBlock[*i] != ';')
+			{
+				redirect.path += serverBlock[*i];
+				(*i)++;
+			}
+			loc.redi = redirect;
+			while (serverBlock[*i] && serverBlock[*i] != '\n')
+				(*i)++;
+		}
+		if ((strcmp(serverBlock.substr(*i, 7).c_str(), "default")) == 0)
+		{
+			int j = 0;
+			(*i)+= 7;
+			while (serverBlock[*i] && (serverBlock[*i] == ' ' || serverBlock[*i] == '\t'))
+				(*i)++;
+			while (serverBlock[*i] && serverBlock[*i] != ';')
+			{
+				(*i)++;
+				j++;
+			}
+			loc.defaultFile = serverBlock.substr(*i - j, j);
+			while (serverBlock[*i] && serverBlock[*i] != '\n')
+				(*i)++;
+		}
+		if ((strcmp(serverBlock.substr(*i, 6).c_str(), "upload")) == 0)
+		{
+			int j = 0;
+			(*i)+= 6;
+			while (serverBlock[*i] && (serverBlock[*i] == ' ' || serverBlock[*i] == '\t'))
+				(*i)++;
+			while (serverBlock[*i] && serverBlock[*i] != ';')
+			{
+				(*i)++;
+				j++;
+			}
+			loc.uploadDir = serverBlock.substr(*i - j, j);
+			while (serverBlock[*i] && serverBlock[*i] != '\n')
+				(*i)++;
+		}
+		if ((strcmp(serverBlock.substr(*i, 7).c_str(), "dirList")) == 0)
+		{
+			int j = 0;
+			(*i)+= 7;
+			while (serverBlock[*i] && (serverBlock[*i] == ' ' || serverBlock[*i] == '\t'))
+				(*i)++;
+			while (serverBlock[*i] && serverBlock[*i] != ';')
+			{
+				(*i)++;
+				j++;
+			}
+			loc.dirList = serverBlock.substr(*i - j, j);
+			while (serverBlock[*i] && serverBlock[*i] != '\n')
+				(*i)++;
+		}
 		(*i)++;
 	}
+	(*i)++;
 	return (loc);
 }
 
@@ -65,7 +137,6 @@ void	addServer(std::vector<struct server> *servers, std::string serverBlock)
 	struct server	s;
 
 	s.max_body_size = 0;
-	s.redi.num = -1;
 	while (serverBlock[i])
 	{
 		if ((strcmp(serverBlock.substr(i, 6).c_str(), "listen")) == 0)
@@ -122,21 +193,6 @@ void	addServer(std::vector<struct server> *servers, std::string serverBlock)
 			while (serverBlock[i] && serverBlock[i] != '\n')
 				i++;
 		}
-		if ((strcmp(serverBlock.substr(i, 4).c_str(), "root")) == 0)
-		{
-			i+= 4;
-			int j = 0;
-			while (serverBlock[i] && (serverBlock[i] == ' ' || serverBlock[i] == '\t'))
-				i++;
-			while (serverBlock[i] && serverBlock[i] != ';')
-			{
-				i++;
-				j++;
-			}
-			s.root = serverBlock.substr(i - j, j);
-			while (serverBlock[i] && serverBlock[i] != '\n')
-				i++;
-		}
 		if ((strcmp(serverBlock.substr(i, 20).c_str(), "client_max_body_size")) == 0)
 		{
 			i+= 20;
@@ -152,33 +208,31 @@ void	addServer(std::vector<struct server> *servers, std::string serverBlock)
 			while (serverBlock[i] && serverBlock[i] != '\n')
 				i++;
 		}
-		if ((strcmp(serverBlock.substr(i, 6).c_str(), "return")) == 0)
-		{
-			struct redirection redirect;
-			redirect.num = 0;
-			int j = 0;
-			i+= 6;
-			while (serverBlock[i] && (serverBlock[i] == ' ' || serverBlock[i] == '\t'))
+		if ((strcmp(serverBlock.substr(i, 3).c_str(), "cgi")) == 0)
+        {
+            int j = 0;
+            i+= 3;
+            while (serverBlock[i] && (serverBlock[i] == ' ' || serverBlock[i] == '\t'))
+                i++;
+            while (serverBlock[i] && serverBlock[i] != ';' && serverBlock[i] != '\n')
+            {
+                while (serverBlock[i] && serverBlock[i] != ' ' && serverBlock[i] != ';')
+                {
+                    i++;
+                    j++;
+                }
+                s.extensions.push_back(serverBlock.substr(i - j, j));
+				j = 0;
 				i++;
-			while (serverBlock[i] && serverBlock[i] >= '0' && serverBlock[i] <= '9')
-			{
-				i++;
-				j++;
-			}
-			redirect.num = atoi(serverBlock.substr(i - j, j).c_str());
-			while (serverBlock[i] && (serverBlock[i] == ' ' || serverBlock[i] == '\t'))
-				i++;
-			while (serverBlock[i] && serverBlock[i] != ';')
-			{
-				redirect.path += serverBlock[i];
-				i++;
-			}
-			s.redi = redirect;
-			while (serverBlock[i] && serverBlock[i] != '\n')
-				i++;
-		}
+            }
+            while (serverBlock[i] && serverBlock[i] != '\n')
+                i++;
+        }
 		if ((strcmp(serverBlock.substr(i, 8).c_str(), "location")) == 0)
+		{
+			std::cout << "ici\n";
 			s.loc.push_back(addLocation(serverBlock, &i));
+		}
 		if (serverBlock[i] == '#')
 			while (serverBlock[i] != '\n')
 				i++;
@@ -211,7 +265,7 @@ void	readConfig(char const *argv, std::vector<struct server> *servers)
 						i = 0;
 						while (line[i] && (line[i] == ' ' || line[i] == '\t'))
 							i++;
-						if (line[i] == '}')
+						if (line[i] == '}' && line[i + 1] == ';')
 							bracket = 1;
 						else
 							serverBlock += line.substr(i) + '\n';
@@ -248,11 +302,16 @@ void	readConfig(char const *argv, std::vector<struct server> *servers)
 			for (size_t k(0); k < (*servers)[i].loc[j].method.size(); k++)
 				std::cout << (*servers)[i].loc[j].method[k] << " ";
 			std::cout << std::endl;
+			std::cout << "-->redirection num: " << (*servers)[i].loc[j].redi.num << ", redirection path: " << (*servers)[i].loc[j].redi.path << std::endl;
+			std::cout << "-->defaultFile: " << (*servers)[i].loc[j].defaultFile << std::endl;
+			std::cout << "-->uploadDir: " << (*servers)[i].loc[j].uploadDir << std::endl;
+			std::cout << "-->dirList: " << (*servers)[i].loc[j].dirList << std::endl;
 		}
-		std::cout << "root: " << (*servers)[i].root << std::endl;
 		std::cout << "client_max_body_size: " << (*servers)[i].max_body_size << std::endl;
-		std::cout << "redirection num: " << (*servers)[i].redi.num << std::endl;
-		std::cout << "redirection path: " << (*servers)[i].redi.path << std::endl;
+        std::cout << "extensions: ";
+        for (size_t k(0); k < (*servers)[i].extensions.size(); k++)
+            std::cout << (*servers)[i].extensions[k] << " ";
+		std::cout << std::endl;
 		std::cout << std::endl;
 	}
 	//close file?
