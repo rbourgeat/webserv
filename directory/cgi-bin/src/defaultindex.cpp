@@ -6,25 +6,31 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/08 17:03:35 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/18 15:38:39 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/07 15:09:51 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <dirent.h>
 #include <iostream>
+#include <string>
 
 int main(void)
 {
-    char path[80] = "";
+    char *path;
     char *data = getenv("QUERY_STRING");
-    if (!data)
-        data = "";
     DIR *d;
     struct dirent *dir;
-    if (sscanf(data, "path=%s", &path) < 0)
-        d = opendir(".");
+    if (data != NULL)
+        if (sscanf(data, "path=%s", path) < 0)
+            d = opendir("./directory");
+        else
+        {
+            std::string str1(path);
+            std::string str2 = "./directory/" + str1;
+            d = opendir(str2.c_str());
+        }
     else
-        d = opendir(strcpy("directory", path));
+        d = opendir("./directory");
     std::cout << "Content-type:text/html\r\n\r\n";
     if (d)
     {

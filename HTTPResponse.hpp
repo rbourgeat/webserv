@@ -33,9 +33,16 @@ class HTTPResponse
 				fileLocation+= r.rL.requestTarget;
 				if (!r.isCGI)
 				{
-					defineResponseHeaderForNonCGI();
-					if (contentLength.size() > 0)
-						body = getFileContent(fileLocation);
+					if (r.isUpload)
+					{
+						uploadParsing();
+					}
+					else
+					{
+						defineResponseHeaderForNonCGI();
+						if (contentLength.size() > 0)
+							body = getFileContent(fileLocation);
+					}
 				}
 				else
 					defineResponseForCGI();
@@ -128,11 +135,11 @@ class HTTPResponse
 			std::cout << "test" << std::endl;
 			if (message != "Error")
 			{
-				size_t position = message.find("\n");
-				size_t position2 = message.find("\n", position + 1);
+				size_t position = message.find("\r\n\r\n");
+				//size_t position2 = message.find("\r\n\r\n", position + 1);
 				sL.statusCode = "200";
 				sL.reasonPhrase = "OK";
-				contentLength = cgi->get_buffer_size(position2);
+				contentLength = cgi->get_buffer_size(position + 4);
 				body = message;
 			}
 			else
@@ -174,6 +181,18 @@ class HTTPResponse
 			}
 			else
 				return (0);
+		}
+
+		void		uploadParsing()
+		{
+			std::string upload_body(r.body.begin(), r.body.end());
+
+			unsigned first = upload_body.find("filename=");
+			unsigned last = upload_body.find("Content");
+			upload_filename = upload_body.substr (first,last-first);
+			std::cout << "upload_filename= " << upload_filename << std::endl;
+
+			//uploadFile();
 		}
 
 		void		uploadFile()
@@ -240,7 +259,7 @@ class HTTPResponse
 				cgi->add_variable("AUTH_TYPE", "Basic");
 				cgi->add_variable("REMOTE_USER", "");
 				cgi->add_variable("CONTENT_TYPE", ""); // Récuperer le contenu du POST
-				cgi->add_variable("CONTENT_LENGTH", contentLength.c_str());
+				//cgi->add_variable("CONTENT_LENGTH", contentLength.c_str());
 				FILE_PATH = "directory" + request.defineScriptName();
 				if (request.headerFields.find("Accept") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
@@ -587,6 +606,7 @@ class HTTPResponse
 		std::string			contentLength;
 		std::string			body;
 		std::string			redirectionLocation;
+		std::string			upload_filename;
 
 	public:
 		std::string			resp;
