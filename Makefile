@@ -6,14 +6,13 @@
 #    By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/23 19:42:48 by rbourgea          #+#    #+#              #
-#    Updated: 2021/11/25 14:46:26 by dgoudet          ###   ########.fr        #
+#    Updated: 2021/12/07 11:42:45 by dgoudet          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	= 	webserv
 
-SRCS	=	parser.cpp \
-			webserv.cpp \
+SRCS	=	webserv.cpp \
 			parse_request.cpp \
 			createResponse.cpp \
 			CGI.cpp
@@ -21,7 +20,7 @@ SRCS	=	parser.cpp \
 OBJS	=	$(SRCS:.cpp=.o)
 
 
-CC		=	g++
+CC		=	clang++
 
 #On VM, function "ifstream" of parser.cpp only compiles with c++11 flag
 CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -fsanitize=address -g

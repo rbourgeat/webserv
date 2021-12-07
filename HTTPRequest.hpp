@@ -97,7 +97,7 @@ class	HTTPRequest
 					i++;
 				if (i < tmp.size() && tmp[i] == ' ')
 					i++;
-				while (i < tmp.size() && tmp[i] != ' ')
+				while (i < tmp.size())// && tmp[i] != ' ')
 				{
 					temp2.push_back(tmp[i]);
 					i++;

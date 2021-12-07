@@ -24,15 +24,12 @@ class HTTPResponse
 
 		std::string	defineResponse()
 		{
-			if (s.redi.num > -1)
+			getLoc();
+			if (loc.redi.num > -1)
 				redirectClient();
-			else if (!checkRequest() && !checkClientBodySize())
+			else if (!checkRequest() && !checkClientBodySize() && !checkMethod())
 			{
-				std::cout << r.isCGI << std::endl;
-				if (s.root.size() > 1)
-					fileLocation = s.root;
-				else
-					fileLocation = "directory";
+				fileLocation = loc.root;
 				fileLocation+= r.rL.requestTarget;
 				if (!r.isCGI)
 				{
@@ -49,19 +46,44 @@ class HTTPResponse
 
 	private:
 
+		void	getLoc()
+		{
+			int	comp(0);
+
+			if (r.rL.requestTarget.size() > 0)
+			{
+				for (size_t i(0); i < s.loc.size(); i++)
+				{
+					int n(0);
+					size_t j(0);
+					while (j < s.loc[i].path.size() && j < r.rL.requestTarget.size() &&
+							s.loc[i].path[j] == r.rL.requestTarget[j])
+					{
+						j++;
+						n++;
+					}
+					if (n > comp && j == s.loc[i].path.size())
+					{
+						loc = s.loc[i];
+						comp = n;
+					}
+				}
+			}
+		}
+
 		void	redirectClient()
 		{
 			std::stringstream ss;
-			ss << s.redi.num;
+			ss << loc.redi.num;
 			ss >> sL.statusCode;
-			if (s.redi.num == 301)
+			if (loc.redi.num == 301)
 				sL.reasonPhrase = "Moved permanently";
-			redirectionLocation = s.redi.path;
+			redirectionLocation = loc.redi.path;
 		}
 		void	aggregateResponse()
 		{
 			resp+= sL.httpVersion + " " + sL.statusCode + " " + sL.reasonPhrase + "\r\n";
-			if (r.rL.method != "DELETE" && s.redi.num == -1)
+			if (r.rL.method != "DELETE" && loc.redi.num == -1)
 			{
 				resp+= "Content-Length: " + contentLength + "\r\n";
 				if (contentType.size() > 0)
@@ -87,20 +109,18 @@ class HTTPResponse
 					deleteFile();
 				else
 				{
-					if (fileLocation == (s.root + "/")) //REDIRECTION TO INDEX.HTML in case we're looking in root directory => TO DEFINE IN CONFIG FILE
-						fileLocation+= "index.html";
+					if (fileLocation == loc.root + "/")
+						fileLocation+= loc.defaultFile;
 					contentType = findFileType(fileLocation);
 				}
 				sL.statusCode = "200";
 				sL.reasonPhrase = "OK";
-				std::cout << "fileLocation????? " << fileLocation << std::endl;
 				contentLength = countFileChar(fileLocation);
 			}
 		}
 
 		void		defineResponseForCGI()
 		{
-			std::cout << "HELOOOOOOOOOOOOOOOOOO\n";
 			CGI *cgi = new CGI;
 			std::string CGI_PATH = CGIparsing(r, cgi);
 			cgi->print_env();
@@ -291,6 +311,32 @@ class HTTPResponse
 					return (0);
 			}
 			return (1);
+		}
+
+		bool	checkMethod()
+		{
+			std::cout << "ICIIIIIIIIIIIIIIIIIII!!!!\n";
+			size_t i(0);
+			bool authorized(false);
+
+			if (loc.method.size() == 0)
+				return (false);
+			while (i < loc.method.size() && authorized == false)
+			{
+				if (loc.method[i] == r.rL.method)
+					authorized = true;
+				i++;
+			}
+			if (authorized == true)
+				return (false);
+			else
+			{
+				std::cout << "ERROR 405\n";
+				sL.statusCode = "405";
+                sL.reasonPhrase = "Method not allowed";
+                errorPageLocation(405);
+                return (true);
+			}
 		}
 
 		bool	checkFile()
@@ -534,6 +580,7 @@ class HTTPResponse
 
 		HTTPRequest			r;
 		struct server		s;
+		struct location		loc;
 		struct statusLine   sL;
 		std::string			fileLocation;
 		std::string			contentType;

@@ -21,6 +21,10 @@ struct			location
 	std::string					path;
 	std::vector<std::string>	method;
 	std::string					root;
+	struct redirection			redi;
+	std::string					defaultFile;
+	std::string					uploadDir;
+	std::string					dirList;
 };
 
 struct  					server
@@ -30,9 +34,8 @@ struct  					server
 	TCPSocket				sock;
 	std::vector<errorPage>	error;
 	std::vector<location>	loc;
-	std::string				root;
+    std::vector<std::string>    extensions;
 	size_t					max_body_size;
-	struct redirection		redi;	
 };
 
 struct							client
