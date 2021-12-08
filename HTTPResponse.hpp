@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/08 15:50:16 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/08 17:17:07 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,10 @@ class HTTPResponse
 			resp+= sL.httpVersion + " " + sL.statusCode + " " + sL.reasonPhrase + "\r\n";
 			if (r.rL.method != "DELETE" && loc.redi.num == -1)
 			{
-				resp+= "Content-Length: " + contentLength + "\r\n";
+				if (r.isUpload)
+					resp+= "Content-Length: 0 \r\n\r\n";
+				else
+					resp+= "Content-Length: " + contentLength + "\r\n";
 				if (contentType.size() > 0)
 				{
 					resp+= "Content-Type: " + contentType + "\r\n";
@@ -207,7 +210,7 @@ class HTTPResponse
 			else
 				return (0);
 		}
-
+		
 		int nthOccurrence(const std::string& str, const std::string& findMe, int nth)
 		{
 			size_t  pos = 0;
@@ -229,17 +232,23 @@ class HTTPResponse
 			std::string upload_body(r.body.begin(), r.body.end());
 			
 			upload_filename = upload_body.substr(nthOccurrence(upload_body, "\"", 3));
-			std::cout << "upload_filename= " << upload_filename << std::endl;
+			upload_filename.erase(0, 1);
+			std::size_t pt = upload_filename.find("\"");
+			upload_filename.erase(upload_filename.begin() + pt, upload_filename.end());
+			// std::cout << "upload_filename= " << upload_filename << std::endl; // DONE
 
-			//uploadFile();
+			std::string content = upload_body.substr(upload_body.find("\r\n\r\n"));
+			content.erase(0, 4);
+			content.erase(content.end() - 46, content.end());
+			// std::cout << "content= " << content << std::endl;
+
+			uploadFile(upload_filename, "./directory/upload", content);
 		}
 
-		void		uploadFile()
+		void		uploadFile(std::string filename, std::string upload_path, std::string content_file)
 		{
 			int fd = -1;
-			std::string path, filename; // Récupérer le nom du fichier
-			std::string upload_path; // Chemin par défaut pour upload
-			const std::string content_file; // Trouver le moyen de recup le contenu du fichier
+			std::string path;
 
 			path = upload_path + "/" + filename;
 			int type = pathType(path, NULL);
@@ -291,15 +300,13 @@ class HTTPResponse
 				cgi->add_variable("REQUEST_METHOD", request.rL.method);
 				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
 				if (request.rL.requestTarget.find("?") != std::string::npos)
-				{std::cout << ">> request target = " << request.rL.requestTarget << std::endl;
-					std::cout << ">> ? found !!!" << std::endl;
+				{
 					cgi->add_variable("QUERY_STRING", request.defineQueryString());
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("?"));
 					FILE_PATH = "directory" + request.defineScriptName("?");
 				}
 				else if (request.rL.requestTarget.find(".cgi/") != std::string::npos || request.rL.requestTarget.find(".php/") != std::string::npos || request.rL.requestTarget.find(".py/") != std::string::npos)
 				{
-					std::cout << ">> / found !!!" << std::endl;
 					cgi->add_variable("PATH_INFO", request.definePathInfo());
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
 					FILE_PATH = "directory" + request.defineScriptName("/");
