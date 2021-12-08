@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   HTTPRequest.hpp                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/07 17:04:46 by rbourgea          #+#    #+#             */
+/*   Updated: 2021/12/07 17:04:46 by rbourgea         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef HTTPREQUEST_HPP
 # define HTTPREQUEST_HPP
 
@@ -49,11 +61,17 @@ class	HTTPRequest
 			chunkSize = -1;
 		}
 
-		std::string defineScriptName()
+		std::string defineScriptName(std::string str)
 		{
 			std::string scriptName(rL.requestTarget.begin(), rL.requestTarget.end());
-			return (std::string(scriptName, 0, scriptName.find("?")));
+			if (str == "?")
+				return (std::string(scriptName, 0, scriptName.find("?")));
+			else if (str == "/")
+				return (std::string(scriptName, 0, scriptName.find("/")));
+			else
+				return (scriptName);
 		}
+
 		std::string	defineQueryString()
 		{
 			std::string queryString(rL.requestTarget.begin(), rL.requestTarget.end());
@@ -62,7 +80,16 @@ class	HTTPRequest
 			else
 				return ("");
 		}
-		
+
+		std::string	definePathInfo()
+		{
+			std::string queryString(rL.requestTarget.begin(), rL.requestTarget.end());
+			if (queryString.find(".cgi/") != std::string::npos)
+				return (std::string(queryString, queryString.find(".cgi/") + 5));
+			else
+				return ("");
+		}
+
 		void		determineIfBody()
 		{
 			if (headerFields.find("Content-Length") != headerFields.end())

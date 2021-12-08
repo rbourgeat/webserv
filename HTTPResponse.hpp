@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   HTTPResponse.hpp                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
+/*   Updated: 2021/12/07 17:04:43 by rbourgea         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef HTTPRESPONSE_HPP
 # define HTTPRESPONSE_HPP
 
@@ -196,13 +208,27 @@ class HTTPResponse
 				return (0);
 		}
 
+		int nthOccurrence(const std::string& str, const std::string& findMe, int nth)
+		{
+			size_t  pos = 0;
+			int     cnt = 0;
+
+			while( cnt != nth )
+			{
+				pos+=1;
+				pos = str.find(findMe, pos);
+				if ( pos == std::string::npos )
+					return -1;
+				cnt++;
+			}
+			return pos;
+		}
+
 		void		uploadParsing()
 		{
 			std::string upload_body(r.body.begin(), r.body.end());
-
-			unsigned first = upload_body.find("filename=");
-			unsigned last = upload_body.find("Content");
-			upload_filename = upload_body.substr (first,last-first);
+			
+			upload_filename = upload_body.substr(nthOccurrence(upload_body, "\"", 3));
 			std::cout << "upload_filename= " << upload_filename << std::endl;
 
 			//uploadFile();
@@ -262,11 +288,20 @@ class HTTPResponse
 				cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 				cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
 				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
-				cgi->add_variable("REQUEST_METHOD", r.rL.method);
-				cgi->add_variable("PATH_INFO", "");
+				cgi->add_variable("REQUEST_METHOD", request.rL.method);
 				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
-				cgi->add_variable("SCRIPT_NAME", request.defineScriptName());
-				cgi->add_variable("QUERY_STRING", request.defineQueryString());
+				if (request.rL.requestTarget.find("?"))
+				{
+					cgi->add_variable("QUERY_STRING", request.defineQueryString());
+					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("?"));
+				}
+				else
+				{
+					cgi->add_variable("PATH_INFO", request.definePathInfo());
+					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
+				}
+				else
+					cgi->add_variable("SCRIPT_NAME", request.defineScriptName(""));
 				cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
 				cgi->add_variable("REMOTE_ADDR", ""); // IP du client ??? Demander si on doit vraiment le faire
 				cgi->add_variable("AUTH_TYPE", "Basic");
