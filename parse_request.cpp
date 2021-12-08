@@ -31,7 +31,6 @@ void	printRequestBody(HTTPRequest &request)
 void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 {
 	size_t i(0);
-	size_t chunkSize(-1);
 	std::string temp;
 
 	if (request.isHeaderComplete == false)
@@ -97,36 +96,50 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 		}
 		else
 		{
-			while (i < message.size() && request.isComplete == false)
+			while (i < message.size() && message[i] != '\0')
 			{
-				while (i < message.size() && message[i] != '\r')
+			if (request.isChunkSizeComplete == false)
+			{
+				while (i < message.size() && message[i] != '\0' && message[i] != '\r')
 				{
-					temp.push_back(message[i]);
+					request.chunkSizeStr.push_back(message[i]);
 					i++;
 				}
-				if (i < message.size() && message[i] == '\r' && message[i + 1] == '\n')
+				if (message[i] == '\r')
 				{
-					i+= 2;
-					chunkSize = std::stoi(temp.c_str(), 0, 16);
-					temp.clear();
-				}
-				if (chunkSize > 0)
-				{
-					size_t j(0);
-					while (i < message.size() && j < chunkSize)
-					{
-						request.body.push_back(message[i]);
+					while (i < message.size() && message[i] != '\0' && (message[i] == '\r' || message[i] == '\n'))
 						i++;
-						j++;
-					}
+					std::cout << "chunkSizeStr= " << request.chunkSizeStr << std::endl;
+					request.chunkSize = std::stoi(request.chunkSizeStr.c_str(), 0, 16);
+					request.chunkSizeStr.clear();
+					request.isChunkSizeComplete = true;
 				}
-				else if (chunkSize == 0)
+			}
+			if (request.isChunkSizeComplete == true)
+			{
+				if (request.chunkSize == 0)
 				{
 					request.isComplete = true;
 					printRequestBody(request);
 				}
-				while (i < message.size() && (message[i] == '\r' || message[i] == '\n'))
-					i++;
+				else
+				{
+					while (i < message.size() && message[i] != '\0' && request.chunkData.size() < request.chunkSize)
+					{
+						request.chunkData.push_back(message[i]);
+						i++;
+					}
+					if (request.chunkData.size() == request.chunkSize)
+					{
+						for (size_t j(0); j < request.chunkData.size(); j++)
+							request.body.push_back(request.chunkData[j]);
+						request.chunkData.clear();
+						request.isChunkSizeComplete = false;
+					}
+					while (i < message.size() && message[i] != '\0' && (message[i] == '\r' || message[i] == '\n'))
+						i++;
+				}
+			}
 			}
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/08 09:13:28 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/08 11:20:16 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ class	HTTPRequest
 			isComplete = false;
 			chunkSize = -1;
 			bodySize = 0;
+			isChunkSizeComplete = false;
 		}
 		~HTTPRequest(){;}
 
@@ -191,7 +192,9 @@ class	HTTPRequest
 		std::vector<unsigned char>			body;
 		size_t								bodySize;
 		std::vector<unsigned char>			tmp;
-		int									chunkSize;
+		size_t								chunkSize;
+		std::string							chunkSizeStr;
+		bool								isChunkSizeComplete;
 		std::vector<unsigned char>			chunkData;
 		bool								isBody;
 		bool								isCGI;
@@ -200,6 +203,7 @@ class	HTTPRequest
 		bool								isHeaderComplete;
 		bool								isRequestLineComplete;
 		bool								isComplete;
+
 };
 
 #endif
