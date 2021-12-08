@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/07 17:04:43 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/08 09:13:38 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,7 +290,7 @@ class HTTPResponse
 				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
 				cgi->add_variable("REQUEST_METHOD", request.rL.method);
 				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
-				if (request.rL.requestTarget.find("?"))
+				/*if (request.rL.requestTarget.find("?"))
 				{
 					cgi->add_variable("QUERY_STRING", request.defineQueryString());
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("?"));
@@ -301,7 +301,7 @@ class HTTPResponse
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
 				}
 				else
-					cgi->add_variable("SCRIPT_NAME", request.defineScriptName(""));
+					cgi->add_variable("SCRIPT_NAME", request.defineScriptName(""));*/
 				cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
 				cgi->add_variable("REMOTE_ADDR", ""); // IP du client ??? Demander si on doit vraiment le faire
 				cgi->add_variable("AUTH_TYPE", "Basic");
