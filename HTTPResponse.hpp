@@ -39,9 +39,26 @@ class HTTPResponse
 					}
 					else
 					{
-						defineResponseHeaderForNonCGI();
-						if (contentLength.size() > 0)
-							body = getFileContent(fileLocation);
+						struct stat s;
+						stat(fileLocation.c_str(), &s);
+						if (s.st_mode & S_IFDIR)
+						{
+							if (loc.dirList == "ON")
+								defineResponseForCGI();
+							else
+							{
+								fileLocation = loc.root + "/" + loc.defaultFile;
+								defineResponseHeaderForNonCGI();
+								if (contentLength.size() > 0)
+									body = getFileContent(fileLocation);
+							}
+						}
+						else
+						{
+							defineResponseHeaderForNonCGI();
+							if (contentLength.size() > 0)
+								body = getFileContent(fileLocation);
+						}
 					}
 				}
 				else
@@ -115,11 +132,7 @@ class HTTPResponse
 				if (r.rL.method == "DELETE")
 					deleteFile();
 				else
-				{
-					if (fileLocation == loc.root + "/")
-						fileLocation+= loc.defaultFile;
 					contentType = findFileType(fileLocation);
-				}
 				sL.statusCode = "200";
 				sL.reasonPhrase = "OK";
 				contentLength = countFileChar(fileLocation);
@@ -271,8 +284,13 @@ class HTTPResponse
 					cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
 				if (request.headerFields.find("Cookie") != request.headerFields.end())
 					cgi->add_variable("HTTP_COOKIE", request.headerFields.find("Cookie")->second);
+				return (FILE_PATH);
 			}
-			return (FILE_PATH);
+			else
+			{
+				cgi->add_variable("QUERY_STRING", "path=./" + std::string(fileLocation, 0, fileLocation.size() - 1));
+				return ("directory/cgi-bin/defaultindex.cgi");
+			}
 		}
 
 		unsigned long long      fileSize(std::string string)
@@ -352,9 +370,9 @@ class HTTPResponse
 			{
 				std::cout << "ERROR 405\n";
 				sL.statusCode = "405";
-                sL.reasonPhrase = "Method not allowed";
-                errorPageLocation(405);
-                return (true);
+				sL.reasonPhrase = "Method not allowed";
+				errorPageLocation(405);
+				return (true);
 			}
 		}
 

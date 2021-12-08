@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/08 17:03:35 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/07 15:09:51 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/07 17:09:46 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ int main(void)
         else
         {
             std::string str1(path);
-            std::string str2 = "./directory/" + str1;
-            d = opendir(str2.c_str());
+            //std::string str2 = "./directory/" + str1;
+            d = opendir(str1.c_str());
         }
     else
         d = opendir("./directory");
