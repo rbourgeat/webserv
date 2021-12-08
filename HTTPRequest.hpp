@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/08 11:20:16 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/08 15:52:33 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,21 +62,22 @@ class	HTTPRequest
 			chunkSize = -1;
 		}
 
-		/*std::string defineScriptName(std::string str)
+		std::string defineScriptName(std::string str)
 		{
 			std::string scriptName(rL.requestTarget.begin(), rL.requestTarget.end());
 			if (str == "?")
 				return (std::string(scriptName, 0, scriptName.find("?")));
 			else if (str == "/")
-				return (std::string(scriptName, 0, scriptName.find("/")));
+				return (std::string(scriptName, 0, scriptName.find_last_of("/")));
 			else
 				return (scriptName);
-		}*/
-		std::string defineScriptName()
+		}
+		
+		/*std::string defineScriptName()
 		{
 			std::string scriptName(rL.requestTarget.begin(), rL.requestTarget.end());
 			return (std::string(scriptName, 0, scriptName.find("?")));
-		}
+		}*/
 
 		std::string	defineQueryString()
 		{

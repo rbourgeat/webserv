@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/07 16:44:35 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/08 15:13:12 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ int		main(int argc, char const *argv[])
 						int k;
 						k = findClient(vPfd.getPfd()[i].fd, clients);
 						std::vector<unsigned char> request;
-						std::cout << GRN << "+++ Request received from fd " << vPfd.getPfd()[i].fd << " +++\n";
+						//std::cout << GRN << "+++ Request received from fd " << vPfd.getPfd()[i].fd << " +++\n";
 						request = servers[clients[k].servIndex].sock.socketRecv(i, vPfd);
 						if (request.size() <= 0)
 						{
@@ -102,9 +102,9 @@ int		main(int argc, char const *argv[])
 						else
 						{
 							parseRequest(request, clients[k].request);
-							for (size_t l(0); l < request.size(); l++)
-								std::cout << GRN << request[l];
-							std::cout << NC << std::endl;
+							//for (size_t l(0); l < request.size(); l++)
+							//	std::cout << GRN << request[l];
+							// std::cout << NC << std::endl;
 							if (clients[k].request.isComplete == true)
 							{
 								clients[k].request.determineIfUpload();

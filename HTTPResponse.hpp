@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/08 09:29:59 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/08 15:50:16 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,25 +290,31 @@ class HTTPResponse
 				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
 				cgi->add_variable("REQUEST_METHOD", request.rL.method);
 				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
-				/*if (request.rL.requestTarget.find("?"))
-				{
+				if (request.rL.requestTarget.find("?") != std::string::npos)
+				{std::cout << ">> request target = " << request.rL.requestTarget << std::endl;
+					std::cout << ">> ? found !!!" << std::endl;
 					cgi->add_variable("QUERY_STRING", request.defineQueryString());
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("?"));
+					FILE_PATH = "directory" + request.defineScriptName("?");
+				}
+				else if (request.rL.requestTarget.find(".cgi/") != std::string::npos || request.rL.requestTarget.find(".php/") != std::string::npos || request.rL.requestTarget.find(".py/") != std::string::npos)
+				{
+					std::cout << ">> / found !!!" << std::endl;
+					cgi->add_variable("PATH_INFO", request.definePathInfo());
+					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
+					FILE_PATH = "directory" + request.defineScriptName("/");
 				}
 				else
 				{
-					cgi->add_variable("PATH_INFO", request.definePathInfo());
-					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
+					cgi->add_variable("SCRIPT_NAME", request.defineScriptName(""));
+					FILE_PATH = "directory" + request.defineScriptName("");
 				}
-				else
-					cgi->add_variable("SCRIPT_NAME", request.defineScriptName(""));*/
 				cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
 				cgi->add_variable("REMOTE_ADDR", ""); // IP du client ??? Demander si on doit vraiment le faire
 				cgi->add_variable("AUTH_TYPE", "Basic");
 				cgi->add_variable("REMOTE_USER", "");
 				cgi->add_variable("CONTENT_TYPE", ""); // Récuperer le contenu du POST
 				//cgi->add_variable("CONTENT_LENGTH", contentLength.c_str());
-				FILE_PATH = "directory" + request.defineScriptName();
 				if (request.headerFields.find("Accept") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
 				if (request.headerFields.find("Accept-Language") != request.headerFields.end())

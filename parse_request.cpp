@@ -85,7 +85,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 			while (i < message.size() && message[i] != '\0' && request.body.size() < request.bodySize)
 			{
 				request.body.push_back(message[i]);
-				std::cout << "message[i] = " << message[i] << std::endl;
+				//std::cout << "message[i] = " << message[i] << std::endl;
 				i++;
 			}
 			if (request.body.size() == request.bodySize)
