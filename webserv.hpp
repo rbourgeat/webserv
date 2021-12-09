@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/07 11:38:13 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/09 15:25:12 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@
 #include <filesystem>
 
 #define NC "\e[0m"
+#define RED "\033[31m"
 #define GRN "\e[0;32m"
 #define MAG "\e[0;35m"
 #define CYN "\e[0;36m"

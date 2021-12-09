@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/08 16:53:52 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/09 17:09:26 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ class	HTTPRequest
 						isUpload = true;
 						boundary = headerFields.find("Content-Type")->second;
 						std::size_t pt = boundary.find("=");
-						boundary.erase(boundary.begin(), boundary.begin() + pt);
+						boundary.erase(boundary.begin(), boundary.begin() + pt + 1);
 						//std::cout << ">> boundary = " << boundary << std::endl;
 					}
 					else

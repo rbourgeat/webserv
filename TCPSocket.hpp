@@ -73,6 +73,7 @@ class TCPSocket
 			std::vector<unsigned char> buffer(10000);
 
 			int nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), MSG_DONTWAIT);	
+			//std::cout << "nbytes = " << nbytes << "buffer.size() = " << buffer.size() << std::endl;
 			if (nbytes <= 0)
 			{
 				if (nbytes == 0)

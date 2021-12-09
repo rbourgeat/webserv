@@ -82,10 +82,13 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 	{
 		if (request.isChunked == false)
 		{
+			// while (i < message.size() && message[i] != '\0' && request.body.size() < request.bodySize)
 			while (i < message.size() && message[i] != '\0' && request.body.size() < request.bodySize)
 			{
 				request.body.push_back(message[i]);
-				//std::cout << "message[i] = " << message[i] << std::endl;
+				std::cout << "message[i] = " << message[i] << std::endl;
+				//if (i % 9 == 0)
+				//	std::cout << request.body.size() << " / " << request.bodySize << std::endl;
 				i++;
 			}
 			if (request.body.size() == request.bodySize)

@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/08 17:17:07 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/09 17:15:41 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class HTTPResponse
 				{
 					if (r.isUpload)
 					{
-						uploadParsing();
+						foreachUpload();
 					}
 					else
 					{
@@ -226,21 +226,49 @@ class HTTPResponse
 			}
 			return pos;
 		}
+		
+		std::vector<std::string> split (std::string s, std::string delimiter) {
+			std::size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+			std::string token;
+			std::vector<std::string> res;
 
-		void		uploadParsing()
+			while ((pos_end = s.find (delimiter, pos_start)) != std::string::npos) {
+				token = s.substr (pos_start, pos_end - pos_start);
+				pos_start = pos_end + delim_len;
+				res.push_back (token);
+			}
+
+			res.push_back (s.substr (pos_start));
+			return res;
+		}
+		
+		void		foreachUpload()
 		{
 			std::string upload_body(r.body.begin(), r.body.end());
 			
+			std::string delimiter = "--" + r.boundary;
+			std::cout << RED << " delimiter = [" << delimiter << "] " << NC << std::endl;
+			
+			std::vector<std::string> splitted_body = split(upload_body, delimiter);
+
+			for (size_t i = 0; i < splitted_body.size(); i++) {
+				std::cout << RED << " [ " << splitted_body[i] << " ] " << NC << std::endl;
+				if (splitted_body[i].find("filename") != std::string::npos)
+					uploadParsing(splitted_body[i]);
+			}
+
+		}
+
+		void		uploadParsing(std::string upload_body)
+		{
 			upload_filename = upload_body.substr(nthOccurrence(upload_body, "\"", 3));
 			upload_filename.erase(0, 1);
 			std::size_t pt = upload_filename.find("\"");
 			upload_filename.erase(upload_filename.begin() + pt, upload_filename.end());
-			// std::cout << "upload_filename= " << upload_filename << std::endl; // DONE
 
 			std::string content = upload_body.substr(upload_body.find("\r\n\r\n"));
 			content.erase(0, 4);
-			content.erase(content.end() - 46, content.end());
-			// std::cout << "content= " << content << std::endl;
+			content.erase(content.end() - 2, content.end());
 
 			uploadFile(upload_filename, "./directory/upload", content);
 		}
