@@ -81,11 +81,11 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size
 	}
 	if (request.isBody == true && request.isHeaderComplete == true && request.isComplete == false)
 	{
-		if (s.max_body_size > 0)
+		/*if (s.max_body_size > 0)
 		{
 			if (request.bodySize > s.max_body_size)
 				request.isComplete = true;
-		}
+		}*/
 		if (request.isComplete == false && request.isChunked == false)
 		{
 			// while (i < message.size() && message[i] != '\0' && request.body.size() < request.bodySize)
