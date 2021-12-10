@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 16:55:02 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/10 16:59:18 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class HTTPResponse
 				{
 					if (r.isUpload)
 					{
-						uploadParsing();
+						foreachUpload();
 					}
 					else
 					{
@@ -121,7 +121,10 @@ class HTTPResponse
 			resp+= sL.httpVersion + " " + sL.statusCode + " " + sL.reasonPhrase + "\r\n";
 			if (r.rL.method != "DELETE" && loc.redi.num == -1)
 			{
-				resp+= "Content-Length: " + contentLength + "\r\n";
+				if (r.isUpload)
+					resp+= "Content-Length: 13 \r\n\r\nUpload Done !";
+				else
+					resp+= "Content-Length: " + contentLength + "\r\n";
 				if (contentType.size() > 0)
 				{
 					resp+= "Content-Type: " + contentType + "\r\n";
@@ -207,7 +210,7 @@ class HTTPResponse
 			else
 				return (0);
 		}
-
+		
 		int nthOccurrence(const std::string& str, const std::string& findMe, int nth)
 		{
 			size_t  pos = 0;
@@ -223,23 +226,57 @@ class HTTPResponse
 			}
 			return pos;
 		}
+		
+		std::vector<std::string> split (std::string s, std::string delimiter) {
+			std::size_t pos_start = 0, pos_end, delim_len = delimiter.length();
+			std::string token;
+			std::vector<std::string> res;
 
-		void		uploadParsing()
+			while ((pos_end = s.find (delimiter, pos_start)) != std::string::npos) {
+				token = s.substr (pos_start, pos_end - pos_start);
+				pos_start = pos_end + delim_len;
+				res.push_back (token);
+			}
+
+			res.push_back (s.substr (pos_start));
+			return res;
+		}
+		
+		void		foreachUpload()
 		{
 			std::string upload_body(r.body.begin(), r.body.end());
 			
-			upload_filename = upload_body.substr(nthOccurrence(upload_body, "\"", 3));
-			std::cout << "upload_filename= " << upload_filename << std::endl;
+			std::string delimiter = "--" + r.boundary;
+			//std::cout << RED << " delimiter = [" << delimiter << "] " << NC << std::endl;
+			
+			std::vector<std::string> splitted_body = split(upload_body, delimiter);
 
-			//uploadFile();
+			for (size_t i = 0; i < splitted_body.size(); i++) {
+				//std::cout << RED << " [ " << splitted_body[i] << " ] " << NC << std::endl;
+				if (splitted_body[i].find("filename") != std::string::npos)
+					uploadParsing(splitted_body[i]);
+			}
+
 		}
 
-		void		uploadFile()
+		void		uploadParsing(std::string upload_body)
+		{
+			upload_filename = upload_body.substr(nthOccurrence(upload_body, "\"", 3));
+			upload_filename.erase(0, 1);
+			std::size_t pt = upload_filename.find("\"");
+			upload_filename.erase(upload_filename.begin() + pt, upload_filename.end());
+
+			std::string content = upload_body.substr(upload_body.find("\r\n\r\n"));
+			content.erase(0, 4);
+			content.erase(content.end() - 2, content.end());
+
+			uploadFile(upload_filename, "./" + loc.root + "/" +loc.uploadDir, content);
+		}
+
+		void		uploadFile(std::string filename, std::string upload_path, std::string content_file)
 		{
 			int fd = -1;
-			std::string path, filename; // Récupérer le nom du fichier
-			std::string upload_path; // Chemin par défaut pour upload
-			const std::string content_file; // Trouver le moyen de recup le contenu du fichier
+			std::string path;
 
 			path = upload_path + "/" + filename;
 			int type = pathType(path, NULL);
@@ -291,23 +328,21 @@ class HTTPResponse
 				cgi->add_variable("REQUEST_METHOD", request.rL.method);
 				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
 				if (request.rL.requestTarget.find("?") != std::string::npos)
-				{std::cout << ">> request target = " << request.rL.requestTarget << std::endl;
-					std::cout << ">> ? found !!!" << std::endl;
+				{
 					cgi->add_variable("QUERY_STRING", request.defineQueryString());
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("?"));
-					FILE_PATH = "directory" + request.defineScriptName("?");
+					FILE_PATH = loc.root + request.defineScriptName("?");
 				}
 				else if (request.rL.requestTarget.find(".cgi/") != std::string::npos || request.rL.requestTarget.find(".php/") != std::string::npos || request.rL.requestTarget.find(".py/") != std::string::npos)
 				{
-					std::cout << ">> / found !!!" << std::endl;
 					cgi->add_variable("PATH_INFO", request.definePathInfo());
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
-					FILE_PATH = "directory" + request.defineScriptName("/");
+					FILE_PATH = loc.root + request.defineScriptName("/");
 				}
 				else
 				{
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName(""));
-					FILE_PATH = "directory" + request.defineScriptName("");
+					FILE_PATH = loc.root + request.defineScriptName("");
 				}
 				cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
 				cgi->add_variable("REMOTE_ADDR", ""); // IP du client ??? Demander si on doit vraiment le faire
@@ -329,8 +364,9 @@ class HTTPResponse
 			}
 			else
 			{
-				cgi->add_variable("QUERY_STRING", "path=./" + std::string(fileLocation, 0, fileLocation.size() - 1));
-				return ("directory/cgi-bin/defaultindex.cgi");
+				std::cout << RED << fileLocation << NC << std::endl;
+				cgi->add_variable("QUERY_STRING", "path=./" + std::string(fileLocation, 0, fileLocation.size()));
+				return (loc.root + "/cgi-bin/defaultindex.cgi");
 			}
 		}
 
@@ -363,9 +399,9 @@ class HTTPResponse
 			while (i < s.error.size() && s.error[i].num != code)
 				i++;
 			if (i < s.error.size() && s.error[i].num == code)
-				fileLocation = "directory/" + s.error[i].path;
+				fileLocation = loc.root + "/" + s.error[i].path;
 			else
-				fileLocation = "directory/" + codeToString + ".html";
+				fileLocation = loc.root + "/" + codeToString + ".html";
 			contentLength = countFileChar(fileLocation);	
 			if (contentLength.size() > 0)
 				body = getFileContent(fileLocation);

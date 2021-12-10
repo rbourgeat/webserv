@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/08 17:03:35 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/07 17:09:46 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/10 14:57:36 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ int main(void)
         std::cout << "<h1>Index Of:</h1><br>" << std::endl;
         while ((dir = readdir(d)) != NULL)
         {
-            std::cout << "<a href=" << path << "/" << dir->d_name << ">" << dir->d_name << "</a>\n<br><br>";
+            // std::cout << "<a href=" << path << dir->d_name << ">" << dir->d_name << "</a>\n<br><br>";
+            std::cout << "<a>" << dir->d_name << "</a><br>" << std::endl;
         }
         closedir(d);
     }

@@ -6,7 +6,11 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2021/12/10 16:56:40 by dgoudet          ###   ########.fr       */
+=======
+/*   Updated: 2021/12/10 15:30:27 by rbourgea         ###   ########.fr       */
+>>>>>>> bc7b29d7913a494e357a3d1f0bd03987dd250332
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,17 +138,25 @@ int		main(int argc, char const *argv[])
 							{
 								clients[k].sentBytes = servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
 								clients[k].totalSentBytes+= clients[k].sentBytes;
+<<<<<<< HEAD
 								/*for (size_t l(0); l < clients[k].answer.size(); l++)
 								  std::cout << MAG << clients[k].answer[l];*/
+=======
+								for (size_t l(0); l < clients[k].answer.size(); l++)
+										std::cout << MAG << clients[k].answer[l];
+>>>>>>> bc7b29d7913a494e357a3d1f0bd03987dd250332
 								clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
 								if (clients[k].answer.size() == 0)
 								{
 									std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
+<<<<<<< HEAD
 									if (clients[k].statusCode == "413")
 									{
 										close(vPfd.getPfd()[i].fd);
 										vPfd.deleteFd(i);
 									}
+=======
+>>>>>>> bc7b29d7913a494e357a3d1f0bd03987dd250332
 									clients[k].answer.clear();
 									clients[k].request.clearAll();
 									std::cout << NC << std::endl;

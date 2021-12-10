@@ -36,8 +36,11 @@
   <Form method="POST" action="/cgi-bin/postdata.cgi">
     <p>➤ POST data = <INPUT type="text" NAME="data" value="ecole 42" size="40"><input type="submit" name="submit"> </p>
   </Form><br>
-  <form method="POST" action="/upload/" enctype="multipart/form-data">
+  <form method="POST" enctype="multipart/form-data">
     <p>➤ POST file = <input type="file" name="file1"> <button type="submit">Upload</button></p>
+  </form><br>
+  <form method="POST" enctype="multipart/form-data">
+    <p>➤ POST 3 files = <input type="file" name="file1"><input type="file" name="file2"><input type="file" name="file3"> <button type="submit">Upload</button></p>
   </form><br>
   ➤ DELETE (use telnet for exemple)<br>
   <br><ins>❖ PHP CGI tests:</ins><br>
