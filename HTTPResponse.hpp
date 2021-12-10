@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 13:02:25 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/10 13:37:02 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -270,7 +270,7 @@ class HTTPResponse
 			content.erase(0, 4);
 			content.erase(content.end() - 2, content.end());
 
-			uploadFile(upload_filename, "./directory/upload", content);
+			uploadFile(upload_filename, "./" + loc.root + "/" +loc.uploadDir, content);
 		}
 
 		void		uploadFile(std::string filename, std::string upload_path, std::string content_file)
@@ -331,18 +331,18 @@ class HTTPResponse
 				{
 					cgi->add_variable("QUERY_STRING", request.defineQueryString());
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("?"));
-					FILE_PATH = "directory" + request.defineScriptName("?");
+					FILE_PATH = loc.root + request.defineScriptName("?");
 				}
 				else if (request.rL.requestTarget.find(".cgi/") != std::string::npos || request.rL.requestTarget.find(".php/") != std::string::npos || request.rL.requestTarget.find(".py/") != std::string::npos)
 				{
 					cgi->add_variable("PATH_INFO", request.definePathInfo());
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
-					FILE_PATH = "directory" + request.defineScriptName("/");
+					FILE_PATH = loc.root + request.defineScriptName("/");
 				}
 				else
 				{
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName(""));
-					FILE_PATH = "directory" + request.defineScriptName("");
+					FILE_PATH = loc.root + request.defineScriptName("");
 				}
 				cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
 				cgi->add_variable("REMOTE_ADDR", ""); // IP du client ??? Demander si on doit vraiment le faire
@@ -365,7 +365,7 @@ class HTTPResponse
 			else
 			{
 				cgi->add_variable("QUERY_STRING", "path=./" + std::string(fileLocation, 0, fileLocation.size() - 1));
-				return ("directory/cgi-bin/defaultindex.cgi");
+				return (loc.root + "/cgi-bin/defaultindex.cgi");
 			}
 		}
 
@@ -398,9 +398,9 @@ class HTTPResponse
 			while (i < s.error.size() && s.error[i].num != code)
 				i++;
 			if (i < s.error.size() && s.error[i].num == code)
-				fileLocation = "directory/" + s.error[i].path;
+				fileLocation = loc.root + "/" + s.error[i].path;
 			else
-				fileLocation = "directory/" + codeToString + ".html";
+				fileLocation = loc.root + "/" + codeToString + ".html";
 			contentLength = countFileChar(fileLocation);	
 			if (contentLength.size() > 0)
 				body = getFileContent(fileLocation);
