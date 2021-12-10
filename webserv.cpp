@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/08 15:13:12 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/10 15:30:27 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,29 +116,29 @@ int		main(int argc, char const *argv[])
 							}
 						}
 					}
-					/*3. Send response message to client: either succeed in fulfilling request (i.e., provide access to the file OR returns file execution output), or return appropriate error status code*/
-					if (i < vPfd.getFdCount())
+				}
+				/*3. Send response message to client: either succeed in fulfilling request (i.e., provide access to the file OR returns file execution output), or return appropriate error status code*/
+				if (i < vPfd.getFdCount())
+				{
+					if (vPfd.getPfd()[i].revents & POLLOUT)
 					{
-						if (vPfd.getPfd()[i].revents & POLLOUT)
+						int k;
+						if ((k = findClient(vPfd.getPfd()[i].fd, clients)) != -1)
 						{
-							int k;
-							if ((k = findClient(vPfd.getPfd()[i].fd, clients)) != -1)
+							//std::cout << clients[k].answer.size() << std::endl;
+							if (clients[k].answer.size() > 0)
 							{
-								//std::cout << clients[k].answer.size() << std::endl;
-								if (clients[k].answer.size() > 0)
+								clients[k].sentBytes = servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
+								clients[k].totalSentBytes+= clients[k].sentBytes;
+								for (size_t l(0); l < clients[k].answer.size(); l++)
+										std::cout << MAG << clients[k].answer[l];
+								clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
+								if (clients[k].answer.size() == 0)
 								{
-									clients[k].sentBytes = servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
-									clients[k].totalSentBytes+= clients[k].sentBytes;
-									for (size_t l(0); l < clients[k].answer.size(); l++)
-											std::cout << MAG << clients[k].answer[l];
-									clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
-									if (clients[k].answer.size() == 0)
-									{
-										std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
-										clients[k].answer.clear();
-										clients[k].request.clearAll();
-										std::cout << NC << std::endl;
-									}
+									std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
+									clients[k].answer.clear();
+									clients[k].request.clearAll();
+									std::cout << NC << std::endl;
 								}
 							}
 						}
