@@ -44,6 +44,7 @@ struct							client
 	int							servIndex;
 	HTTPRequest					request;
 	std::vector<unsigned char>	answer;
+	std::string					statusCode;
 	int							sentBytes;
 	int							totalSentBytes;
 	int							bytesToSend;

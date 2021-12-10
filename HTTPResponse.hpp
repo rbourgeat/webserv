@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/08 15:50:16 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/10 16:55:02 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class HTTPResponse
 	}
 		~HTTPResponse(){;}
 
-		std::string	defineResponse()
+		void	defineResponse()
 		{
 			getLoc();
 			if (loc.redi.num > -1)
@@ -77,7 +77,7 @@ class HTTPResponse
 					defineResponseForCGI();
 			}
 			aggregateResponse();
-			return (resp);
+			//return (resp);
 		}
 
 	private:
@@ -393,7 +393,6 @@ class HTTPResponse
 
 		bool	checkMethod()
 		{
-			std::cout << "ICIIIIIIIIIIIIIIIIIII!!!!\n";
 			size_t i(0);
 			bool authorized(false);
 
@@ -659,16 +658,15 @@ class HTTPResponse
 		HTTPRequest			r;
 		struct server		s;
 		struct location		loc;
-		struct statusLine   sL;
 		std::string			fileLocation;
 		std::string			contentType;
 		std::string			contentLength;
 		std::string			body;
 		std::string			redirectionLocation;
 		std::string			upload_filename;
-
 	public:
-		std::string			resp;
+		std::string	resp;
+        struct statusLine   sL;
 };
 
 #endif

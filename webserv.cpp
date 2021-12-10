@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/08 15:13:12 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/10 16:56:40 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "serverAndClient.hpp"
 #include "config_parsing.cpp"
 #include <unistd.h>
+#include "HTTPResponse.hpp"
 
 int		findClient(int fd, std::vector<struct client> clients)
 {
@@ -79,6 +80,7 @@ int		main(int argc, char const *argv[])
 						c.socket = servers[k].sock.socketAccept();
 						fcntl(c.socket, F_SETFL, O_NONBLOCK);
 						c.servIndex = k;
+						c.statusCode = "0";
 						vPfd.addFd(c.socket);
 						clients.push_back(c);
 						std::cout << "+++New connection from fd " << c.socket << " accepted +++" << std::endl;
@@ -90,7 +92,7 @@ int		main(int argc, char const *argv[])
 						int k;
 						k = findClient(vPfd.getPfd()[i].fd, clients);
 						std::vector<unsigned char> request;
-						//std::cout << GRN << "+++ Request received from fd " << vPfd.getPfd()[i].fd << " +++\n";
+						std::cout << GRN << "+++ Request received from fd " << vPfd.getPfd()[i].fd << " +++\n";
 						request = servers[clients[k].servIndex].sock.socketRecv(i, vPfd);
 						if (request.size() <= 0)
 						{
@@ -101,44 +103,51 @@ int		main(int argc, char const *argv[])
 						}
 						else
 						{
-							parseRequest(request, clients[k].request);
+							parseRequest(request, clients[k].request, servers[clients[k].servIndex]);
 							//for (size_t l(0); l < request.size(); l++)
 							//	std::cout << GRN << request[l];
 							// std::cout << NC << std::endl;
 							if (clients[k].request.isComplete == true)
 							{
 								clients[k].request.determineIfUpload();
-								//std::vector<unsigned char> answer = parsing(clients[k].request, request, servers[clients[k].servIndex]);
-								std::vector<unsigned char> answer2 = createResponse(clients[k].request, servers[clients[k].servIndex]);
-								clients[k].answer = answer2;
-								clients[k].bytesToSend = answer2.size();
+								HTTPResponse response(clients[k].request, servers[clients[k].servIndex]);
+								response.defineResponse();
+								std::vector<unsigned char> answer(response.resp.begin(), response.resp.end());
+								clients[k].answer = answer;
+								clients[k].statusCode = response.sL.statusCode;
+								clients[k].bytesToSend = answer.size();
 								clients[k].totalSentBytes = 0;
 							}
 						}
 					}
-					/*3. Send response message to client: either succeed in fulfilling request (i.e., provide access to the file OR returns file execution output), or return appropriate error status code*/
-					if (i < vPfd.getFdCount())
+				}
+				/*3. Send response message to client: either succeed in fulfilling request (i.e., provide access to the file OR returns file execution output), or return appropriate error status code*/
+				if (i < vPfd.getFdCount())
+				{
+					if (vPfd.getPfd()[i].revents & POLLOUT)
 					{
-						if (vPfd.getPfd()[i].revents & POLLOUT)
+						int k;
+						if ((k = findClient(vPfd.getPfd()[i].fd, clients)) != -1)
 						{
-							int k;
-							if ((k = findClient(vPfd.getPfd()[i].fd, clients)) != -1)
+							//std::cout << clients[k].answer.size() << std::endl;
+							if (clients[k].answer.size() > 0)
 							{
-								//std::cout << clients[k].answer.size() << std::endl;
-								if (clients[k].answer.size() > 0)
+								clients[k].sentBytes = servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
+								clients[k].totalSentBytes+= clients[k].sentBytes;
+								/*for (size_t l(0); l < clients[k].answer.size(); l++)
+								  std::cout << MAG << clients[k].answer[l];*/
+								clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
+								if (clients[k].answer.size() == 0)
 								{
-									clients[k].sentBytes = servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
-									clients[k].totalSentBytes+= clients[k].sentBytes;
-									for (size_t l(0); l < clients[k].answer.size(); l++)
-											std::cout << MAG << clients[k].answer[l];
-									clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
-									if (clients[k].answer.size() == 0)
+									std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
+									if (clients[k].statusCode == "413")
 									{
-										std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
-										clients[k].answer.clear();
-										clients[k].request.clearAll();
-										std::cout << NC << std::endl;
+										close(vPfd.getPfd()[i].fd);
+										vPfd.deleteFd(i);
 									}
+									clients[k].answer.clear();
+									clients[k].request.clearAll();
+									std::cout << NC << std::endl;
 								}
 							}
 						}
@@ -152,6 +161,5 @@ int		main(int argc, char const *argv[])
 			// exit(EXIT_FAILURE);
 		}
 	}
-
 	return 0;
 }

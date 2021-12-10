@@ -6,7 +6,7 @@
 #    By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/23 19:42:48 by rbourgea          #+#    #+#              #
-#    Updated: 2021/12/07 11:42:45 by dgoudet          ###   ########.fr        #
+#    Updated: 2021/12/10 13:56:09 by dgoudet          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,6 @@ NAME	= 	webserv
 
 SRCS	=	webserv.cpp \
 			parse_request.cpp \
-			createResponse.cpp \
 			CGI.cpp
 
 OBJS	=	$(SRCS:.cpp=.o)

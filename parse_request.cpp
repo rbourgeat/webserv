@@ -1,4 +1,5 @@
 #include "HTTPRequest.hpp"
+#include "serverAndClient.hpp"
 
 void	printRequestHeader(HTTPRequest &request)
 {
@@ -28,7 +29,7 @@ void	printRequestBody(HTTPRequest &request)
 	std::cout << std::endl;
 }
 
-void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
+void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, struct server s)
 {
 	size_t i(0);
 	std::string temp;
@@ -80,7 +81,12 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 	}
 	if (request.isBody == true && request.isHeaderComplete == true && request.isComplete == false)
 	{
-		if (request.isChunked == false)
+		if (s.max_body_size > 0)
+		{
+			if (request.bodySize > s.max_body_size)
+				request.isComplete = true;
+		}
+		if (request.isComplete == false && request.isChunked == false)
 		{
 			while (i < message.size() && message[i] != '\0' && request.body.size() < request.bodySize)
 			{
@@ -94,7 +100,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 				printRequestBody(request);
 			}
 		}
-		else
+		if (request.isComplete == false && request.isChunked == true)
 		{
 			while (i < message.size() && message[i] != '\0')
 			{
@@ -109,7 +115,6 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request)
 				{
 					while (i < message.size() && message[i] != '\0' && (message[i] == '\r' || message[i] == '\n'))
 						i++;
-					std::cout << "chunkSizeStr= " << request.chunkSizeStr << std::endl;
 					request.chunkSize = std::stoi(request.chunkSizeStr.c_str(), 0, 16);
 					request.chunkSizeStr.clear();
 					request.isChunkSizeComplete = true;
