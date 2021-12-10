@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 13:37:02 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/10 14:41:24 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -364,7 +364,8 @@ class HTTPResponse
 			}
 			else
 			{
-				cgi->add_variable("QUERY_STRING", "path=./" + std::string(fileLocation, 0, fileLocation.size() - 1));
+				std::cout << RED << fileLocation << NC << std::endl;
+				cgi->add_variable("QUERY_STRING", "path=./" + std::string(fileLocation, 0, fileLocation.size()));
 				return (loc.root + "/cgi-bin/defaultindex.cgi");
 			}
 		}
