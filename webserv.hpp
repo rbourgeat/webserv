@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/09 15:25:12 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/10 16:21:22 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@
 
 std::vector<unsigned char>	parsing(HTTPRequest &request, std::vector<unsigned char> buffer, struct server s);
 void												cgi_get();
-void						parseRequest(std::vector<unsigned char> message, HTTPRequest &request);
+void						parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size_t nbytes, std::vector<std::string> s);
 std::vector<unsigned char>  createResponse(HTTPRequest request, struct server s);
 
 #endif

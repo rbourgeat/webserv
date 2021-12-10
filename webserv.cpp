@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 15:30:27 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/10 16:21:52 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ int		main(int argc, char const *argv[])
 						}
 						else
 						{
-							parseRequest(request, clients[k].request);
+							parseRequest(request, clients[k].request, servers[clients[k].servIndex].sock.nbytes, servers[clients[k].servIndex].extensions);
 							//for (size_t l(0); l < request.size(); l++)
 							//	std::cout << GRN << request[l];
 							// std::cout << NC << std::endl;
