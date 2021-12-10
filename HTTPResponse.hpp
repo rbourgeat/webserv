@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/09 17:15:41 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/10 13:02:25 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,12 +247,12 @@ class HTTPResponse
 			std::string upload_body(r.body.begin(), r.body.end());
 			
 			std::string delimiter = "--" + r.boundary;
-			std::cout << RED << " delimiter = [" << delimiter << "] " << NC << std::endl;
+			//std::cout << RED << " delimiter = [" << delimiter << "] " << NC << std::endl;
 			
 			std::vector<std::string> splitted_body = split(upload_body, delimiter);
 
 			for (size_t i = 0; i < splitted_body.size(); i++) {
-				std::cout << RED << " [ " << splitted_body[i] << " ] " << NC << std::endl;
+				//std::cout << RED << " [ " << splitted_body[i] << " ] " << NC << std::endl;
 				if (splitted_body[i].find("filename") != std::string::npos)
 					uploadParsing(splitted_body[i]);
 			}
