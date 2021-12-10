@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/09 17:09:26 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/10 15:38:37 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ class	HTTPRequest
 			isHeaderComplete = false;
 			isRequestLineComplete = false;
 			isCGI = false;
+			isUpload = false;
 			rL.method.clear();
 			rL.requestTarget.clear();
 			rL.httpVersion.clear();

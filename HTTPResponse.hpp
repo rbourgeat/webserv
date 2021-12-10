@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 14:41:24 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/10 15:37:08 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,7 @@ class HTTPResponse
 			if (r.rL.method != "DELETE" && loc.redi.num == -1)
 			{
 				if (r.isUpload)
-					resp+= "Content-Length: 0 \r\n\r\n";
+					resp+= "Content-Length: 13 \r\n\r\nUpload Done !";
 				else
 					resp+= "Content-Length: " + contentLength + "\r\n";
 				if (contentType.size() > 0)
