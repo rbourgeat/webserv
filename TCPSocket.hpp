@@ -12,6 +12,7 @@ class TCPSocket
 		
 		TCPSocket(uint16_t port) : _port(port)
 	{
+		nbytes = 0;
 		_socketFd = socket(AF_INET, SOCK_STREAM, 0); /*1*/
 		if (_socketFd < 0)
 			throw TCPSocketException("while creating");
@@ -71,8 +72,7 @@ class TCPSocket
 		std::vector<unsigned char>	socketRecv(int i, PollFd &objectPoll)
 		{
 			std::vector<unsigned char> buffer(10000);
-
-			int nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), MSG_DONTWAIT);	
+			nbytes = recv(objectPoll.getPfd()[i].fd, &buffer[0], sizeof(buffer), MSG_DONTWAIT);	
 			//std::cout << "nbytes = " << nbytes << "buffer.size() = " << buffer.size() << std::endl;
 			if (nbytes <= 0)
 			{
@@ -107,6 +107,7 @@ class TCPSocket
 		uint16_t	_port;
 
 	public:
+		size_t			nbytes;
 		class TCPSocketException: public std::exception
 	{
 		public:

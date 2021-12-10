@@ -29,14 +29,14 @@ void	printRequestBody(HTTPRequest &request)
 	std::cout << std::endl;
 }
 
-void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, struct server s)
+void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size_t nbytes, std::vector<std::string> s)
 {
 	size_t i(0);
 	std::string temp;
 
 	if (request.isHeaderComplete == false)
 	{
-		while (i < message.size() && request.isHeaderComplete == false)
+		while (i < nbytes && request.isHeaderComplete == false)
 		{
 			if ((message[i] == '\r' && message[i + 1] == '\n') || message[i] == '\n')
 			{
@@ -58,7 +58,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, stru
 				else if (message[i] == '\r' && message[i + 1] == '\n')
 				{
 					i+= 2;
-					request.insertHeaderLine();
+					request.insertHeaderLine(s);
 					request.isHeaderComplete = true;
 					printRequestHeader(request);
 					request.determineIfBody();
@@ -69,7 +69,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, stru
 					}
 				}
 				else
-					request.insertHeaderLine();
+					request.insertHeaderLine(s);
 			}
 			else
 			{
@@ -89,10 +89,10 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, stru
 		if (request.isComplete == false && request.isChunked == false)
 		{
 			// while (i < message.size() && message[i] != '\0' && request.body.size() < request.bodySize)
-			while (i < message.size() && message[i] != '\0' && request.body.size() < request.bodySize)
+			while (i < nbytes && request.body.size() < request.bodySize)
 			{
 				request.body.push_back(message[i]);
-				std::cout << "message[i] = " << message[i] << std::endl;
+				// std::cout << "message[i] = " << message[i] << std::endl;
 				//if (i % 9 == 0)
 				//	std::cout << request.body.size() << " / " << request.bodySize << std::endl;
 				i++;
@@ -105,18 +105,18 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, stru
 		}
 		if (request.isComplete == false && request.isChunked == true)
 		{
-			while (i < message.size() && message[i] != '\0')
+			while (i < nbytes && message[i] != '\0')
 			{
 			if (request.isChunkSizeComplete == false)
 			{
-				while (i < message.size() && message[i] != '\0' && message[i] != '\r')
+				while (i < nbytes && message[i] != '\0' && message[i] != '\r')
 				{
 					request.chunkSizeStr.push_back(message[i]);
 					i++;
 				}
 				if (message[i] == '\r')
 				{
-					while (i < message.size() && message[i] != '\0' && (message[i] == '\r' || message[i] == '\n'))
+					while (i < nbytes && message[i] != '\0' && (message[i] == '\r' || message[i] == '\n'))
 						i++;
 					request.chunkSize = std::stoi(request.chunkSizeStr.c_str(), 0, 16);
 					request.chunkSizeStr.clear();
@@ -132,7 +132,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, stru
 				}
 				else
 				{
-					while (i < message.size() && message[i] != '\0' && request.chunkData.size() < request.chunkSize)
+					while (i < nbytes && message[i] != '\0' && request.chunkData.size() < request.chunkSize)
 					{
 						request.chunkData.push_back(message[i]);
 						i++;
@@ -144,7 +144,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, stru
 						request.chunkData.clear();
 						request.isChunkSizeComplete = false;
 					}
-					while (i < message.size() && message[i] != '\0' && (message[i] == '\r' || message[i] == '\n'))
+					while (i < nbytes && message[i] != '\0' && (message[i] == '\r' || message[i] == '\n'))
 						i++;
 				}
 			}

@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 16:59:18 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/10 17:05:48 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -317,7 +317,9 @@ class HTTPResponse
 
 		std::string CGIparsing(HTTPRequest &request, CGI *cgi)
 		{
-			std::string FILE_PATH = "";
+			std::string FILE_PATH = "", path = fileLocation;
+			std::string ext = std::string(path.substr(path.find_last_of(".")), 0, path.find_last_of("/"));
+			
 			if (request.isCGI == true)
 			{
 				cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
@@ -333,9 +335,9 @@ class HTTPResponse
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("?"));
 					FILE_PATH = loc.root + request.defineScriptName("?");
 				}
-				else if (request.rL.requestTarget.find(".cgi/") != std::string::npos || request.rL.requestTarget.find(".php/") != std::string::npos || request.rL.requestTarget.find(".py/") != std::string::npos)
+				else if (request.rL.requestTarget.find(ext) != std::string::npos)
 				{
-					cgi->add_variable("PATH_INFO", request.definePathInfo());
+					cgi->add_variable("PATH_INFO", request.definePathInfo(ext));
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
 					FILE_PATH = loc.root + request.defineScriptName("/");
 				}

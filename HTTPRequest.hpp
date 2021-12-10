@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 16:59:58 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/10 17:06:08 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,13 +89,21 @@ class	HTTPRequest
 				return ("");
 		}
 
-		std::string	definePathInfo()
+		std::string	definePathInfo(std::string str)
 		{
-			std::string queryString(rL.requestTarget.begin(), rL.requestTarget.end());
-			if (queryString.find(".cgi/") != std::string::npos)
-				return (std::string(queryString, queryString.find(".cgi/") + 5));
+			(void)str;
+			std::string PathInfo(rL.requestTarget.begin(), rL.requestTarget.end());
+			/*if (PathInfo.find(str) != std::string::npos)
+				return (std::string(PathInfo, PathInfo.find(str) + 5));
 			else
-				return ("");
+				return ("");*/
+			if (str.find("/") != std::string::npos)
+			{
+				PathInfo.erase(0, PathInfo.find_last_of("/"));
+				return(PathInfo);
+			}
+			else
+				return("");
 		}
 
 		void		determineIfBody()
@@ -132,14 +140,14 @@ class	HTTPRequest
 				}
 		}
 
-		void		insertHeaderLine()
+		void		insertHeaderLine(std::vector<std::string> s)
 		{
 			size_t i(0);
 			std::string temp1;
 			std::string temp2;
 			if (isRequestLineComplete == false)
 			{
-				insertHeaderRequestLine();
+				insertHeaderRequestLine(s);
 				isRequestLineComplete = true;
 			}
 			else
@@ -164,7 +172,7 @@ class	HTTPRequest
 		}
 
 	private:
-		void	insertHeaderRequestLine()
+		void	insertHeaderRequestLine(std::vector<std::string> s)
 		{
 			size_t i(0);
 
@@ -181,11 +189,19 @@ class	HTTPRequest
 				rL.requestTarget.push_back(tmp[i]);
 				i++;
 			}
-			// Replace by CGI config !!!
+
+			// Check if CGI extension is Good 
+			for (size_t j = 0; j < s.size(); j++)
+			{
+				//std::cout << "==========> " << s[j] << std::endl;
+				if (rL.requestTarget.find(s[j]) != std::string::npos)
+					isCGI = true;
+			}
+			/*(void)s;
 			if (rL.requestTarget.find(".cgi") != std::string::npos
 				|| rL.requestTarget.find(".php") != std::string::npos
 				|| rL.requestTarget.find(".py") != std::string::npos)
-					isCGI = true;
+					isCGI = true;*/
 			if (i < tmp.size() && tmp[i] == ' ')
 				i++;
 			while (i < tmp.size() && tmp[i] != '\n')
