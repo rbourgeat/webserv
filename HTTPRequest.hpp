@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 17:06:08 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/11 11:03:08 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,6 @@ class	HTTPRequest
 			else
 				return (scriptName);
 		}
-		
-		/*std::string defineScriptName()
-		{
-			std::string scriptName(rL.requestTarget.begin(), rL.requestTarget.end());
-			return (std::string(scriptName, 0, scriptName.find("?")));
-		}*/
 
 		std::string	defineQueryString()
 		{
@@ -93,13 +87,9 @@ class	HTTPRequest
 		{
 			(void)str;
 			std::string PathInfo(rL.requestTarget.begin(), rL.requestTarget.end());
-			/*if (PathInfo.find(str) != std::string::npos)
-				return (std::string(PathInfo, PathInfo.find(str) + 5));
-			else
-				return ("");*/
 			if (str.find("/") != std::string::npos)
 			{
-				PathInfo.erase(0, PathInfo.find_last_of("/"));
+				PathInfo.erase(0, PathInfo.find_last_of("/") + 1);
 				return(PathInfo);
 			}
 			else

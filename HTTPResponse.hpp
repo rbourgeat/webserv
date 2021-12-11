@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 17:05:48 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/11 11:03:48 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -319,7 +319,8 @@ class HTTPResponse
 		{
 			std::string FILE_PATH = "", path = fileLocation;
 			std::string ext = std::string(path.substr(path.find_last_of(".")), 0, path.find_last_of("/"));
-			
+			if (ext.find("/") == std::string::npos)
+				ext += "/";
 			if (request.isCGI == true)
 			{
 				cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
