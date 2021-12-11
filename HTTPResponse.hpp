@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/11 14:57:29 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/11 16:02:29 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,12 @@ class HTTPResponse
 							else
 							{
 								fileLocation = loc.root + "/" + loc.defaultFile;
-								defineResponseHeaderForNonCGI();
-								if (contentLength.size() > 0)
-									body = getFileContent(fileLocation);
+								if (checkFile())
+								{
+									defineResponseHeaderForNonCGI();
+									if (contentLength.size() > 0)
+										body = getFileContent(fileLocation);	
+								}
 							}
 						}
 						else
@@ -81,6 +84,11 @@ class HTTPResponse
 		}
 
 	private:
+	
+		inline bool isExist (const std::string& name) {
+			struct stat buffer;   
+			return (stat (name.c_str(), &buffer) == 0); 
+		}
 
 		void	getLoc()
 		{
@@ -413,9 +421,9 @@ class HTTPResponse
 			while (i < s.error.size() && s.error[i].num != code)
 				i++;
 			if (i < s.error.size() && s.error[i].num == code)
-				fileLocation = loc.root + "/" + s.error[i].path;
+				fileLocation = "directory/" + s.error[i].path;
 			else
-				fileLocation = loc.root + "/" + codeToString + ".html";
+				fileLocation = "directory/" + codeToString + ".html";
 			contentLength = countFileChar(fileLocation);	
 			if (contentLength.size() > 0)
 				body = getFileContent(fileLocation);
@@ -468,7 +476,6 @@ class HTTPResponse
 
 		bool	checkFile()
 		{
-			std::cout << "fileLocation????? " << fileLocation << std::endl;
 			if (!isPathExist(fileLocation))
 			{                
 				sL.statusCode = "404";
