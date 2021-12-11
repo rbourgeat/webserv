@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:42:20 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/11/19 16:54:57 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/11 15:06:34 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ class CGI
 		{
 			if (value.size() == 0)
 				value = "";
-			std::cout << "name=" << name << " / value=" << value << std::endl;
+			// std::cout << "name=" << name << " / value=" << value << std::endl;
 			std::ostringstream ss;
 			ss << name << "=" << value;
 			setenv(name.c_str(), value.c_str(), 1);

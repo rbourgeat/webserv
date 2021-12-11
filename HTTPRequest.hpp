@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/11 11:03:08 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/11 15:05:47 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,11 +187,7 @@ class	HTTPRequest
 				if (rL.requestTarget.find(s[j]) != std::string::npos)
 					isCGI = true;
 			}
-			/*(void)s;
-			if (rL.requestTarget.find(".cgi") != std::string::npos
-				|| rL.requestTarget.find(".php") != std::string::npos
-				|| rL.requestTarget.find(".py") != std::string::npos)
-					isCGI = true;*/
+			
 			if (i < tmp.size() && tmp[i] == ' ')
 				i++;
 			while (i < tmp.size() && tmp[i] != '\n')

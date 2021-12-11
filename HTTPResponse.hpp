@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/11 11:03:48 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/11 14:57:29 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,6 @@ class HTTPResponse
 			std::string CGI_PATH = CGIparsing(r, cgi);
 			cgi->print_env();
 			std::string message = cgi->execute(CGI_PATH, r);
-			std::cout << "test" << std::endl;
 			if (message != "Error")
 			{
 				size_t position = message.find("\r\n\r\n");
@@ -314,6 +313,14 @@ class HTTPResponse
 				errorPageLocation(500);
 			}
 		}
+		
+		template <typename T>
+		std::string NumberToString(T Number)
+		{
+			std::ostringstream ss;
+			ss << Number;
+			return ss.str();
+		}
 
 		std::string CGIparsing(HTTPRequest &request, CGI *cgi)
 		{
@@ -321,15 +328,15 @@ class HTTPResponse
 			std::string ext = std::string(path.substr(path.find_last_of(".")), 0, path.find_last_of("/"));
 			if (ext.find("/") == std::string::npos)
 				ext += "/";
+			std::cout << "ext == " << ext << std::endl;
 			if (request.isCGI == true)
 			{
 				cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
-				cgi->add_variable("SERVER_NAME", ""); // Le nom d'hôte, alias DNS ou adresse IP du serveur.
+				cgi->add_variable("SERVER_NAME", s.name);
 				cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 				cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
-				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
+				cgi->add_variable("SERVER_PORT", NumberToString(s.port));
 				cgi->add_variable("REQUEST_METHOD", request.rL.method);
-				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
 				if (request.rL.requestTarget.find("?") != std::string::npos)
 				{
 					cgi->add_variable("QUERY_STRING", request.defineQueryString());
@@ -339,6 +346,7 @@ class HTTPResponse
 				else if (request.rL.requestTarget.find(ext) != std::string::npos)
 				{
 					cgi->add_variable("PATH_INFO", request.definePathInfo(ext));
+					cgi->add_variable("PATH_TRANSLATED", request.definePathInfo(ext));
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
 					FILE_PATH = loc.root + request.defineScriptName("/");
 				}
@@ -347,17 +355,20 @@ class HTTPResponse
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName(""));
 					FILE_PATH = loc.root + request.defineScriptName("");
 				}
-				cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
-				cgi->add_variable("REMOTE_ADDR", ""); // IP du client ??? Demander si on doit vraiment le faire
+				// cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
+				if (request.headerFields.find("Host") != request.headerFields.end())
+					cgi->add_variable("REMOTE_ADDR", request.headerFields.find("Host")->second);
 				cgi->add_variable("AUTH_TYPE", "Basic");
-				cgi->add_variable("REMOTE_USER", "");
-				cgi->add_variable("CONTENT_TYPE", ""); // Récuperer le contenu du POST
-				//cgi->add_variable("CONTENT_LENGTH", contentLength.c_str());
+				// cgi->add_variable("REMOTE_USER", ""); // laisser vide car serveur identification non requis
+				if (request.headerFields.find("Content-Type") != request.headerFields.end())
+					cgi->add_variable("CONTENT_TYPE", request.headerFields.find("Content-Type")->second);
+				if (request.headerFields.find("Content-Length") != request.headerFields.end())
+					cgi->add_variable("CONTENT_LENGTH", request.headerFields.find("Content-Length")->second);
 				if (request.headerFields.find("Accept") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
 				if (request.headerFields.find("Accept-Language") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT_LANGUAGE", request.headerFields.find("Accept-Language")->second);
-				if (request.headerFields.find("User-Agent") != request.headerFields.end()) //Ask Raph if test can be performed directly in add_variables
+				if (request.headerFields.find("User-Agent") != request.headerFields.end())
 					cgi->add_variable("HTTP_USER_AGENT", request.headerFields.find("User-Agent")->second);
 				if (request.headerFields.find("Referer") != request.headerFields.end())
 					cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
