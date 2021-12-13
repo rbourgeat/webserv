@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 17:04:36 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/13 19:41:47 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,23 @@
 #include "config_parsing.cpp"
 #include <unistd.h>
 #include "HTTPResponse.hpp"
+
+PollFd vPfd;
+std::vector<struct server> servers;
+std::vector<struct client> clients;
+
+void	sighandler(int signum)
+{
+	(void)signum;
+	if (signum == SIGINT)
+	{
+		std::cout << MAG << "ICIIIIIII!!!" << NC << std::endl;
+		for (size_t i(0); i < vPfd.getFdCount(); i++)
+						close(vPfd.getPfd()[i].fd);
+		exit(signum);
+	}
+}
+
 
 int		findClient(int fd, std::vector<struct client> clients)
 {
@@ -45,14 +62,15 @@ int		main(int argc, char const *argv[])
 	else
 		config_path = argv[1];
 	/*Read config file*/
-	std::vector<struct server> servers;
-	std::vector<struct client> clients;
+	//std::vector<struct server> servers;
+	//std::vector<struct client> clients;
 	readConfig(config_path, &servers);
 
 	/*Create pollfd structure to monitor sockets with poll()*/		
-	PollFd vPfd;
+	//PollFd vPfd;
 	while(1)
 	{
+		signal(SIGINT, &sighandler);
 		try
 		{
 			poll(vPfd.getPfd().data(), vPfd.getFdCount(), 0); //Check all events on all fds at once with poll()
@@ -110,7 +128,7 @@ int		main(int argc, char const *argv[])
 							if (clients[k].request.isComplete == true)
 							{
 								clients[k].request.determineIfUpload();
-								HTTPResponse response(clients[k].request, servers[clients[k].servIndex]);
+								HTTPResponse response(clients[k].request, servers[clients[k].servIndex], vPfd);
 								response.defineResponse();
 								std::vector<unsigned char> answer(response.resp.begin(), response.resp.end());
 								clients[k].answer = answer;
@@ -163,5 +181,6 @@ int		main(int argc, char const *argv[])
 			// exit(EXIT_FAILURE);
 		}
 	}
+	std::cout << "Do you go there???\n";
 	return 0;
 }

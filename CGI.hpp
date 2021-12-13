@@ -6,15 +6,26 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:42:20 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/11 15:06:34 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/13 19:25:26 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef CGI_HPP
 # define CGI_HPP
 
-# include "webserv.hpp"
+//# include "webserv.hpp"
+# include "HTTPRequest.hpp"
 # include <stdlib.h>
+# include <vector>
+# include <iostream>
+# include <sys/stat.h>
+# include <sys/wait.h>
+# include <sys/types.h>
+# include <sys/ioctl.h>
+# include <unistd.h>
+# include <cstring>
+# include <sstream>
+# include "PollFd.hpp"
 
 # define IS_ERROR(x) \
     (x == cgi_status::CGI_ERROR || x == cgi_status::SYSTEM_ERROR \
@@ -48,7 +59,7 @@ class CGI
 		int					get_fd() const;
 		cgi_status::status	status();
 		std::vector<char *>	print_env();
-		std::string execute(std::string PATH, HTTPRequest &request);
+		std::string execute(std::string PATH, HTTPRequest &request, PollFd &vPfd);
 		std::string			get_buffer_size(int count);
 		void add_variable(std::string name, std::string value)
 		{

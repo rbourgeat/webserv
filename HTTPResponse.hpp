@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/11 16:02:29 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/13 19:26:36 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@
 # include "CGI.hpp"
 # include "serverAndClient.hpp"
 # include <sys/time.h>
+# include "PollFd.hpp"
+
 
 struct	statusLine
 {
@@ -28,7 +30,7 @@ struct	statusLine
 class HTTPResponse
 {
 	public:
-		HTTPResponse(HTTPRequest &request, struct server serv): r(request), s(serv)
+		HTTPResponse(HTTPRequest &request, struct server serv, PollFd &vPfd): r(request), s(serv), _vPfd(vPfd)
 	{
 		sL.httpVersion = "HTTP/1.1";
 	}
@@ -60,12 +62,9 @@ class HTTPResponse
 							else
 							{
 								fileLocation = loc.root + "/" + loc.defaultFile;
-								if (checkFile())
-								{
-									defineResponseHeaderForNonCGI();
-									if (contentLength.size() > 0)
-										body = getFileContent(fileLocation);	
-								}
+								defineResponseHeaderForNonCGI();
+								if (contentLength.size() > 0)
+									body = getFileContent(fileLocation);
 							}
 						}
 						else
@@ -84,11 +83,6 @@ class HTTPResponse
 		}
 
 	private:
-	
-		inline bool isExist (const std::string& name) {
-			struct stat buffer;   
-			return (stat (name.c_str(), &buffer) == 0); 
-		}
 
 		void	getLoc()
 		{
@@ -167,7 +161,8 @@ class HTTPResponse
 			CGI *cgi = new CGI;
 			std::string CGI_PATH = CGIparsing(r, cgi);
 			cgi->print_env();
-			std::string message = cgi->execute(CGI_PATH, r);
+			std::string message = cgi->execute(CGI_PATH, r, _vPfd);
+			std::cout << "test" << std::endl;
 			if (message != "Error")
 			{
 				size_t position = message.find("\r\n\r\n");
@@ -321,30 +316,21 @@ class HTTPResponse
 				errorPageLocation(500);
 			}
 		}
-		
-		template <typename T>
-		std::string NumberToString(T Number)
-		{
-			std::ostringstream ss;
-			ss << Number;
-			return ss.str();
-		}
 
 		std::string CGIparsing(HTTPRequest &request, CGI *cgi)
 		{
 			std::string FILE_PATH = "", path = fileLocation;
 			std::string ext = std::string(path.substr(path.find_last_of(".")), 0, path.find_last_of("/"));
-			if (ext.find("/") == std::string::npos)
-				ext += "/";
-			std::cout << "ext == " << ext << std::endl;
+			
 			if (request.isCGI == true)
 			{
 				cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
-				cgi->add_variable("SERVER_NAME", s.name);
+				cgi->add_variable("SERVER_NAME", ""); // Le nom d'hôte, alias DNS ou adresse IP du serveur.
 				cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 				cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
-				cgi->add_variable("SERVER_PORT", NumberToString(s.port));
+				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
 				cgi->add_variable("REQUEST_METHOD", request.rL.method);
+				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
 				if (request.rL.requestTarget.find("?") != std::string::npos)
 				{
 					cgi->add_variable("QUERY_STRING", request.defineQueryString());
@@ -354,7 +340,6 @@ class HTTPResponse
 				else if (request.rL.requestTarget.find(ext) != std::string::npos)
 				{
 					cgi->add_variable("PATH_INFO", request.definePathInfo(ext));
-					cgi->add_variable("PATH_TRANSLATED", request.definePathInfo(ext));
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
 					FILE_PATH = loc.root + request.defineScriptName("/");
 				}
@@ -363,20 +348,17 @@ class HTTPResponse
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName(""));
 					FILE_PATH = loc.root + request.defineScriptName("");
 				}
-				// cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
-				if (request.headerFields.find("Host") != request.headerFields.end())
-					cgi->add_variable("REMOTE_ADDR", request.headerFields.find("Host")->second);
+				cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
+				cgi->add_variable("REMOTE_ADDR", ""); // IP du client ??? Demander si on doit vraiment le faire
 				cgi->add_variable("AUTH_TYPE", "Basic");
-				// cgi->add_variable("REMOTE_USER", ""); // laisser vide car serveur identification non requis
-				if (request.headerFields.find("Content-Type") != request.headerFields.end())
-					cgi->add_variable("CONTENT_TYPE", request.headerFields.find("Content-Type")->second);
-				if (request.headerFields.find("Content-Length") != request.headerFields.end())
-					cgi->add_variable("CONTENT_LENGTH", request.headerFields.find("Content-Length")->second);
+				cgi->add_variable("REMOTE_USER", "");
+				cgi->add_variable("CONTENT_TYPE", ""); // Récuperer le contenu du POST
+				//cgi->add_variable("CONTENT_LENGTH", contentLength.c_str());
 				if (request.headerFields.find("Accept") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
 				if (request.headerFields.find("Accept-Language") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT_LANGUAGE", request.headerFields.find("Accept-Language")->second);
-				if (request.headerFields.find("User-Agent") != request.headerFields.end())
+				if (request.headerFields.find("User-Agent") != request.headerFields.end()) //Ask Raph if test can be performed directly in add_variables
 					cgi->add_variable("HTTP_USER_AGENT", request.headerFields.find("User-Agent")->second);
 				if (request.headerFields.find("Referer") != request.headerFields.end())
 					cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
@@ -421,9 +403,9 @@ class HTTPResponse
 			while (i < s.error.size() && s.error[i].num != code)
 				i++;
 			if (i < s.error.size() && s.error[i].num == code)
-				fileLocation = "directory/" + s.error[i].path;
+				fileLocation = loc.root + "/" + s.error[i].path;
 			else
-				fileLocation = "directory/" + codeToString + ".html";
+				fileLocation = loc.root + "/" + codeToString + ".html";
 			contentLength = countFileChar(fileLocation);	
 			if (contentLength.size() > 0)
 				body = getFileContent(fileLocation);
@@ -476,6 +458,7 @@ class HTTPResponse
 
 		bool	checkFile()
 		{
+			std::cout << "fileLocation????? " << fileLocation << std::endl;
 			if (!isPathExist(fileLocation))
 			{                
 				sL.statusCode = "404";
@@ -721,6 +704,7 @@ class HTTPResponse
 		std::string			body;
 		std::string			redirectionLocation;
 		std::string			upload_filename;
+		PollFd					&_vPfd;
 	public:
 		std::string	resp;
         struct statusLine   sL;

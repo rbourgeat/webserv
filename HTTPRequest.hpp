@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/11 15:05:47 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/13 17:52:35 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,7 +215,6 @@ class	HTTPRequest
 		bool								isRequestLineComplete;
 		bool								isComplete;
 		std::string							boundary;
-
 };
 
 #endif

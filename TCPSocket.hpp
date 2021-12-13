@@ -1,7 +1,20 @@
 #ifndef TCPSOCKET_HPP
 #define TCPSOCKET_HPP
 
-#include "webserv.hpp"
+#include <iostream>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <arpa/inet.h>
+# include <vector>
+#include <cstring>
+#include <unistd.h>
+#include <fcntl.h>
+#define NC "\e[0m"
+#define RED "\033[31m"
+#define GRN "\e[0;32m"
+#define MAG "\e[0;35m"
+#define CYN "\e[0;36m"
+
 #include "PollFd.hpp"
 
 class TCPSocket

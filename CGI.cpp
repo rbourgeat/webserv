@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/07 16:06:37 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/13 19:39:25 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ cgi_status::status CGI::status()
 	return (_status);
 }
 
-std::string CGI::execute(std::string PATH, HTTPRequest &request)
+std::string CGI::execute(std::string PATH, HTTPRequest &request, PollFd &vPfd)
 {
 	_status = cgi_status::NON_INIT;
 	(void)request;
@@ -142,6 +142,8 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request)
 			}
 			if (_child_pid == 0)
 			{
+				for (size_t z(0); z < vPfd.getFdCount(); z++)
+          close(vPfd.getPfd()[z].fd);
 				dup2(fd_in, 0);
 				close(fd1[0]);
 				if (dup2(fd1[1], 1) < 0)
@@ -228,6 +230,8 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request)
 		}
 		if (_child_pid == 0)
 		{
+			for (size_t z(0); z < vPfd.getFdCount(); z++)
+					close(vPfd.getPfd()[z].fd);
 			std::string exec_path = PATH;
 			close(fd1[0]);
 			if (dup2(fd1[1], 1) < 0)
@@ -236,6 +240,7 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request)
 				close(fd1[0]);
 				exit(-1);
 			}
+			close(fd1[1]);
 			execve(args[0], args, env);
 			exit(-1);
 
@@ -250,12 +255,10 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request)
 			{
 				free(env[k]);
 			}
-
 			_pipe = fd1[0];
 			_buffSize = read(_pipe, _buffer, 10000);
 			close(fd1[0]);
 			return (_buffer);
-			// fcntl(_pipe, F_SETFL, O_NONBLOCK);
 		}
 	}
 	return ("");

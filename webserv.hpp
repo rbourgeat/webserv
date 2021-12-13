@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 16:33:46 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/10 17:03:10 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/13 18:15:00 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@
 # include <cstdlib>
 #include <string>
 #include <map>
-#include <filesystem>
+#include <csignal>
 
 #define NC "\e[0m"
 #define RED "\033[31m"
@@ -47,8 +47,6 @@
 #define CYN "\e[0;36m"
 #include "HTTPRequest.hpp"
 
-std::vector<unsigned char>	parsing(HTTPRequest &request, std::vector<unsigned char> buffer, struct server s);
-void												cgi_get();
 void						parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size_t nbytes, std::vector<std::string> s);
 std::vector<unsigned char>  createResponse(HTTPRequest request, struct server s);
 

@@ -1,7 +1,7 @@
 #ifndef POLLFD_HPP
 # define POLLFD_HPP
 
-#include "webserv.hpp"
+#include <poll.h>
 
 class	PollFd
 {
