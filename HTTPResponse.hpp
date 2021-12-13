@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/13 19:26:36 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/13 20:34:15 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -321,7 +321,7 @@ class HTTPResponse
 		{
 			std::string FILE_PATH = "", path = fileLocation;
 			std::string ext = std::string(path.substr(path.find_last_of(".")), 0, path.find_last_of("/"));
-			
+			std::cout << ">> ext = " << ext << std::endl;
 			if (request.isCGI == true)
 			{
 				cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
@@ -337,7 +337,7 @@ class HTTPResponse
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("?"));
 					FILE_PATH = loc.root + request.defineScriptName("?");
 				}
-				else if (request.rL.requestTarget.find(ext) != std::string::npos)
+				else if (ext.find("/") != std::string::npos)
 				{
 					cgi->add_variable("PATH_INFO", request.definePathInfo(ext));
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName("/"));
