@@ -6,7 +6,7 @@
 #    By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/23 19:42:48 by rbourgea          #+#    #+#              #
-#    Updated: 2021/12/13 12:41:02 by dgoudet          ###   ########.fr        #
+#    Updated: 2021/12/13 19:46:03 by dgoudet          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,8 +22,8 @@ OBJS	=	$(SRCS:.cpp=.o)
 CC		=	clang++
 
 #On VM, function "ifstream" of parser.cpp only compiles with c++11 flag
-#CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -fsanitize=address -g
-CFLAGS  = -Wall -Werror -Wextra -std=c++11 -g
+CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -fsanitize=address -g
+#CFLAGS  = -Wall -Werror -Wextra -std=c++11 -g
 
 
 all:		$(NAME)
