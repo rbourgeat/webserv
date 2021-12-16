@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/13 20:07:26 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/16 09:39:50 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ cgi_status::status CGI::status()
 std::string CGI::execute(std::string PATH, HTTPRequest &request, PollFd &vPfd)
 {
 	_status = cgi_status::NON_INIT;
-	(void)request;
+	//(void)vPfd;
 	int fd1[2];
 	int fd_in = 0;
 	for (size_t j(0); j < request.body.size(); j++)
@@ -128,7 +128,6 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request, PollFd &vPfd)
 			env[i] = NULL;
 
 			char *args[] = {cgi, NULL};
-
 			// Multi-threading....
 			if ((_child_pid = fork()) < 0)
 			{
@@ -148,23 +147,22 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request, PollFd &vPfd)
 				close(fd1[0]);
 				if (dup2(fd1[1], 1) < 0)
 				{
+					free(cgi);
 					close(fd1[1]);
 					exit(-1);
 				}
+				close(fd1[1]);
 				if (l == 0)
 				{
+					free(cgi);
 					for (size_t j(0); j < request.body.size(); j++)
-					{
 						std::cout << request.body[j];
-					}
-					close(fd1[0]);
-					//close(1);
-					//close(0);
 					exit(0);
 				}
 				else
 				{
 					execve(args[0], args, env);
+					free(cgi);
 					exit(-1);
 				}
 
@@ -177,14 +175,15 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request, PollFd &vPfd)
 				else
 				{
 					_status = cgi_status::WAITING;
-					free(cgi);
 					for (size_t k = 0; k < _variables.size(); k++)
 					{
 						free(env[k]);
 					}
 					_pipe = fd1[0];
 					_buffSize = read(_pipe, _buffer, 10000);
+					free(cgi);
 					close(fd1[0]);
+					close(fd_in);
 					return (_buffer);
 				}
 			}
@@ -216,7 +215,6 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request, PollFd &vPfd)
 		env[i] = NULL;
 
 		char *args[] = {cgi, NULL};
-
 		// Multi-threading....
 		if ((_child_pid = fork()) < 0)
 		{
@@ -230,18 +228,18 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request, PollFd &vPfd)
 		}
 		if (_child_pid == 0)
 		{
-			for (size_t z(0); z < vPfd.getFdCount(); z++)
-					close(vPfd.getPfd()[z].fd);
 			std::string exec_path = PATH;
 			close(fd1[0]);
 			if (dup2(fd1[1], 1) < 0)
 			{
 				close(fd1[1]);
 				close(fd1[0]);
+				free(cgi);
 				exit(-1);
 			}
 			close(fd1[1]);
 			execve(args[0], args, env);
+			free(cgi);
 			exit(-1);
 
 		} else {
