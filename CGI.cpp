@@ -6,9 +6,10 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/17 15:00:00 by rbourgea         ###   ########.fr       */
+/*   Updated: 2021/12/17 15:42:38 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 // Je refais tout le CGI au propre
 
@@ -170,6 +171,7 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request, PollFd &vPfd)
 				wait(NULL);
 				close(fd1[1]);
 				dup2(fd1[0], 0);
+				free(cgi);
 				if (l == 0)
 					fd_in = fd1[0];
 				else
@@ -181,7 +183,6 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request, PollFd &vPfd)
 					}
 					_pipe = fd1[0];
 					_buffSize = read(_pipe, _buffer, 10000);
-					free(cgi);
 					close(fd1[0]);
 					close(fd_in);
 					return (_buffer);

@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/17 14:43:35 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/17 15:39:24 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,24 +131,27 @@ class HTTPResponse
 		void	aggregateResponse()
 		{
 			resp+= sL.httpVersion + " " + sL.statusCode + " " + sL.reasonPhrase + "\r\n";
-			if (r.rL.method != "DELETE" && loc.redi.num == -1)
+			if (isPathExist(fileLocation))
 			{
-				if (r.isUpload && sL.statusCode != "413")
-					resp+= "Content-Length: 13 \r\n\r\nUpload Done !";
-				else
-					resp+= "Content-Length: " + contentLength + "\r\n";
-				if (contentType.size() > 0)
+				if (r.rL.method != "DELETE" && loc.redi.num == -1)
 				{
-					resp+= "Content-Type: " + contentType + "\r\n";
+					if (r.isUpload && sL.statusCode != "413")
+						resp+= "Content-Length: 13 \r\n\r\nUpload Done !";
+					else
+						resp+= "Content-Length: " + contentLength + "\r\n";
+					if (contentType.size() > 0)
+					{
+						resp+= "Content-Type: " + contentType + "\r\n";
+						resp+= "\r\n";
+					}
+					resp+= body;
+				}
+				else
+				{
+					if (redirectionLocation.size() > 0)
+						resp+= "Location: " + redirectionLocation + "\r\n";
 					resp+= "\r\n";
 				}
-				resp+= body;
-			}
-			else
-			{
-				if (redirectionLocation.size() > 0)
-					resp+= "Location: " + redirectionLocation + "\r\n";
-				resp+= "\r\n";
 			}
 		}
 
@@ -157,9 +160,9 @@ class HTTPResponse
 			if (invalidHost == true)
 			{
 				sL.statusCode = "400";
-                sL.reasonPhrase = "Bad request";
-                errorPageLocation(400);
-                return (true);
+				sL.reasonPhrase = "Bad request";
+				errorPageLocation(400);
+				return (true);
 			}
 			else
 				return (false);
@@ -429,9 +432,13 @@ class HTTPResponse
 				fileLocation = loc.root + "/" + s.error[i].path;
 			else
 				fileLocation = loc.root + "/" + codeToString + ".html";
-			contentLength = countFileChar(fileLocation);	
-			if (contentLength.size() > 0)
-				body = getFileContent(fileLocation);
+			if (isPathExist(fileLocation))
+			{
+				contentLength = countFileChar(fileLocation);	
+				if (contentLength.size() > 0)
+					body = getFileContent(fileLocation);
+				contentType = "text/html";
+			}
 		}
 
 		bool isPathExist(const std::string &s)
