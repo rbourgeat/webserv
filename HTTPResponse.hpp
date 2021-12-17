@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/17 18:22:46 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/17 19:35:40 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,6 @@ class HTTPResponse
 		{
 			if (invalidHost == true)
 			{
-				std::cout << "Host PB??\n";
 				sL.statusCode = "400";
 				sL.reasonPhrase = "Bad request";
 				errorPageLocation(400);
@@ -172,7 +171,7 @@ class HTTPResponse
 		}
 
 		void		defineResponseHeaderForNonCGI()
-		{			
+		{
 			if (!checkFile())
 			{
 				if (r.rL.method == "DELETE")
