@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/17 16:45:31 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/17 17:05:00 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -355,7 +355,7 @@ class HTTPResponse
 			if (request.isCGI == true)
 			{
 				cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
-				cgi->add_variable("SERVER_NAME", ""); // Le nom d'hôte, alias DNS ou adresse IP du serveur.
+				cgi->add_variable("SERVER_NAME", "localhost"); // Le nom d'hôte, alias DNS ou adresse IP du serveur.
 				cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 				cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
 				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
@@ -433,7 +433,7 @@ class HTTPResponse
 			while (i < s.error.size() && s.error[i].num != code)
 				i++;
 			if (i < s.error.size() && s.error[i].num == code)
-				fileLocation = loc.root + "/" + s.error[i].path;
+				fileLocation = s.error[i].path;
 			else
 				fileLocation = loc.root + "/" + codeToString + ".html";
 			std::cout << "fileLocation??? " << fileLocation << std::endl;
