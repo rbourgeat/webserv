@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/11 11:41:44 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/16 09:39:50 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/17 15:00:00 by rbourgea         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ std::string CGI::execute(std::string PATH, HTTPRequest &request, PollFd &vPfd)
 			if (_child_pid == 0)
 			{
 				for (size_t z(0); z < vPfd.getFdCount(); z++)
-          close(vPfd.getPfd()[z].fd);
+          			close(vPfd.getPfd()[z].fd);
 				dup2(fd_in, 0);
 				close(fd1[0]);
 				if (dup2(fd1[1], 1) < 0)
