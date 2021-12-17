@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/17 13:03:26 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/17 14:47:53 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ void	sighandler(int signum)
 	(void)signum;
 	if (signum == SIGINT)
 	{
-		std::cout << MAG << "ICIIIIIII!!!" << NC << std::endl;
 		for (size_t i(0); i < vPfd.getFdCount(); i++)
 			close(vPfd.getPfd()[i].fd);
 		exit(signum);
@@ -64,6 +63,8 @@ int		checkHost(HTTPRequest &request, int index, std::vector<struct server> serve
 		{
             if (request.headerFields.find("Host")->second.find("localhost") != std::string::npos)
 				return (j);
+			 if (request.headerFields.find("Host")->second.find("127.0.0.1") != std::string::npos)
+                return (j);
 			if (request.headerFields.find("Host")->second.find(servers[j].name) != std::string::npos)
 					return (j);
 		}
@@ -114,7 +115,7 @@ int		main(int argc, char const *argv[])
 						servers[j].sock.socketListen();
 					}
 					vPfd.addFd(servers[j].sock.getSocketFd());
-					std::cout << vPfd.getFdCount() << std::endl;
+					//std::cout << vPfd.getFdCount() << std::endl;
 				}
 			}
 			for (size_t i(0); i < vPfd.getFdCount(); i++)
@@ -124,7 +125,7 @@ int		main(int argc, char const *argv[])
 					int k;
 					if ((k = isServerFd(vPfd.getPfd()[i].fd, servers)) != -1)// == server.getSocketFd()) //if there is some data to read on server
 					{
-						std::cout << "+++++++ " << servers[k].name << " accepting new connection ++++++++\n\n";
+						//std::cout << "+++++++ " << servers[k].name << " accepting new connection ++++++++\n\n";
 						client c;
 						c.socket = servers[k].sock.socketAccept();
 						fcntl(c.socket, F_SETFL, O_NONBLOCK);
@@ -132,8 +133,8 @@ int		main(int argc, char const *argv[])
 						c.statusCode = "0";
 						vPfd.addFd(c.socket);
 						clients.push_back(c);
-						std::cout << "+++New connection from fd " << c.socket << " accepted +++" << std::endl;
-						std::cout << std::endl;
+						//std::cout << "+++New connection from fd " << c.socket << " accepted +++" << std::endl;
+						//std::cout << std::endl;
 					}
 					else //else, there is some data to read elsewhere (meaning on client side)
 					{
@@ -141,7 +142,7 @@ int		main(int argc, char const *argv[])
 						int k;
 						k = findClient(vPfd.getPfd()[i].fd, clients);
 						std::vector<unsigned char> request;
-						std::cout << GRN << "+++ Request received from fd " << vPfd.getPfd()[i].fd << " +++\n";
+						//std::cout << GRN << "+++ Request received from fd " << vPfd.getPfd()[i].fd << " +++\n";
 						request = servers[clients[k].servIndex].sock.socketRecv(i, vPfd);
 						if (request.size() <= 0)
 						{
@@ -161,7 +162,6 @@ int		main(int argc, char const *argv[])
 								std::vector<unsigned char> answer;
 								if ((clients[k].servIndex = checkHost(clients[k].request, clients[k].servIndex, servers)) < 0)
 								{
-									std::cout << "-1!!\n";
 									HTTPResponse response(clients[k].request, vPfd);
 									response.defineResponse();
 									clients[k].statusCode = response.sL.statusCode;
@@ -197,12 +197,12 @@ int		main(int argc, char const *argv[])
 								clients[k].totalSentBytes+= clients[k].sentBytes;
 								/*for (size_t l(0); l < clients[k].answer.size(); l++)
 								  std::cout << MAG << clients[k].answer[l];*/
-								for (size_t l(0); l < clients[k].answer.size(); l++)
-									std::cout << MAG << clients[k].answer[l];
+								/*for (size_t l(0); l < clients[k].answer.size(); l++)
+									std::cout << MAG << clients[k].answer[l];*/
 								clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
 								if (clients[k].answer.size() == 0)
 								{
-									std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
+									//std::cout << MAG << "+++ Answer sent to fd " << vPfd.getPfd()[i].fd << " +++" << std::endl;
 									if (clients[k].statusCode == "413")
 									{
 										close(vPfd.getPfd()[i].fd);
@@ -210,7 +210,7 @@ int		main(int argc, char const *argv[])
 									}
 									clients[k].answer.clear();
 									clients[k].request.clearAll();
-									std::cout << NC << std::endl;
+									//std::cout << NC << std::endl;
 								}
 							}
 						}

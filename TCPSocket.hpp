@@ -89,9 +89,10 @@ class TCPSocket
 			//std::cout << "nbytes = " << nbytes << "buffer.size() = " << buffer.size() << std::endl;
 			if (nbytes <= 0)
 			{
-				if (nbytes == 0)
+				/*if (nbytes == 0)
 					std::cout << NC << "Socket " << objectPoll.getPfd()[i].fd << " hung up -------------------------------------------\n";
-				else
+				else*/
+				if (nbytes != 0)
 					throw TCPSocketException("while receiving");
 				close(objectPoll.getPfd()[i].fd);
 				objectPoll.deleteFd(i);

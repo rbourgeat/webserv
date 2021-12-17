@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/17 12:17:55 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/17 14:43:35 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -481,7 +481,6 @@ class HTTPResponse
 
 		bool	checkFile()
 		{
-			std::cout << "fileLocation????? " << fileLocation << std::endl;
 			if (!isPathExist(fileLocation))
 			{                
 				sL.statusCode = "404";

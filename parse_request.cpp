@@ -47,11 +47,11 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size
 				if (request.tmp.size() == 0 || (request.tmp.size() == 1 && message[0] == '\n')) //in case there is only a /n as last caracter
 				{
 					request.isHeaderComplete = true;
-					printRequestHeader(request);
+					//printRequestHeader(request);
 					request.determineIfBody();
 					if (request.isBody == false)
 					{
-						std::cout << "No body\n";
+						//std::cout << "No body\n";
 						request.isComplete = true;
 					}
 				}
@@ -60,11 +60,11 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size
 					i+= 2;
 					request.insertHeaderLine(s.extensions);
 					request.isHeaderComplete = true;
-					printRequestHeader(request);
+					//printRequestHeader(request);
 					request.determineIfBody();
 					if (request.isBody == false)
 					{
-						std::cout << "No body\n";
+						//std::cout << "No body\n";
 						request.isComplete = true;
 					}
 				}
@@ -98,7 +98,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size
 			if (request.body.size() == request.bodySize)
 			{
 				request.isComplete = true;
-				printRequestBody(request);
+				//printRequestBody(request);
 			}
 		}
 		if (request.isComplete == false && request.isChunked == true)
@@ -126,7 +126,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size
 					if (request.chunkSize == 0)
 					{
 						request.isComplete = true;
-						printRequestBody(request);
+						//printRequestBody(request);
 					}
 					else
 					{
