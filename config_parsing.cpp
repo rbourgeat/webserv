@@ -278,7 +278,6 @@ void	readConfig(char const *argv, std::vector<struct server> *servers)
 			}
 			i = 0;
 		}
-
 	}
 	else
 	{

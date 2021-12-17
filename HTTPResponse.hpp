@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/16 10:22:09 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/17 12:17:55 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,53 +30,63 @@ struct	statusLine
 class HTTPResponse
 {
 	public:
+
+		HTTPResponse(HTTPRequest &request, PollFd &vPfd): r(request), _vPfd(vPfd)
+	{
+		sL.httpVersion = "HTTP/1.1";
+		invalidHost = true;
+	}
 		HTTPResponse(HTTPRequest &request, struct server serv, PollFd &vPfd): r(request), s(serv), _vPfd(vPfd)
 	{
 		sL.httpVersion = "HTTP/1.1";
+		invalidHost = false;
 	}
 		~HTTPResponse(){;}
 
 		void	defineResponse()
 		{
-			getLoc();
-			if (loc.redi.num > -1)
-				redirectClient();
-			else if (!checkRequest() && !checkClientBodySize() && !checkMethod())
+			if (!checkHost())
 			{
-				fileLocation = loc.root;
-				fileLocation+= r.rL.requestTarget;
-				if (!r.isCGI)
+				getLoc();
+				if (loc.redi.num > -1)
+					redirectClient();
+				else if (!checkRequest() && !checkClientBodySize() && !checkMethod())
 				{
-					if (r.isUpload)
+					fileLocation = loc.root;
+					fileLocation+= r.rL.requestTarget;
+					if (!r.isCGI)
 					{
-						foreachUpload();
-					}
-					else
-					{
-						struct stat s;
-						stat(fileLocation.c_str(), &s);
-						if (s.st_mode & S_IFDIR)
+						if (r.isUpload)
 						{
-							if (loc.dirList == "ON")
-								defineResponseForCGI();
+							foreachUpload();
+						}
+						else
+						{
+							struct stat s;
+							stat(fileLocation.c_str(), &s);
+							if (s.st_mode & S_IFDIR)
+							{
+								if (loc.dirList == "ON")
+									defineResponseForCGI();
+								else
+								{
+									fileLocation = loc.root + "/" + loc.defaultFile;
+									defineResponseHeaderForNonCGI();
+									if (contentLength.size() > 0)
+										body = getFileContent(fileLocation);
+								}
+							}
 							else
 							{
-								fileLocation = loc.root + "/" + loc.defaultFile;
 								defineResponseHeaderForNonCGI();
 								if (contentLength.size() > 0)
 									body = getFileContent(fileLocation);
 							}
 						}
-						else
-						{
-							defineResponseHeaderForNonCGI();
-							if (contentLength.size() > 0)
-								body = getFileContent(fileLocation);
-						}
 					}
+					else
+						defineResponseForCGI();
 				}
-				else
-					defineResponseForCGI();
 			}
 			aggregateResponse();
 			//return (resp);
@@ -140,6 +150,19 @@ class HTTPResponse
 					resp+= "Location: " + redirectionLocation + "\r\n";
 				resp+= "\r\n";
 			}
+		}
+
+		bool		checkHost()
+		{
+			if (invalidHost == true)
+			{
+				sL.statusCode = "400";
+                sL.reasonPhrase = "Bad request";
+                errorPageLocation(400);
+                return (true);
+			}
+			else
+				return (false);
 		}
 
 		void		defineResponseHeaderForNonCGI()
@@ -212,7 +235,7 @@ class HTTPResponse
 			else
 				return (0);
 		}
-		
+
 		int nthOccurrence(const std::string& str, const std::string& findMe, int nth)
 		{
 			size_t  pos = 0;
@@ -228,7 +251,7 @@ class HTTPResponse
 			}
 			return pos;
 		}
-		
+
 		std::vector<std::string> split (std::string s, std::string delimiter) {
 			std::size_t pos_start = 0, pos_end, delim_len = delimiter.length();
 			std::string token;
@@ -243,14 +266,14 @@ class HTTPResponse
 			res.push_back (s.substr (pos_start));
 			return res;
 		}
-		
+
 		void		foreachUpload()
 		{
 			std::string upload_body(r.body.begin(), r.body.end());
-			
+
 			std::string delimiter = "--" + r.boundary;
 			//std::cout << RED << " delimiter = [" << delimiter << "] " << NC << std::endl;
-			
+
 			std::vector<std::string> splitted_body = split(upload_body, delimiter);
 
 			for (size_t i = 0; i < splitted_body.size(); i++) {
@@ -698,6 +721,7 @@ class HTTPResponse
 		HTTPRequest			r;
 		struct server		s;
 		struct location		loc;
+		bool				invalidHost;
 		std::string			fileLocation;
 		std::string			contentType;
 		std::string			contentLength;
@@ -707,7 +731,7 @@ class HTTPResponse
 		PollFd					&_vPfd;
 	public:
 		std::string	resp;
-        struct statusLine   sL;
+		struct statusLine   sL;
 };
 
 #endif

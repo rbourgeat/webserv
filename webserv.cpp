@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/16 10:18:25 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/17 13:03:26 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	sighandler(int signum)
 	{
 		std::cout << MAG << "ICIIIIIII!!!" << NC << std::endl;
 		for (size_t i(0); i < vPfd.getFdCount(); i++)
-						close(vPfd.getPfd()[i].fd);
+			close(vPfd.getPfd()[i].fd);
 		exit(signum);
 	}
 }
@@ -54,6 +54,37 @@ int		isServerFd(int fd, std::vector<struct server> servers)
 	return (-1);
 }
 
+int		checkHost(HTTPRequest &request, int index, std::vector<struct server> servers)
+{
+	size_t j(0);
+
+	while (j < servers.size())
+	{
+		if (servers[j].port == servers[index].port)
+		{
+            if (request.headerFields.find("Host")->second.find("localhost") != std::string::npos)
+				return (j);
+			if (request.headerFields.find("Host")->second.find(servers[j].name) != std::string::npos)
+					return (j);
+		}
+		j++;
+	}
+	return (-1);
+}
+
+bool	isPortFree(std::vector<struct server> servers, int port, int i)
+{
+	int j(0);
+
+	while (j < i)
+	{
+		if (servers[j].port == port)
+			return (false);
+		j++;
+	}
+	return (true);
+}
+
 int		main(int argc, char const *argv[])
 {
 	const char *config_path; 
@@ -62,12 +93,9 @@ int		main(int argc, char const *argv[])
 	else
 		config_path = argv[1];
 	/*Read config file*/
-	//std::vector<struct server> servers;
-	//std::vector<struct client> clients;
 	readConfig(config_path, &servers);
 
 	/*Create pollfd structure to monitor sockets with poll()*/		
-	//PollFd vPfd;
 	while(1)
 	{
 		signal(SIGINT, &sighandler);
@@ -80,8 +108,11 @@ int		main(int argc, char const *argv[])
 				{
 					servers[j].sock = TCPSocket(servers[j].port);
 					servers[j].sock.setToNonBlocking();
-					servers[j].sock.socketBind();
-					servers[j].sock.socketListen();
+					if (isPortFree(servers, servers[j].port, j))
+					{
+						servers[j].sock.socketBind();
+						servers[j].sock.socketListen();
+					}
 					vPfd.addFd(servers[j].sock.getSocketFd());
 					std::cout << vPfd.getFdCount() << std::endl;
 				}
@@ -127,12 +158,24 @@ int		main(int argc, char const *argv[])
 							// std::cout << NC << std::endl;
 							if (clients[k].request.isComplete == true)
 							{
-								clients[k].request.determineIfUpload();
-								HTTPResponse response(clients[k].request, servers[clients[k].servIndex], vPfd);
-								response.defineResponse();
-								std::vector<unsigned char> answer(response.resp.begin(), response.resp.end());
+								std::vector<unsigned char> answer;
+								if ((clients[k].servIndex = checkHost(clients[k].request, clients[k].servIndex, servers)) < 0)
+								{
+									std::cout << "-1!!\n";
+									HTTPResponse response(clients[k].request, vPfd);
+									response.defineResponse();
+									clients[k].statusCode = response.sL.statusCode;
+									answer = std::vector<unsigned char>(response.resp.begin(), response.resp.end());
+								}
+								else
+								{
+									clients[k].request.determineIfUpload();
+									HTTPResponse response(clients[k].request, servers[clients[k].servIndex], vPfd);
+									response.defineResponse();
+									clients[k].statusCode = response.sL.statusCode;
+									answer = std::vector<unsigned char>(response.resp.begin(), response.resp.end());
+								}
 								clients[k].answer = answer;
-								clients[k].statusCode = response.sL.statusCode;
 								clients[k].bytesToSend = answer.size();
 								clients[k].totalSentBytes = 0;
 							}
@@ -155,7 +198,7 @@ int		main(int argc, char const *argv[])
 								/*for (size_t l(0); l < clients[k].answer.size(); l++)
 								  std::cout << MAG << clients[k].answer[l];*/
 								for (size_t l(0); l < clients[k].answer.size(); l++)
-										std::cout << MAG << clients[k].answer[l];
+									std::cout << MAG << clients[k].answer[l];
 								clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
 								if (clients[k].answer.size() == 0)
 								{
