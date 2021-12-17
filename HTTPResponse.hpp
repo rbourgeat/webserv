@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/17 15:39:24 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/17 16:45:31 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,8 @@ class HTTPResponse
 									defineResponseForCGI();
 								else
 								{
-									fileLocation = loc.root + "/" + loc.defaultFile;
+									if (r.rL.requestTarget == "/")
+										fileLocation = loc.root + "/" + loc.defaultFile;
 									defineResponseHeaderForNonCGI();
 									if (contentLength.size() > 0)
 										body = getFileContent(fileLocation);
@@ -89,7 +90,6 @@ class HTTPResponse
 				}
 			}
 			aggregateResponse();
-			//return (resp);
 		}
 
 	private:
@@ -131,7 +131,9 @@ class HTTPResponse
 		void	aggregateResponse()
 		{
 			resp+= sL.httpVersion + " " + sL.statusCode + " " + sL.reasonPhrase + "\r\n";
-			if (isPathExist(fileLocation))
+			if (!isPathExist(fileLocation) && !r.isCGI)
+	             resp+="Content-Length: 0\r\n\r\n";
+			else
 			{
 				if (r.rL.method != "DELETE" && loc.redi.num == -1)
 				{
@@ -169,9 +171,11 @@ class HTTPResponse
 		}
 
 		void		defineResponseHeaderForNonCGI()
-		{                        
+		{			
+			std::cout << "CheckFile()\n";
 			if (!checkFile())
 			{
+				std::cout << "no prob with file\n";
 				if (r.rL.method == "DELETE")
 					deleteFile();
 				else
@@ -432,6 +436,7 @@ class HTTPResponse
 				fileLocation = loc.root + "/" + s.error[i].path;
 			else
 				fileLocation = loc.root + "/" + codeToString + ".html";
+			std::cout << "fileLocation??? " << fileLocation << std::endl;
 			if (isPathExist(fileLocation))
 			{
 				contentLength = countFileChar(fileLocation);	
@@ -488,6 +493,7 @@ class HTTPResponse
 
 		bool	checkFile()
 		{
+			std::cout << "fileLocation?? " << fileLocation << std::endl;
 			if (!isPathExist(fileLocation))
 			{                
 				sL.statusCode = "404";

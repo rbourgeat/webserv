@@ -47,7 +47,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size
 				if (request.tmp.size() == 0 || (request.tmp.size() == 1 && message[0] == '\n')) //in case there is only a /n as last caracter
 				{
 					request.isHeaderComplete = true;
-					//printRequestHeader(request);
+					printRequestHeader(request);
 					request.determineIfBody();
 					if (request.isBody == false)
 					{
@@ -60,7 +60,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size
 					i+= 2;
 					request.insertHeaderLine(s.extensions);
 					request.isHeaderComplete = true;
-					//printRequestHeader(request);
+					printRequestHeader(request);
 					request.determineIfBody();
 					if (request.isBody == false)
 					{
