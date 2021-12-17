@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/17 17:05:00 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/17 18:22:46 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,6 +161,7 @@ class HTTPResponse
 		{
 			if (invalidHost == true)
 			{
+				std::cout << "Host PB??\n";
 				sL.statusCode = "400";
 				sL.reasonPhrase = "Bad request";
 				errorPageLocation(400);
@@ -172,10 +173,8 @@ class HTTPResponse
 
 		void		defineResponseHeaderForNonCGI()
 		{			
-			std::cout << "CheckFile()\n";
 			if (!checkFile())
 			{
-				std::cout << "no prob with file\n";
 				if (r.rL.method == "DELETE")
 					deleteFile();
 				else
@@ -192,7 +191,6 @@ class HTTPResponse
 			std::string CGI_PATH = CGIparsing(r, cgi);
 			cgi->print_env();
 			std::string message = cgi->execute(CGI_PATH, r, _vPfd);
-			std::cout << "test" << std::endl;
 			if (message != "Error")
 			{
 				size_t position = message.find("\r\n\r\n");
@@ -350,14 +348,17 @@ class HTTPResponse
 		std::string CGIparsing(HTTPRequest &request, CGI *cgi)
 		{
 			std::string FILE_PATH = "", path = fileLocation;
-			std::string ext = std::string(path.substr(path.find_last_of(".")), 0, path.find_last_of("/"));
-			std::cout << ">> ext = " << ext << std::endl;
+			//std::cout << ">> ext = " << ext << std::endl;
 			if (request.isCGI == true)
 			{
+            std::string ext = std::string(path.substr(path.find_last_of(".")), 0, path.find_last_of("/"));
 				cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
 				cgi->add_variable("SERVER_NAME", "localhost"); // Le nom d'hôte, alias DNS ou adresse IP du serveur.
 				cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 				cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
+				/*std::string s;
+				std::stringstream ss;
+				ss << request*/
 				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
 				cgi->add_variable("REQUEST_METHOD", request.rL.method);
 				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
@@ -436,7 +437,6 @@ class HTTPResponse
 				fileLocation = s.error[i].path;
 			else
 				fileLocation = loc.root + "/" + codeToString + ".html";
-			std::cout << "fileLocation??? " << fileLocation << std::endl;
 			if (isPathExist(fileLocation))
 			{
 				contentLength = countFileChar(fileLocation);	
@@ -483,7 +483,7 @@ class HTTPResponse
 				return (false);
 			else
 			{
-				std::cout << "ERROR 405\n";
+				//std::cout << "ERROR 405\n";
 				sL.statusCode = "405";
 				sL.reasonPhrase = "Method not allowed";
 				errorPageLocation(405);
@@ -493,7 +493,6 @@ class HTTPResponse
 
 		bool	checkFile()
 		{
-			std::cout << "fileLocation?? " << fileLocation << std::endl;
 			if (!isPathExist(fileLocation))
 			{                
 				sL.statusCode = "404";

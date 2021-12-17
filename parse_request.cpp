@@ -36,7 +36,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size
 
 	if (request.isHeaderComplete == false)
 	{
-		while (i < nbytes && request.isHeaderComplete == false)
+		while (message[i] != '\0' && i < nbytes && request.isHeaderComplete == false)
 		{
 			if ((message[i] == '\r' && message[i + 1] == '\n') || message[i] == '\n')
 			{
@@ -98,7 +98,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size
 			if (request.body.size() == request.bodySize)
 			{
 				request.isComplete = true;
-				//printRequestBody(request);
+				printRequestBody(request);
 			}
 		}
 		if (request.isComplete == false && request.isChunked == true)
@@ -126,7 +126,7 @@ void	parseRequest(std::vector<unsigned char> message, HTTPRequest &request, size
 					if (request.chunkSize == 0)
 					{
 						request.isComplete = true;
-						//printRequestBody(request);
+						printRequestBody(request);
 					}
 					else
 					{

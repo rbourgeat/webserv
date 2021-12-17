@@ -229,10 +229,7 @@ void	addServer(std::vector<struct server> *servers, std::string serverBlock)
                 i++;
         }
 		if ((strcmp(serverBlock.substr(i, 8).c_str(), "location")) == 0)
-		{
-			std::cout << "ici\n";
 			s.loc.push_back(addLocation(serverBlock, &i));
-		}
 		if (serverBlock[i] == '#')
 			while (serverBlock[i] != '\n')
 				i++;
