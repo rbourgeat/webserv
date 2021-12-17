@@ -6,7 +6,7 @@
 #    By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/23 19:42:48 by rbourgea          #+#    #+#              #
-#    Updated: 2021/12/16 08:14:40 by dgoudet          ###   ########.fr        #
+#    Updated: 2021/12/17 15:38:31 by dgoudet          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,6 +23,7 @@ CC		=	clang++
 
 #On VM, function "ifstream" of parser.cpp only compiles with c++11 flag
 CFLAGS	=	-Wall -Werror -Wextra -std=c++98 -fsanitize=address -g
+#CFLAGS =   -Wall -Werror -Wextra -std=c++98 -g
 #CFLAGS  = -Wall -Werror -Wextra -std=c++11 -g
 
 
