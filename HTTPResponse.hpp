@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/18 15:21:33 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/18 15:34:35 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,19 @@ class HTTPResponse
 									defineResponseForCGI();
 								else
 								{
-									//if (r.rL.requestTarget == "/")
-									fileLocation = loc.root + "/" + loc.defaultFile;
-									defineResponseHeaderForNonCGI();
-									if (contentLength.size() > 0)
-										body = getFileContent(fileLocation);
+									if (isPathExist(fileLocation))
+									{
+										fileLocation = loc.root + "/" + loc.defaultFile;
+										defineResponseHeaderForNonCGI();
+										if (contentLength.size() > 0)
+											body = getFileContent(fileLocation);
+									}
+									else
+									{
+										sL.statusCode = "404";
+										sL.reasonPhrase = "Not found";
+										errorPageLocation(404);
+									}
 								}
 							}
 							else
@@ -132,7 +140,7 @@ class HTTPResponse
 		{
 			resp+= sL.httpVersion + " " + sL.statusCode + " " + sL.reasonPhrase + "\r\n";
 			if (!isPathExist(fileLocation) && !r.isCGI && loc.redi.num == -1)
-	             resp+="Content-Length: 0\r\n\r\n";
+				resp+="Content-Length: 0\r\n\r\n";
 			else
 			{
 				if (r.rL.method != "DELETE" && loc.redi.num == -1)
@@ -350,14 +358,14 @@ class HTTPResponse
 			//std::cout << ">> ext = " << ext << std::endl;
 			if (request.isCGI == true)
 			{
-            std::string ext = std::string(path.substr(path.find_last_of(".")), 0, path.find_last_of("/"));
+				std::string ext = std::string(path.substr(path.find_last_of(".")), 0, path.find_last_of("/"));
 				cgi->add_variable("SERVER_SOFTWARE", "webserv/1.0");
 				cgi->add_variable("SERVER_NAME", "localhost"); // Le nom d'hôte, alias DNS ou adresse IP du serveur.
 				cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 				cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
 				/*std::string s;
-				std::stringstream ss;
-				ss << request*/
+				  std::stringstream ss;
+				  ss << request*/
 				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
 				cgi->add_variable("REQUEST_METHOD", request.rL.method);
 				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
