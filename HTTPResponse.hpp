@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/18 16:31:34 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/18 16:52:10 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -367,12 +367,13 @@ class HTTPResponse
 				cgi->add_variable("SERVER_NAME", "localhost"); // Le nom d'hôte, alias DNS ou adresse IP du serveur.
 				cgi->add_variable("GATEWAY_INTERFACE", "CGI/1.1");
 				cgi->add_variable("SERVER_PROTOCOL", "HTTP/1.1");
-				/*std::string s;
-				  std::stringstream ss;
-				  ss << request*/
-				cgi->add_variable("SERVER_PORT", ""); // Le port de la requête
+				std::string string;
+				std::stringstream ss;
+				ss << s.port;
+				ss >> string;
+				cgi->add_variable("SERVER_PORT", string); // Le port de la requête
 				cgi->add_variable("REQUEST_METHOD", request.rL.method);
-				cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
+				//cgi->add_variable("PATH_TRANSLATED", ""); // on laisse tombé ça on copie le path_info
 				if (request.rL.requestTarget.find("?") != std::string::npos)
 				{
 					cgi->add_variable("QUERY_STRING", request.defineQueryString());
@@ -390,11 +391,11 @@ class HTTPResponse
 					cgi->add_variable("SCRIPT_NAME", request.defineScriptName(""));
 					FILE_PATH = loc.root + request.defineScriptName("");
 				}
-				cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
-				cgi->add_variable("REMOTE_ADDR", ""); // IP du client ??? Demander si on doit vraiment le faire
+				//cgi->add_variable("REMOTE_HOST", ""); // on laisse vide car DNS inverse désactivé
+				//cgi->add_variable("REMOTE_ADDR", ""); // IP du client ??? Demander si on doit vraiment le faire
 				cgi->add_variable("AUTH_TYPE", "Basic");
-				cgi->add_variable("REMOTE_USER", "");
-				cgi->add_variable("CONTENT_TYPE", ""); // Récuperer le contenu du POST
+				//cgi->add_variable("REMOTE_USER", "");
+				//cgi->add_variable("CONTENT_TYPE", ""); // Récuperer le contenu du POST
 				//cgi->add_variable("CONTENT_LENGTH", contentLength.c_str());
 				if (request.headerFields.find("Accept") != request.headerFields.end())
 					cgi->add_variable("HTTP_ACCEPT", request.headerFields.find("Accept")->second);
