@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/18 15:22:22 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/18 16:18:29 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,8 +197,8 @@ int		main(int argc, char const *argv[])
 							{
 								clients[k].sentBytes = servers[clients[k].servIndex].sock.socketSend(vPfd.getPfd()[i].fd, clients[k].answer);
 								clients[k].totalSentBytes+= clients[k].sentBytes;
-								/*for (size_t l(0); l < clients[k].answer.size(); l++)
-									std::cout << MAG << clients[k].answer[l];*/
+								for (size_t l(0); l < clients[k].answer.size(); l++)
+									std::cout << MAG << clients[k].answer[l];
 								clients[k].answer.erase(clients[k].answer.begin(), clients[k].answer.begin() + clients[k].sentBytes);
 								if (clients[k].answer.size() == 0)
 								{

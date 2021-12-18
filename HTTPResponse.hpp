@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/18 15:34:35 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/18 16:31:34 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,7 @@ class HTTPResponse
 
 		void		defineResponseHeaderForNonCGI()
 		{
-			if (!checkFile())
+			if (!checkFile(fileLocation))
 			{
 				if (r.rL.method == "DELETE")
 					deleteFile();
@@ -196,22 +196,26 @@ class HTTPResponse
 		{
 			CGI *cgi = new CGI;
 			std::string CGI_PATH = CGIparsing(r, cgi);
-			cgi->print_env();
-			std::string message = cgi->execute(CGI_PATH, r, _vPfd);
-			if (message != "Error")
+			std::cout << "CGI_PATH???" << CGI_PATH << std::endl;
+			if (CGI_PATH != "")
 			{
-				size_t position = message.find("\r\n\r\n");
-				//size_t position2 = message.find("\r\n\r\n", position + 1);
-				sL.statusCode = "200";
-				sL.reasonPhrase = "OK";
-				contentLength = cgi->get_buffer_size(position + 4);
-				body = message;
-			}
-			else
-			{
-				sL.statusCode = "500";
-				sL.reasonPhrase = "Internal Server Error";
-				errorPageLocation(500);
+				cgi->print_env();
+				std::string message = cgi->execute(CGI_PATH, r, _vPfd);
+				if (message != "Error")
+				{
+					size_t position = message.find("\r\n\r\n");
+					//size_t position2 = message.find("\r\n\r\n", position + 1);
+					sL.statusCode = "200";
+					sL.reasonPhrase = "OK";
+					contentLength = cgi->get_buffer_size(position + 4);
+					body = message;
+				}
+				else
+				{
+					sL.statusCode = "500";
+					sL.reasonPhrase = "Internal Server Error";
+					errorPageLocation(500);
+				}
 			}
 			delete cgi;
 		}
@@ -402,6 +406,8 @@ class HTTPResponse
 					cgi->add_variable("HTTP_REFERER", request.headerFields.find("Referer")->second);
 				if (request.headerFields.find("Cookie") != request.headerFields.end())
 					cgi->add_variable("HTTP_COOKIE", request.headerFields.find("Cookie")->second);
+				if (checkFile(std::string(loc.root + getenv("SCRIPT_NAME"))))
+					return ("");
 				return (FILE_PATH);
 			}
 			else
@@ -463,13 +469,13 @@ class HTTPResponse
 		{
 			int errno;
 
-			if (access (path.c_str(), F_OK) != 0)
-			{
-				if (errno == 2) //2 = ENOENT --> No such file or directory.
-					return (1);
-				else if (errno == 13) //13 = EACCES --> Permission denied.
+			if (r.isCGI)
+				if (access(path.c_str(), X_OK) != 0)
+					if (errno == 13) //13 = EACCES --> Permission denied.
+						return (0);
+			if (access(path.c_str(), R_OK) != 0)
+				if (errno == 13) //13 = EACCES --> Permission denied.
 					return (0);
-			}
 			return (1);
 		}
 
@@ -498,16 +504,16 @@ class HTTPResponse
 			}
 		}
 
-		bool	checkFile()
+		bool	checkFile(std::string location)
 		{
-			if (!isPathExist(fileLocation))
-			{                
+			if (!isPathExist(location))
+			{   
 				sL.statusCode = "404";
 				sL.reasonPhrase = "Not found";
 				errorPageLocation(404);
 				return (true);
 			}
-			if (!checkFilePerm(fileLocation))
+			if (!checkFilePerm(location))
 			{
 				sL.statusCode = "403";
 				sL.reasonPhrase = "Forbidden";
