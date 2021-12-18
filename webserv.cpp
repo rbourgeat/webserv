@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/23 15:38:07 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/17 18:20:46 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/18 14:41:58 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ int		main(int argc, char const *argv[])
 						c.statusCode = "0";
 						vPfd.addFd(c.socket);
 						clients.push_back(c);
-						//std::cout << "+++New connection from fd " << c.socket << " accepted +++" << std::endl;
+						std::cout << "+++New connection from fd " << c.socket << " accepted +++" << std::endl;
 						//std::cout << std::endl;
 					}
 					else //else, there is some data to read elsewhere (meaning on client side)
@@ -208,6 +208,8 @@ int		main(int argc, char const *argv[])
 										close(vPfd.getPfd()[i].fd);
 										vPfd.deleteFd(i);
 									}
+									if (clients[k].statusCode == "301")
+										sleep(10);
 									clients[k].answer.clear();
 									clients[k].request.clearAll();
 								}
@@ -220,9 +222,7 @@ int		main(int argc, char const *argv[])
 		catch(TCPSocket::TCPSocketException const& e)
 		{
 			std::cerr << "ERROR: " << e.what() << std::endl;
-			// exit(EXIT_FAILURE);
 		}
 	}
-	std::cout << "Do you go there???\n";
 	return 0;
 }

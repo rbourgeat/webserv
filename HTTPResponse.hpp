@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/17 19:35:40 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/18 12:06:59 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ class HTTPResponse
 		void	aggregateResponse()
 		{
 			resp+= sL.httpVersion + " " + sL.statusCode + " " + sL.reasonPhrase + "\r\n";
-			if (!isPathExist(fileLocation) && !r.isCGI)
+			if (!isPathExist(fileLocation) && !r.isCGI && loc.redi.num == -1)
 	             resp+="Content-Length: 0\r\n\r\n";
 			else
 			{
