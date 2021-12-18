@@ -6,7 +6,7 @@
 /*   By: rbourgea <rbourgea@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/07 17:04:43 by rbourgea          #+#    #+#             */
-/*   Updated: 2021/12/18 12:06:59 by dgoudet          ###   ########.fr       */
+/*   Updated: 2021/12/18 15:21:33 by dgoudet          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,8 @@ class HTTPResponse
 									defineResponseForCGI();
 								else
 								{
-									if (r.rL.requestTarget == "/")
-										fileLocation = loc.root + "/" + loc.defaultFile;
+									//if (r.rL.requestTarget == "/")
+									fileLocation = loc.root + "/" + loc.defaultFile;
 									defineResponseHeaderForNonCGI();
 									if (contentLength.size() > 0)
 										body = getFileContent(fileLocation);
